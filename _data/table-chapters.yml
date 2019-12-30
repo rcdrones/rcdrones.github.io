@@ -116,7 +116,7 @@ linux-basic:
 basic:
   chapter-names:
     - 安装
-    - 基本使用
+    - 基本使用11
     - while 和 for 循环
     - if 判断
     - 定义功能
