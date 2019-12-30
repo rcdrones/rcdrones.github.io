@@ -1,9 +1,9 @@
 ---
-title: 友情合作伙伴
+title: 感谢支持
 icon-dir: /static/img/icon/partner_icon.png
 tut-dir: /
 description: ""
 tut-course-detail:
-  - ["http://sofasofa.io", "SofaSofa数据科学社区", "/static/img/support/sofasofa_logo.png",  ]
+  - ["https://5ipi.taobao.com/", "本站淘宝网店", "/static/img/support/sofasofa_logo.png",  ]
 ---
 
