@@ -6,14 +6,6 @@ description: ""
 tut-course-detail:
   - ["/tutorials/others/git", "Git 版本管理", "/static/img/course_cover-small/git.jpg"]
   - ["/tutorials/others/linux-basic", "Linux 简易教学", "/static/img/course_cover-small/linux.jpg"]
-  - ["/tutorials/others/git", "Git 版本管理", "/static/img/course_cover-small/git.jpg"]
-  - ["/tutorials/others/git", "Git 版本管理", "/static/img/course_cover-small/git.jpg"]
-  - ["/tutorials/others/git", "Git 版本管理", "/static/img/course_cover-small/git.jpg"]
-  - ["/tutorials/others/git", "Git 版本管理", "/static/img/course_cover-small/git.jpg"]
-  - ["/tutorials/others/git", "Git 版本管理", "/static/img/course_cover-small/git.jpg"]
-  - ["/tutorials/others/git", "Git 版本管理", "/static/img/course_cover-small/git.jpg"]
-  - ["/tutorials/others/git", "Git 版本管理", "/static/img/course_cover-small/git.jpg"]
-  - ["/tutorials/others/git", "Git 版本管理", "/static/img/course_cover-small/git.jpg"]
 ---
 
 

@@ -1,6 +1,6 @@
 ---
 title: 购买树莓派
-icon-dir: /static/img/icon/partner_icon.png
+icon-dir: /static/img/icon/shopping.png
 tut-dir: /
 description: ""
 tut-course-detail:
