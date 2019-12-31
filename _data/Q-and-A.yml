@@ -1,26 +1,7 @@
 - key: burn-os-tf-change-size
-  question: 用了32G的TF卡，刷好树莓派系统之后，为什么只剩下50M空间了？
+  question: 用了32G的TF卡，刷好树莓派系统之后，为什么只剩下50+MB（250+MB）空间了？
   answer: |
-    感谢你们的喜爱, 我把我的配色方案放在网上了,
-    你可以<a href='/static/files/Morvan Pycharm color scheme.icls'>点击这里</a>下载.
-    在 Pycharm 中, 找到 Python 的配色方案 (Editor > Color Scheme > Python), 点击上部的小齿轮, 选 import scheme, 然后选择你刚刚下载的那个文件就行啦.
-  
-- key: monosnap
-  question: 用什么软件录的视频?
-  answer: |
-    我是 Macbook, 所以我选 <a href="https://monosnap.com/welcome" target="_blank">Monosnap</a> 录的视频, 里面可以设置你自己的头像.
-
-- key: self-taught-ML
-  question: 如何自学机器学习?
-  answer: |
-    其实我也是走的自学的道路一路走到今天这样. 我来总结一下我自己的自学之路吧.
-
-    (1) 首先个人认为还是以上课的形式来学习比较快, 比如 Andrew Ng 的 <a href="https://www.coursera.org/learn/machine-learning" target="_blank">Machine Learning</a> 公开课,
-    还有李飞飞的 <a href="http://cs231n.stanford.edu/" target="_blank>公开课</a>. 还有很多, 比如中文教学的李宏毅的课程. 毕竟有老师来讲课, 你理解起来也方便些.
-
-    (2) 有了一定理解之后, 就到了动手做实验的时候了. 这时, <a href="/">我的这些教学</a>就能帮助你快速搭建起你的工程实践能力.
-    你也可以参考一下我画的这个<a href="/learning-steps/">学习流程</a>.
-    当然, 网络上还有很多其他很优秀的教学, 你也不要放过任何机会, 多看看他们和我的教学有哪些不同, 看看在我教学中没有, 你还没学到的东西.
-
-    (3) 最后, 就是耐下心来读论文, 看paper, 紧紧抓住最前沿技术的尾巴, 让自己不落后于时代.
-
+    因为烧写RPi系统，类似于ghost方式。所以会对TF卡进行分区操作。
+    如果烧录的是raspbian系统，TF卡首个分区被格式化成fat32格式，其他分区格式化成linux的ext分区格式。
+    所以，在windows上烧录TF的系统，只能看到Fat32格式的分区。可见的分区大小只有50+MB（250+MB）大小。
+    
