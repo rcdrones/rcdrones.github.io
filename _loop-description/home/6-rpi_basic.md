@@ -1,6 +1,6 @@
 ---
-title: 认识22树莓派
-icon-dir: /static/img/icon/python_icon.png
+title: 认识树莓派
+icon-dir: /static/img/icon/rpi_icon.png
 tut-dir: /tutorials/rpi-basic/
 description: 初步认识、掌握使用树莓派的技巧.
 tut-course-detail:
@@ -10,8 +10,8 @@ tut-course-detail:
   - ["/tutorials/python-basic/multiprocessing", "多进程 (multiprocessing)", "/static/img/course_cover-small/multiprocessing.jpg"]
 ---
 
-<a href="{{page.tut-dir}}">认识树莓派</a> 非常适合刚入门,
-或者以前使用过其他开发板的小伙伴, 每一段视频都不会很长,
-节节相连, 对于迅速掌握树莓派基础的使用方法很有帮助.
+<a href="{{page.tut-dir}}">认识树莓派</a> 非常适合刚入门，
+或者以前使用过其他开发板的小伙伴。每一段视频都不会很长，
+节节相连，对于迅速掌握树莓派基础的使用方法很有帮助。
 
 
