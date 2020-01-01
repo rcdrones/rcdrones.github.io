@@ -6,7 +6,7 @@ youku_id:
 youtube_id: 
 description: 
 chapter: 1
-title: raspbian系统安装
+title: 乌金甲双风扇外壳
 date: 2019-7-10
 
 author: rcdrones

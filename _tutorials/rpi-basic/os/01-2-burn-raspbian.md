@@ -5,7 +5,7 @@ b_page: 1
 youku_id: 
 youtube_id: 
 description: 
-chapter: 1
+chapter: 2
 title: raspbian系统安装
 date: 2019-7-10
 

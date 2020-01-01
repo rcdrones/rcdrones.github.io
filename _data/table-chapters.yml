@@ -129,17 +129,20 @@ basic:
     - 模块
     - 其他
 
-intro:
+introduce:
   chapter-names:
-    - 介绍
+    - 开箱及介绍
+    - bootload更新
 
-ass:
+assemble:
   chapter-names:
-    - 安装sub
+    - 安装外壳1
+    - 安装外壳2
 
 os:
   chapter-names:
-    - ossub
+    - Raspbian系统卡的制作
+    - osmc
 
 multiprocessing:
   chapter-names:

@@ -5,8 +5,8 @@ b_page: 1
 youku_id: 
 youtube_id: 
 description: 
-chapter: 1
-title: raspbian系统安装
+chapter: 2
+title: Pi4官方红白外壳的安装
 date: 2019-7-10
 
 author: rcdrones

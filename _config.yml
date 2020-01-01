@@ -85,7 +85,7 @@ defaults:
     values:
       series: 介绍
       tut-permalink: /tutorials/rpi-basic/introduce/
-      category: intro
+      category: introduce
       keywords: 树莓派, 基础
       thumbnail: /static/img/course_cover/rpi_intro.jpg      
       
