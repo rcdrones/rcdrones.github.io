@@ -71,7 +71,22 @@ defaults:
       path: "_loop-description/others"
     values:
       module: others
-
+      
+  # rcdrones module descriptions
+  - scope:
+      path: "_loop-description/rpi-basic"
+    values:
+      module: rpi-basic
+      
+  # show on index.html
+  - scope:
+      path: "_tutorials/rpi-basic/basic"
+    values:
+      series: 认识树莓派
+      tut-permalink: /tutorials/rpi-basic/basic/
+      category: rpi-basic
+      keywords: 树莓派, 基础
+      thumbnail: /static/img/course_cover/python_basic.jpg      
 
 
   # tutorial default

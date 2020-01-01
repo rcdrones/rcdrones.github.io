@@ -129,6 +129,23 @@ basic:
     - 模块
     - 其他
 
+rpi-basic:
+  chapter-names:
+    - 安装
+    - 基本使用11
+    - while 和 for 循环
+    - if 判断
+    - 定义功能
+    - 变量形式
+    - 模块安装
+    - 文件读取
+    - class 类
+    - input 输入
+    - 元组, 列表, 字典
+    - 模块
+    - 其他
+
+
 
 multiprocessing:
   chapter-names:

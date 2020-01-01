@@ -1,8 +1,40 @@
-221
+
+
+bzhan：
+
+73041020
+125300467
+
+player.bilibili.com/player.html?aid=73041020&cid=125300467
+
+
+
+
+
+<div class="section">
+	<p>bilibili iframe h5: player.bilibili.com/player.html?aid=16001891&cid=27636919&page=41</p>
+	<div class="video-container">
+		<iframe
+				width="780" height="480" frameborder="0" allowfullscreen
+				src="//player.bilibili.com/player.html?aid=16001891&cid=27636919&page=41">
+		</iframe>
+	</div>
+</div>
+
+
+
+
+
+
+
 
 
 认识树莓派RPi
-	pi4
+	介绍pi4
+
+外壳不兼容
+
+槽点 13.30分钟
 
 	安装外壳
 		1
@@ -11,48 +43,53 @@
 
 
 
-	刷卡
-	Raspbian用法
+	系统刷卡
+		Raspbian用法
 
-	游戏机系统
+		游戏机系统
 
-	osmc系统
+		osmc系统
 
 
 raspbian入门
 	
-	apt
+	中文化设置
 
-	git
+	apt软件源
 
-	samba
+	推荐的软件
+		apt
 
-	。。。
+		git
+
+		samba
+
+		ps
 
 
-Pi4 周边产品
+
+RPI扩展板
+
 	液晶
 
 	ups
 
+	LED点阵
 
-
-	
-
+	keypad
 
 
 python基础
-	。。。
+	基础
 
+	python项目
+		pygame
 
-python项目
-	pygame
+		matplotlib
 
-	matplotlib
+		web
 
-	web
-
-
+----
 wiringpi基础
 	
 
