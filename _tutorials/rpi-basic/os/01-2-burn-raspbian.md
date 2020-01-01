@@ -6,7 +6,7 @@ youku_id:
 youtube_id: 
 description: 
 chapter: 2
-title: raspbian系统安装
+title: osmc系统安装
 date: 2019-7-10
 
 author: rcdrones
