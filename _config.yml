@@ -105,7 +105,7 @@ defaults:
       tut-permalink: /tutorials/rpi-basic/os/
       category: os
       keywords: 树莓派, 系统, Raspbian
-      thumbnail: /static/img/course_cover/tkinter.jpg      
+      thumbnail: /static/img/course_cover/rpi_intro.jpg      
     
 
 
