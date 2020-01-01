@@ -2,9 +2,9 @@
 b_av: 73041020
 b_cid: 125300467
 b_page: 1
-youku_id: 
-youtube_id: 
-description: 
+youku_id: XMTYwNDExNTQ3Ng
+youtube_id: ECb8WKVepGw
+description: "本节包括的内容有: 线程、进程的创建和使用"
 chapter: 1
 title: 乌金甲双风扇外壳
 date: 2019-7-10
