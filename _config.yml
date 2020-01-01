@@ -96,7 +96,7 @@ defaults:
       tut-permalink: /tutorials/rpi-basic/assemble/
       category: assemble
       keywords: 树莓派, 外壳, 安装
-      thumbnail: /static/img/course_cover/tkinter.jpg
+      thumbnail: /static/img/course_cover/case.jpg
 
   - scope:
       path: "_tutorials/rpi-basic/os"
@@ -105,7 +105,7 @@ defaults:
       tut-permalink: /tutorials/rpi-basic/os/
       category: os
       keywords: 树莓派, 系统, Raspbian
-      thumbnail: /static/img/course_cover/rpi_intro.jpg      
+      thumbnail: /static/img/course_cover/os.jpg      
     
 
 
