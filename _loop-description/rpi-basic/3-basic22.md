@@ -1,5 +1,5 @@
 ---
-title: 树莓派的介绍
+title: 刷机
 icon-dir: /static/img/icon/basic_icon.png
 tut-dir: /tutorials/rpi-basic/basic/
 ---
