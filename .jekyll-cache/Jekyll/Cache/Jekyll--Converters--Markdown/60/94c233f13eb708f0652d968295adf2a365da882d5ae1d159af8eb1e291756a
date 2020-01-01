@@ -1,0 +1,52 @@
+I"!
+<h2 class="tut-h2-pad" id="=-的赋值方式会带有关联性">= 的赋值方式会带有关联性
+  <a href="/tutorials/data-manipulation/np-pd/2-8-np-copy/#=-的赋值方式会带有关联性" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>首先 <code class="highlighter-rouge">import numpy</code> 并建立变量, 给变量赋值。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="c1"># array([0, 1, 2, 3])
+</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">a</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">a</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">b</span>
+</code></pre></div></div>
+
+<p>改变<code class="highlighter-rouge">a</code>的第一个值，<code class="highlighter-rouge">b</code>、<code class="highlighter-rouge">c</code>、<code class="highlighter-rouge">d</code>的第一个值也会同时改变。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">11</span>
+<span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="c1"># array([11,  1,  2,  3])
+</span></code></pre></div></div>
+
+<p>确认<code class="highlighter-rouge">b</code>、<code class="highlighter-rouge">c</code>、<code class="highlighter-rouge">d</code>是否与<code class="highlighter-rouge">a</code>相同。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">b</span> <span class="ow">is</span> <span class="n">a</span>  <span class="c1"># True
+</span><span class="n">c</span> <span class="ow">is</span> <span class="n">a</span>  <span class="c1"># True
+</span><span class="n">d</span> <span class="ow">is</span> <span class="n">a</span>  <span class="c1"># True
+</span></code></pre></div></div>
+
+<p>同样更改<code class="highlighter-rouge">d</code>的值，<code class="highlighter-rouge">a</code>、<code class="highlighter-rouge">b</code>、<code class="highlighter-rouge">c</code>也会改变。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">22</span><span class="p">,</span> <span class="mi">33</span><span class="p">]</span>   <span class="c1"># array([11, 22, 33,  3])
+</span><span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>            <span class="c1"># array([11, 22, 33,  3])
+</span><span class="k">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>            <span class="c1"># array([11, 22, 33,  3])
+</span><span class="k">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>            <span class="c1"># array([11, 22, 33,  3])
+</span></code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="copy()-的赋值方式没有关联性">copy() 的赋值方式没有关联性
+  <a href="/tutorials/data-manipulation/np-pd/2-8-np-copy/#copy()-的赋值方式没有关联性" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>    <span class="c1"># deep copy
+</span><span class="k">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>        <span class="c1"># array([11, 22, 33,  3])
+</span><span class="n">a</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">44</span>
+<span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>        <span class="c1"># array([11, 22, 33, 44])
+</span><span class="k">print</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>        <span class="c1"># array([11, 22, 33,  3])
+</span></code></pre></div></div>
+
+<p>此时<code class="highlighter-rouge">a</code>与<code class="highlighter-rouge">b</code>已经没有关联。</p>
+:ET

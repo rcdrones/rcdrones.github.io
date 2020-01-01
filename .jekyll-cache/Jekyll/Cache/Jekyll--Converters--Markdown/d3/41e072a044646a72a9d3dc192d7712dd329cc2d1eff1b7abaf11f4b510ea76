@@ -1,0 +1,104 @@
+I"t#<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/numpy%26pandas/18_plot.py" target="_blank">相关代码</a></li>
+</ul>
+
+<p>这次我们讲如何将数据可视化. 
+首先<code class="highlighter-rouge">import</code>我们需要用到的模块，除了 pandas，我们也需要使用 numpy 生成一些数据，这节里使用的 matplotlib 仅仅是用来 show 图片的, 即 <code class="highlighter-rouge">plt.show()</code>。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+</code></pre></div></div>
+
+<p>今天我们主要是学习如何 plot data</p>
+
+<h2 class="tut-h2-pad" id="创建一个Series">创建一个Series
+  <a href="/tutorials/data-manipulation/np-pd/3-8-pd-plot/#创建一个Series" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>这是一个线性的数据，我们随机生成1000个数据，<code class="highlighter-rouge">Series</code> 默认的 <code class="highlighter-rouge">index</code> 就是从0开始的整数，但是这里我显式赋值以便让大家看的更清楚</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 随机生成1000个数据
+</span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">),</span><span class="n">index</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1000</span><span class="p">))</span>
+ 
+<span class="c1"># 为了方便观看效果, 我们累加这个数据
+</span><span class="n">data</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+
+<span class="c1"># pandas 数据可以直接观看其可视化形式
+</span><span class="n">data</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>就这么简单，熟悉 matplotlib 的朋友知道如果需要<code class="highlighter-rouge">plot</code>一个数据，我们可以使用 <code class="highlighter-rouge">plt.plot(x=, y=)</code>，把<code class="highlighter-rouge">x</code>,<code class="highlighter-rouge">y</code>的数据作为参数存进去，但是<code class="highlighter-rouge">data</code>本来就是一个数据，所以我们可以直接<code class="highlighter-rouge">plot</code>。
+生成的结果就是下图：</p>
+
+<p><a href="/static/results/np-pd/3-8-1.png">
+ <img class="course-image lazy-img" src="/static/results/np-pd/3-8-1.png" alt="Pandas plot 出图" title="Pandas plot 出图" />
+</a></p>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="Dataframe-可视化">Dataframe 可视化
+  <a href="/tutorials/data-manipulation/np-pd/3-8-pd-plot/#Dataframe-可视化" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>我们生成一个1000*4 的<code class="highlighter-rouge">DataFrame</code>，并对他们累加</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span>
+    <span class="n">index</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1000</span><span class="p">),</span>
+    <span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="s">"ABCD"</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+<span class="n">data</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/np-pd/3-8-2.png">
+ <img class="course-image lazy-img" src="/static/results/np-pd/3-8-2.png" alt="Pandas plot 出图" title="Pandas plot 出图" />
+</a></p>
+
+<p>这个就是我们刚刚生成的4个<code class="highlighter-rouge">column</code>的数据，因为有4组数据，所以4组数据会分别<code class="highlighter-rouge">plot</code>出来。<code class="highlighter-rouge">plot</code> 可以指定很多参数，具体的用法大家可以自己查一下<a href="http://pandas.pydata.org/pandas-docs/version/0.18.1/visualization.html" target="_blank">这里</a></p>
+
+<p>除了<code class="highlighter-rouge">plot</code>，我经常会用到还有<code class="highlighter-rouge">scatter</code>，这个会显示散点图，首先给大家说一下在 pandas 中有多少种方法</p>
+
+<ul>
+  <li>bar</li>
+  <li>hist</li>
+  <li>box</li>
+  <li>kde</li>
+  <li>area</li>
+  <li>scatter</li>
+  <li>hexbin</li>
+</ul>
+
+<p>但是我们今天不会一一介绍，主要说一下 <code class="highlighter-rouge">plot</code> 和 <code class="highlighter-rouge">scatter</code>.
+因为<code class="highlighter-rouge">scatter</code>只有<code class="highlighter-rouge">x</code>，<code class="highlighter-rouge">y</code>两个属性，我们我们就可以分别给<code class="highlighter-rouge">x</code>, <code class="highlighter-rouge">y</code>指定数据</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ax</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'A'</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s">'B'</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s">'DarkBlue'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s">'Class1'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>然后我们在可以再画一个在同一个<code class="highlighter-rouge">ax</code>上面，选择不一样的数据列，不同的 <code class="highlighter-rouge">color</code> 和 <code class="highlighter-rouge">label</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 将之下这个 data 画在上一个 ax 上面
+</span><span class="n">data</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'A'</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s">'C'</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s">'LightGreen'</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s">'Class2'</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>下面就是我<code class="highlighter-rouge">plot</code>出来的图片</p>
+
+<p><a href="/static/results/np-pd/3-8-3.png">
+ <img class="course-image lazy-img" src="/static/results/np-pd/3-8-3.png" alt="Pandas plot 出图" title="Pandas plot 出图" />
+</a></p>
+
+<p>这就是我们今天讲的两种呈现方式，一种是线性的方式，一种是散点图。</p>
+
+:ET

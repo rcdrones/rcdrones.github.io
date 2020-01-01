@@ -1,0 +1,212 @@
+I"W<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/numpy%26pandas/16_concat.py" target="_blank">相关代码</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="要点">要点
+  <a href="/tutorials/data-manipulation/np-pd/3-6-pd-concat/#要点" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><code class="highlighter-rouge">pandas</code>处理多组数据的时候往往会要用到数据的合并处理,使用 <code class="highlighter-rouge">concat</code>是一种基本的合并方式.而且<code class="highlighter-rouge">concat</code>中有很多参数可以调整,合并成你想要的数据形式.</p>
+
+<h2 class="tut-h2-pad" id="axis-(合并方向)">axis (合并方向)
+  <a href="/tutorials/data-manipulation/np-pd/3-6-pd-concat/#axis-(合并方向)" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><code class="highlighter-rouge">axis=0</code>是预设值，因此未设定任何参数时，函数默认<code class="highlighter-rouge">axis=0</code>。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="c1">#定义资料集
+</span><span class="n">df1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span><span class="o">*</span><span class="mi">0</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'a'</span><span class="p">,</span><span class="s">'b'</span><span class="p">,</span><span class="s">'c'</span><span class="p">,</span><span class="s">'d'</span><span class="p">])</span>
+<span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span><span class="o">*</span><span class="mi">1</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'a'</span><span class="p">,</span><span class="s">'b'</span><span class="p">,</span><span class="s">'c'</span><span class="p">,</span><span class="s">'d'</span><span class="p">])</span>
+<span class="n">df3</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'a'</span><span class="p">,</span><span class="s">'b'</span><span class="p">,</span><span class="s">'c'</span><span class="p">,</span><span class="s">'d'</span><span class="p">])</span>
+
+<span class="c1">#concat纵向合并
+</span><span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">,</span> <span class="n">df3</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1">#打印结果
+</span><span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="c1">#     a    b    c    d
+# 0  0.0  0.0  0.0  0.0
+# 1  0.0  0.0  0.0  0.0
+# 2  0.0  0.0  0.0  0.0
+# 0  1.0  1.0  1.0  1.0
+# 1  1.0  1.0  1.0  1.0
+# 2  1.0  1.0  1.0  1.0
+# 0  2.0  2.0  2.0  2.0
+# 1  2.0  2.0  2.0  2.0
+# 2  2.0  2.0  2.0  2.0
+</span></code></pre></div></div>
+
+<p>仔细观察会发现结果的<code class="highlighter-rouge">index</code>是0, 1, 2, 0, 1, 2, 0, 1, 2，若要将<code class="highlighter-rouge">index</code>重置，请看<strong>例子二</strong>。</p>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="ignore_index-(重置-index)">ignore_index (重置 index)
+  <a href="/tutorials/data-manipulation/np-pd/3-6-pd-concat/#ignore_index-(重置-index)" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#承上一个例子，并将index_ignore设定为True
+</span><span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">,</span> <span class="n">df3</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1">#打印结果
+</span><span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="c1">#     a    b    c    d
+# 0  0.0  0.0  0.0  0.0
+# 1  0.0  0.0  0.0  0.0
+# 2  0.0  0.0  0.0  0.0
+# 3  1.0  1.0  1.0  1.0
+# 4  1.0  1.0  1.0  1.0
+# 5  1.0  1.0  1.0  1.0
+# 6  2.0  2.0  2.0  2.0
+# 7  2.0  2.0  2.0  2.0
+# 8  2.0  2.0  2.0  2.0
+</span></code></pre></div></div>
+
+<p>结果的<code class="highlighter-rouge">index</code>变0, 1, 2, 3, 4, 5, 6, 7, 8。</p>
+
+<h2 class="tut-h2-pad" id="join-(合并方式)">join (合并方式)
+  <a href="/tutorials/data-manipulation/np-pd/3-6-pd-concat/#join-(合并方式)" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><code class="highlighter-rouge">join='outer'</code>为预设值，因此未设定任何参数时，函数默认<code class="highlighter-rouge">join='outer'</code>。此方式是依照<code class="highlighter-rouge">column</code>来做纵向合并，有相同的<code class="highlighter-rouge">column</code>上下合并在一起，其他独自的<code class="highlighter-rouge">column</code>个自成列，原本没有值的位置皆以<code class="highlighter-rouge">NaN</code>填充。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="c1">#定义资料集
+</span><span class="n">df1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span><span class="o">*</span><span class="mi">0</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'a'</span><span class="p">,</span><span class="s">'b'</span><span class="p">,</span><span class="s">'c'</span><span class="p">,</span><span class="s">'d'</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span><span class="o">*</span><span class="mi">1</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'b'</span><span class="p">,</span><span class="s">'c'</span><span class="p">,</span><span class="s">'d'</span><span class="p">,</span><span class="s">'e'</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+
+<span class="c1">#纵向"外"合并df1与df2
+</span><span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s">'outer'</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="c1">#     a    b    c    d    e
+# 1  0.0  0.0  0.0  0.0  NaN
+# 2  0.0  0.0  0.0  0.0  NaN
+# 3  0.0  0.0  0.0  0.0  NaN
+# 2  NaN  1.0  1.0  1.0  1.0
+# 3  NaN  1.0  1.0  1.0  1.0
+# 4  NaN  1.0  1.0  1.0  1.0
+</span></code></pre></div></div>
+
+<p>原理同上个例子的说明，但只有相同的<code class="highlighter-rouge">column</code>合并在一起，其他的会被抛弃。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#承上一个例子
+</span>
+<span class="c1">#纵向"内"合并df1与df2
+</span><span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s">'inner'</span><span class="p">)</span>
+
+<span class="c1">#打印结果
+</span><span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="c1">#     b    c    d
+# 1  0.0  0.0  0.0
+# 2  0.0  0.0  0.0
+# 3  0.0  0.0  0.0
+# 2  1.0  1.0  1.0
+# 3  1.0  1.0  1.0
+# 4  1.0  1.0  1.0
+</span>
+<span class="c1">#重置index并打印结果
+</span><span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s">'inner'</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="c1">#     b    c    d
+# 0  0.0  0.0  0.0
+# 1  0.0  0.0  0.0
+# 2  0.0  0.0  0.0
+# 3  1.0  1.0  1.0
+# 4  1.0  1.0  1.0
+# 5  1.0  1.0  1.0
+</span></code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="join_axes-(依照-axes-合并)">join_axes (依照 axes 合并)
+  <a href="/tutorials/data-manipulation/np-pd/3-6-pd-concat/#join_axes-(依照-axes-合并)" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="c1">#定义资料集
+</span><span class="n">df1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span><span class="o">*</span><span class="mi">0</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'a'</span><span class="p">,</span><span class="s">'b'</span><span class="p">,</span><span class="s">'c'</span><span class="p">,</span><span class="s">'d'</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span><span class="o">*</span><span class="mi">1</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'b'</span><span class="p">,</span><span class="s">'c'</span><span class="p">,</span><span class="s">'d'</span><span class="p">,</span><span class="s">'e'</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">])</span>
+
+<span class="c1">#依照`df1.index`进行横向合并
+</span><span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">join_axes</span><span class="o">=</span><span class="p">[</span><span class="n">df1</span><span class="o">.</span><span class="n">index</span><span class="p">])</span>
+
+<span class="c1">#打印结果
+</span><span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="c1">#     a    b    c    d    b    c    d    e
+# 1  0.0  0.0  0.0  0.0  NaN  NaN  NaN  NaN
+# 2  0.0  0.0  0.0  0.0  1.0  1.0  1.0  1.0
+# 3  0.0  0.0  0.0  0.0  1.0  1.0  1.0  1.0
+</span>
+<span class="c1">#移除join_axes，并打印结果
+</span><span class="n">res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="c1">#     a    b    c    d    b    c    d    e
+# 1  0.0  0.0  0.0  0.0  NaN  NaN  NaN  NaN
+# 2  0.0  0.0  0.0  0.0  1.0  1.0  1.0  1.0
+# 3  0.0  0.0  0.0  0.0  1.0  1.0  1.0  1.0
+# 4  NaN  NaN  NaN  NaN  1.0  1.0  1.0  1.0
+</span></code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="append-(添加数据)">append (添加数据)
+  <a href="/tutorials/data-manipulation/np-pd/3-6-pd-concat/#append-(添加数据)" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><code class="highlighter-rouge">append</code>只有纵向合并，没有横向合并。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="c1">#定义资料集
+</span><span class="n">df1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span><span class="o">*</span><span class="mi">0</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'a'</span><span class="p">,</span><span class="s">'b'</span><span class="p">,</span><span class="s">'c'</span><span class="p">,</span><span class="s">'d'</span><span class="p">])</span>
+<span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span><span class="o">*</span><span class="mi">1</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'a'</span><span class="p">,</span><span class="s">'b'</span><span class="p">,</span><span class="s">'c'</span><span class="p">,</span><span class="s">'d'</span><span class="p">])</span>
+<span class="n">df3</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span><span class="o">*</span><span class="mi">1</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'a'</span><span class="p">,</span><span class="s">'b'</span><span class="p">,</span><span class="s">'c'</span><span class="p">,</span><span class="s">'d'</span><span class="p">])</span>
+<span class="n">s1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s">'a'</span><span class="p">,</span><span class="s">'b'</span><span class="p">,</span><span class="s">'c'</span><span class="p">,</span><span class="s">'d'</span><span class="p">])</span>
+
+<span class="c1">#将df2合并到df1的下面，以及重置index，并打印出结果
+</span><span class="n">res</span> <span class="o">=</span> <span class="n">df1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df2</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="c1">#     a    b    c    d
+# 0  0.0  0.0  0.0  0.0
+# 1  0.0  0.0  0.0  0.0
+# 2  0.0  0.0  0.0  0.0
+# 3  1.0  1.0  1.0  1.0
+# 4  1.0  1.0  1.0  1.0
+# 5  1.0  1.0  1.0  1.0
+</span>
+<span class="c1">#合并多个df，将df2与df3合并至df1的下面，以及重置index，并打印出结果
+</span><span class="n">res</span> <span class="o">=</span> <span class="n">df1</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">df2</span><span class="p">,</span> <span class="n">df3</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="c1">#     a    b    c    d
+# 0  0.0  0.0  0.0  0.0
+# 1  0.0  0.0  0.0  0.0
+# 2  0.0  0.0  0.0  0.0
+# 3  1.0  1.0  1.0  1.0
+# 4  1.0  1.0  1.0  1.0
+# 5  1.0  1.0  1.0  1.0
+# 6  1.0  1.0  1.0  1.0
+# 7  1.0  1.0  1.0  1.0
+# 8  1.0  1.0  1.0  1.0
+</span>
+<span class="c1">#合并series，将s1合并至df1，以及重置index，并打印出结果
+</span><span class="n">res</span> <span class="o">=</span> <span class="n">df1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="c1">#     a    b    c    d
+# 0  0.0  0.0  0.0  0.0
+# 1  0.0  0.0  0.0  0.0
+# 2  0.0  0.0  0.0  0.0
+# 3  1.0  2.0  3.0  4.0
+</span></code></pre></div></div>
+
+:ET

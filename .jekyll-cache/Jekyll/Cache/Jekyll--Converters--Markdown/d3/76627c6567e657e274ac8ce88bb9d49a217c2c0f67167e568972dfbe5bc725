@@ -1,0 +1,99 @@
+I"�<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/numpy%26pandas/14_nan.py" target="_blank">相关代码</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="创建含-NaN-的矩阵">创建含 NaN 的矩阵
+  <a href="/tutorials/data-manipulation/np-pd/3-4-pd-nan/#创建含-NaN-的矩阵" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>有时候我们导入或处理数据, 会产生一些空的或者是 <code class="highlighter-rouge">NaN</code> 数据,如何删除或者是填补这些 <code class="highlighter-rouge">NaN</code> 数据就是我们今天所要提到的内容.</p>
+
+<p>建立了一个6X4的矩阵数据并且把两个位置置为空.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s">'20130101'</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">)),</span><span class="n">index</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">,</span><span class="s">'C'</span><span class="p">,</span><span class="s">'D'</span><span class="p">])</span>
+<span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+<span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+<span class="s">"""
+             A     B     C   D
+2013-01-01   0   NaN   2.0   3
+2013-01-02   4   5.0   NaN   7
+2013-01-03   8   9.0  10.0  11
+2013-01-04  12  13.0  14.0  15
+2013-01-05  16  17.0  18.0  19
+2013-01-06  20  21.0  22.0  23
+"""</span>
+</code></pre></div></div>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="pd.dropna()">pd.dropna()
+  <a href="/tutorials/data-manipulation/np-pd/3-4-pd-nan/#pd.dropna()" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>如果想直接去掉有 <code class="highlighter-rouge">NaN</code> 的行或列, 可以使用 <code class="highlighter-rouge">dropna</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span>
+    <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>     <span class="c1"># 0: 对行进行操作; 1: 对列进行操作
+</span>    <span class="n">how</span><span class="o">=</span><span class="s">'any'</span>   <span class="c1"># 'any': 只要存在 NaN 就 drop 掉; 'all': 必须全部是 NaN 才 drop 
+</span>    <span class="p">)</span> 
+<span class="s">"""
+             A     B     C   D
+2013-01-03   8   9.0  10.0  11
+2013-01-04  12  13.0  14.0  15
+2013-01-05  16  17.0  18.0  19
+2013-01-06  20  21.0  22.0  23
+"""</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="pd.fillna()">pd.fillna()
+  <a href="/tutorials/data-manipulation/np-pd/3-4-pd-nan/#pd.fillna()" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>如果是将 <code class="highlighter-rouge">NaN</code> 的值用其他值代替, 比如代替成 <code class="highlighter-rouge">0</code>:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="s">"""
+             A     B     C   D
+2013-01-01   0   0.0   2.0   3
+2013-01-02   4   5.0   0.0   7
+2013-01-03   8   9.0  10.0  11
+2013-01-04  12  13.0  14.0  15
+2013-01-05  16  17.0  18.0  19
+2013-01-06  20  21.0  22.0  23
+"""</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="pd.isnull()">pd.isnull()
+  <a href="/tutorials/data-manipulation/np-pd/3-4-pd-nan/#pd.isnull()" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>判断是否有缺失数据 <code class="highlighter-rouge">NaN</code>, 为 <code class="highlighter-rouge">True</code> 表示缺失数据:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span> 
+<span class="s">"""
+                A      B      C      D
+2013-01-01  False   True  False  False
+2013-01-02  False  False   True  False
+2013-01-03  False  False  False  False
+2013-01-04  False  False  False  False
+2013-01-05  False  False  False  False
+2013-01-06  False  False  False  False
+"""</span>
+</code></pre></div></div>
+
+<p>检测在数据中是否存在 <code class="highlighter-rouge">NaN</code>, 如果存在就返回 <code class="highlighter-rouge">True</code>:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">np</span><span class="o">.</span><span class="nb">any</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">())</span> <span class="o">==</span> <span class="bp">True</span>  
+<span class="c1"># True
+</span></code></pre></div></div>
+
+<p>下次课会将pandas如何导入导出数据的过程。</p>
+:ET

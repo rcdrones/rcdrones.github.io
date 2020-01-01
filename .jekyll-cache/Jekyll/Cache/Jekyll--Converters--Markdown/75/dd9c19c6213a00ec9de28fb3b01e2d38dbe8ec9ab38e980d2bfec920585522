@@ -1,0 +1,167 @@
+I"F&<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/numpy%26pandas/12_selection.py" target="_blank">相关代码</a></li>
+</ul>
+
+<p>我们建立了一个 6X4 的矩阵数据。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s">'20130101'</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">)),</span><span class="n">index</span><span class="o">=</span><span class="n">dates</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">,</span><span class="s">'C'</span><span class="p">,</span><span class="s">'D'</span><span class="p">])</span>
+
+<span class="s">"""
+             A   B   C   D
+2013-01-01   0   1   2   3
+2013-01-02   4   5   6   7
+2013-01-03   8   9  10  11
+2013-01-04  12  13  14  15
+2013-01-05  16  17  18  19
+2013-01-06  20  21  22  23
+"""</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="简单的筛选">简单的筛选
+  <a href="/tutorials/data-manipulation/np-pd/3-2-pd-indexing/#简单的筛选" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>如果我们想选取<code class="highlighter-rouge">DataFrame</code>中的数据，下面描述了两种途径, 他们都能达到同一个目的：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">'A'</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">A</span><span class="p">)</span>
+
+<span class="s">"""
+2013-01-01     0
+2013-01-02     4
+2013-01-03     8
+2013-01-04    12
+2013-01-05    16
+2013-01-06    20
+Freq: D, Name: A, dtype: int64
+"""</span>
+</code></pre></div></div>
+
+<p>让选择跨越多行或多列:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+ 
+<span class="s">"""
+            A  B   C   D
+2013-01-01  0  1   2   3
+2013-01-02  4  5   6   7
+2013-01-03  8  9  10  11
+"""</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">'20130102'</span><span class="p">:</span><span class="s">'20130104'</span><span class="p">])</span>
+
+<span class="s">"""
+A   B   C   D
+2013-01-02   4   5   6   7
+2013-01-03   8   9  10  11
+2013-01-04  12  13  14  15
+"""</span>
+</code></pre></div></div>
+
+<p>如果<code class="highlighter-rouge">df[3:3]</code>将会是一个空对象。后者选择<code class="highlighter-rouge">20130102</code>到<code class="highlighter-rouge">20130104</code>标签之间的数据，并且包括这两个标签。</p>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="根据标签-loc">根据标签 loc
+  <a href="/tutorials/data-manipulation/np-pd/3-2-pd-indexing/#根据标签-loc" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>同样我们可以使用标签来选择数据 <code class="highlighter-rouge">loc</code>, 本例子主要通过标签名字选择某一行数据，
+或者通过选择某行或者所有行（<code class="highlighter-rouge">:</code>代表所有行）然后选其中某一列或几列数据。:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'20130102'</span><span class="p">])</span>
+<span class="s">"""
+A    4
+B    5
+C    6
+D    7
+Name: 2013-01-02 00:00:00, dtype: int64
+"""</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,[</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">]])</span> 
+<span class="s">"""
+             A   B
+2013-01-01   0   1
+2013-01-02   4   5
+2013-01-03   8   9
+2013-01-04  12  13
+2013-01-05  16  17
+2013-01-06  20  21
+"""</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'20130102'</span><span class="p">,[</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">]])</span>
+<span class="s">"""
+A    4
+B    5
+Name: 2013-01-02 00:00:00, dtype: int64
+"""</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="根据序列-iloc">根据序列 iloc
+  <a href="/tutorials/data-manipulation/np-pd/3-2-pd-indexing/#根据序列-iloc" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>另外我们可以采用位置进行选择 <code class="highlighter-rouge">iloc</code>, 在这里我们可以通过位置选择在不同情况下所需要的数据例如选某一个，连续选或者跨行选等操作。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="c1"># 13
+</span>
+<span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+<span class="s">"""
+             B   C
+2013-01-04  13  14
+2013-01-05  17  18
+"""</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+<span class="s">"""
+             B   C
+2013-01-02   5   6
+2013-01-04  13  14
+2013-01-06  21  22
+
+"""</span>
+</code></pre></div></div>
+
+<p>在这里我们可以通过位置选择在不同情况下所需要的数据, 例如选某一个，连续选或者跨行选等操作。</p>
+
+<h2 class="tut-h2-pad" id="根据混合的这两种-ix">根据混合的这两种 ix
+  <a href="/tutorials/data-manipulation/np-pd/3-2-pd-indexing/#根据混合的这两种-ix" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>当然我们可以采用混合选择 <code class="highlighter-rouge">ix</code>, 其中选择’A’和’C’的两列，并选择前三行的数据。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">ix</span><span class="p">[:</span><span class="mi">3</span><span class="p">,[</span><span class="s">'A'</span><span class="p">,</span><span class="s">'C'</span><span class="p">]])</span>
+<span class="s">"""
+            A   C
+2013-01-01  0   2
+2013-01-02  4   6
+2013-01-03  8  10
+"""</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="通过判断的筛选">通过判断的筛选
+  <a href="/tutorials/data-manipulation/np-pd/3-2-pd-indexing/#通过判断的筛选" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>最后我们可以采用判断指令 (Boolean indexing) 进行选择. 我们可以约束某项条件然后选择出当前所有数据.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">A</span><span class="o">&gt;</span><span class="mi">8</span><span class="p">])</span>
+<span class="s">"""
+             A   B   C   D
+2013-01-04  12  13  14  15
+2013-01-05  16  17  18  19
+2013-01-06  20  21  22  23
+"""</span>
+</code></pre></div></div>
+
+<p>下节我们将会讲到Pandas中如何设置值。</p>
+:ET
