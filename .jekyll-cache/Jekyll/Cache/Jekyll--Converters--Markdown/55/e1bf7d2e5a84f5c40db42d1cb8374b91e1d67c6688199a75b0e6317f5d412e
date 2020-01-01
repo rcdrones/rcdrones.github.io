@@ -1,0 +1,80 @@
+I"
+<h2 class="tut-h2-pad" id="读取文件内容-file.read()">读取文件内容 file.read()
+  <a href="/tutorials/python-basic/basic/08-3-read-file3/#读取文件内容-file.read()" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>使用 <code class="highlighter-rouge">file.read()</code> 能够读取到文本的所有内容.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">file</span><span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">'my file.txt'</span><span class="p">,</span><span class="s">'r'</span><span class="p">)</span> 
+<span class="n">content</span><span class="o">=</span><span class="nb">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>  
+<span class="k">print</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+<span class="s">""""
+This is my first test.
+This is the second line.
+This the third line.
+This is appended file.    
+""""</span><span class="err">
+</span></code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="按行读取-file.readline()">按行读取 file.readline()
+  <a href="/tutorials/python-basic/basic/08-3-read-file3/#按行读取-file.readline()" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>如果想在文本中一行行的读取文本, 可以使用 <code class="highlighter-rouge">file.readline()</code>, <code class="highlighter-rouge">file.readline()</code> 读取的内容和你使用的次数有关,
+使用第二次的时候, 读取到的是文本的第二行, 并可以以此类推:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">file</span><span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">'my file.txt'</span><span class="p">,</span><span class="s">'r'</span><span class="p">)</span> 
+<span class="n">content</span><span class="o">=</span><span class="nb">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>  <span class="c1"># 读取第一行
+</span><span class="k">print</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+<span class="s">""""
+This is my first test.
+""""</span><span class="err">
+
+</span><span class="s">second_read_time=file.readline()  # 读取第二行</span><span class="err">
+</span><span class="s">print(second_read_time)</span><span class="err">
+
+</span><span class="s">"""</span>
+<span class="n">This</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">second</span> <span class="n">line</span><span class="o">.</span>
+<span class="s">"""
+</span></code></pre></div></div>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="读取所有行-file.readlines()">读取所有行 file.readlines()
+  <a href="/tutorials/python-basic/basic/08-3-read-file3/#读取所有行-file.readlines()" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>如果想要读取所有行, 并可以使用像 <code class="highlighter-rouge">for</code> 一样的迭代器迭代这些行结果, 我们可以使用 <code class="highlighter-rouge">file.readlines()</code>, 将每一行的结果存储在 <code class="highlighter-rouge">list</code> 中, 方便以后迭代.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">file</span><span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">'my file.txt'</span><span class="p">,</span><span class="s">'r'</span><span class="p">)</span> 
+<span class="n">content</span><span class="o">=</span><span class="nb">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span> <span class="c1"># python_list 形式
+</span><span class="k">print</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+<span class="s">""""
+['This is my first test.</span><span class="se">\n</span><span class="s">', 'This is the second line.</span><span class="se">\n</span><span class="s">', 'This the third line.</span><span class="se">\n</span><span class="s">', 'This is appended file.']
+""""</span><span class="err">
+
+</span><span class="s"># 之后如果使用 for 来迭代输出:</span><span class="err">
+</span><span class="s">for item in content:</span><span class="err">
+</span><span class="s">    print(item)</span><span class="err">
+</span><span class="s">    </span><span class="err">
+</span><span class="s">"""</span>
+<span class="n">This</span> <span class="ow">is</span> <span class="n">my</span> <span class="n">first</span> <span class="n">test</span><span class="o">.</span>
+
+<span class="n">This</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">second</span> <span class="n">line</span><span class="o">.</span>
+
+<span class="n">This</span> <span class="n">the</span> <span class="n">third</span> <span class="n">line</span><span class="o">.</span>
+
+<span class="n">This</span> <span class="ow">is</span> <span class="n">appended</span> <span class="nb">file</span><span class="o">.</span>
+<span class="s">"""
+</span></code></pre></div></div>
+
+:ET

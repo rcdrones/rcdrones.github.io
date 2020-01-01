@@ -1,0 +1,68 @@
+I"u<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/tensorflowTUT/tf19_saver.py" target="_blank">相关代码</a></li>
+  <li>为 TF 2017 打造的<a href="https://github.com/MorvanZhou/Tensorflow-Tutorial" target="_blank">新版可视化教学代码</a></li>
+</ul>
+
+<p>我们搭建好了一个神经网络, 训练好了, 肯定也想保存起来, 用于再次加载. 
+那今天我们就来说说怎样用 Tensorflow 中的 saver 保存和加载吧.</p>
+
+<h2 class="tut-h2-pad" id="保存">保存
+  <a href="/tutorials/machine-learning/tensorflow/5-06-save/#保存" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><code class="highlighter-rouge">import</code>所需的模块, 然后建立神经网络当中的 <code class="highlighter-rouge">W</code> 和 <code class="highlighter-rouge">b</code>, 并初始化变量.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="c1">## Save to file
+# remember to define the same dtype and shape when restore
+</span><span class="n">W</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'weights'</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'biases'</span><span class="p">)</span>
+
+<span class="c1"># init= tf.initialize_all_variables() # tf 马上就要废弃这种写法
+# 替换成下面的写法:
+</span><span class="n">init</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>保存时, 首先要建立一个 <code class="highlighter-rouge">tf.train.Saver()</code> 用来保存, 提取变量. 再创建一个名为<code class="highlighter-rouge">my_net</code>的文件夹, 用这个 <code class="highlighter-rouge">saver</code> 来保存变量到这个目录 <code class="highlighter-rouge">"my_net/save_net.ckpt"</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">saver</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Saver</span><span class="p">()</span>
+
+<span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+    <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
+    <span class="n">save_path</span> <span class="o">=</span> <span class="n">saver</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="s">"my_net/save_net.ckpt"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Save to path: "</span><span class="p">,</span> <span class="n">save_path</span><span class="p">)</span>
+
+<span class="s">"""    
+Save to path:  my_net/save_net.ckpt
+"""</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="提取">提取
+  <a href="/tutorials/machine-learning/tensorflow/5-06-save/#提取" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>提取时, 先建立零时的<code class="highlighter-rouge">W</code> 和 <code class="highlighter-rouge">b</code>容器. 找到文件目录, 并用<code class="highlighter-rouge">saver.restore()</code>我们放在这个目录的变量.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 先建立 W, b 的容器
+</span><span class="n">W</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">"weights"</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">"biases"</span><span class="p">)</span>
+
+<span class="c1"># 这里不需要初始化步骤 init= tf.initialize_all_variables()
+</span>
+<span class="n">saver</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Saver</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+    <span class="c1"># 提取变量
+</span>    <span class="n">saver</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="s">"my_net/save_net.ckpt"</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"weights:"</span><span class="p">,</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">W</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"biases:"</span><span class="p">,</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+
+<span class="s">"""
+weights: [[ 1.  2.  3.]
+          [ 3.  4.  5.]]
+biases: [[ 1.  2.  3.]]
+"""</span>
+</code></pre></div></div>
+:ET

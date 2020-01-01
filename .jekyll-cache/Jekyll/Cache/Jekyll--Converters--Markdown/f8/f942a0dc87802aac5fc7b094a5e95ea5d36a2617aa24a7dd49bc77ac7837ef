@@ -1,0 +1,34 @@
+I"^
+<h2 class="tut-h2-pad" id="计算图纸">计算图纸
+  <a href="/tutorials/machine-learning/tensorflow/2-1-structure/#计算图纸" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>Tensorflow 首先要定义神经网络的结构,
+然后再把数据放入结构当中去运算和 training.</p>
+
+<p><a href="/static/results/tensorflow/1_4_1.png">
+ <img class="course-image lazy-img" src="/static/results/tensorflow/1_4_1.png" alt="处理结构" title="处理结构" />
+</a></p>
+
+<p style="text-align: center; font-size: 0.8em;">(动图效果请点击<a href="https://www.tensorflow.org/images/tensors_flowing.gif" alt="处理结构">这里</a>)</p>
+
+<p>因为TensorFlow是采用数据流图（data　flow　graphs）来计算,
+所以首先我们得创建一个数据流流图,
+然后再将我们的数据（数据以张量(tensor)的形式存在）放在数据流图中计算.
+节点（Nodes）在图中表示数学操作,图中的线（edges）则表示在节点间相互联系的多维数据数组,
+即张量（tensor). 训练模型时tensor会不断的从数据流图中的一个节点flow到另一节点,
+这就是TensorFlow名字的由来.</p>
+
+<h2 class="tut-h2-pad" id="Tensor-张量意义">Tensor 张量意义
+  <a href="/tutorials/machine-learning/tensorflow/2-1-structure/#Tensor-张量意义" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><strong>张量（Tensor)</strong>:</p>
+<ul>
+  <li>张量有多种. 零阶张量为 纯量或标量 (scalar) 也就是一个数值. 比如 <code class="highlighter-rouge">[1]</code></li>
+  <li>一阶张量为 向量 (vector), 比如 一维的 <code class="highlighter-rouge">[1, 2, 3]</code></li>
+  <li>二阶张量为 矩阵 (matrix), 比如 二维的  <code class="highlighter-rouge">[[1, 2, 3],[4, 5, 6],[7, 8, 9]]</code></li>
+  <li>以此类推, 还有 三阶 三维的 …</li>
+</ul>
+
+:ET

@@ -1,0 +1,131 @@
+I";<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/PyTorch-Tutorial/blob/master/tutorial-contents/301_regression.py" target="_blank">本节的全部代码</a></li>
+  <li><a href="https://github.com/MorvanZhou/Tensorflow-Tutorial/blob/master/tutorial-contents/301_simple_regression.py" target="_blank">用 Tensorflow 达到同样效果的代码</a></li>
+  <li><a href="/tutorials/machine-learning/ML-intro/2-1-NN/">我制作的 什么是神经网络 动画简介</a></li>
+  <li><a href="http://pytorch.org/" target="_blank">PyTorch 官网</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="要点">要点
+  <a href="/tutorials/machine-learning/torch/3-01-regression/#要点" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>我会这次会来见证神经网络是如何通过简单的形式将一群数据用一条线条来表示. 或者说, 是如何在数据当中找到他们的关系, 然后用神经网络模型来建立一个可以代表他们关系的线条.</p>
+
+<p><a href="/static/results/torch/1-1-2.gif">
+ <img class="course-image lazy-img" src="/static/results/torch/1-1-2.gif" alt="关系拟合 (回归)" title="关系拟合 (回归)" />
+</a></p>
+
+<h2 class="tut-h2-pad" id="建立数据集">建立数据集
+  <a href="/tutorials/machine-learning/torch/3-01-regression/#建立数据集" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>我们创建一些假数据来模拟真实的情况. 比如一个一元二次函数: <code class="highlighter-rouge">y = a * x^2 + b</code>, 我们给 <code class="highlighter-rouge">y</code> 数据加上一点噪声来更加真实的展示它.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># x data (tensor), shape=(100, 1)
+</span><span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.2</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>                 <span class="c1"># noisy y data (tensor), shape=(100, 1)
+</span>
+<span class="c1"># 画图
+</span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="建立神经网络">建立神经网络
+  <a href="/tutorials/machine-learning/torch/3-01-regression/#建立神经网络" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>建立一个神经网络我们可以直接运用 torch 中的体系. 先定义所有的层属性(<code class="highlighter-rouge">__init__()</code>), 然后再一层层搭建(<code class="highlighter-rouge">forward(x)</code>)层于层的关系链接.
+建立关系的时候, 我们会用到激励函数, 如果还不清楚激励函数用途的同学, 这里有非常好的<a href="/tutorials/machine-learning/ML-intro/3-04-activation-function/">一篇动画教程</a>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="n">F</span>     <span class="c1"># 激励函数都在这
+</span>
+<span class="k">class</span> <span class="nc">Net</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>  <span class="c1"># 继承 torch 的 Module
+</span>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_feature</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_output</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Net</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>     <span class="c1"># 继承 __init__ 功能
+</span>        <span class="c1"># 定义每层用什么样的形式
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">hidden</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_feature</span><span class="p">,</span> <span class="n">n_hidden</span><span class="p">)</span>   <span class="c1"># 隐藏层线性输出
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">predict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">n_hidden</span><span class="p">,</span> <span class="n">n_output</span><span class="p">)</span>   <span class="c1"># 输出层线性输出
+</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>   <span class="c1"># 这同时也是 Module 中的 forward 功能
+</span>        <span class="c1"># 正向传播输入值, 神经网络分析出输出值
+</span>        <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>      <span class="c1"># 激励函数(隐藏层的线性值)
+</span>        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>             <span class="c1"># 输出值
+</span>        <span class="k">return</span> <span class="n">x</span>
+
+<span class="n">net</span> <span class="o">=</span> <span class="n">Net</span><span class="p">(</span><span class="n">n_feature</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_hidden</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_output</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>  <span class="c1"># net 的结构
+</span><span class="s">"""
+Net (
+  (hidden): Linear (1 -&gt; 10)
+  (predict): Linear (10 -&gt; 1)
+)
+"""</span>
+</code></pre></div></div>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="训练网络">训练网络
+  <a href="/tutorials/machine-learning/torch/3-01-regression/#训练网络" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>训练的步骤很简单, 如下:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># optimizer 是训练的工具
+</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>  <span class="c1"># 传入 net 的所有参数, 学习率
+</span><span class="n">loss_func</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>      <span class="c1"># 预测值和真实值的误差计算公式 (均方差)
+</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+    <span class="n">prediction</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>     <span class="c1"># 喂给 net 训练数据 x, 输出预测值
+</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_func</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>     <span class="c1"># 计算两者的误差
+</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>   <span class="c1"># 清空上一步的残余更新参数值
+</span>    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>         <span class="c1"># 误差反向传播, 计算参数更新值
+</span>    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>        <span class="c1"># 将参数更新值施加到 net 的 parameters 上
+</span></code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="可视化训练过程">可视化训练过程
+  <a href="/tutorials/machine-learning/torch/3-01-regression/#可视化训练过程" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>为了可视化整个训练的过程, 更好的理解是如何训练, 我们如下操作:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>   <span class="c1"># 画图
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">200</span><span class="p">):</span>
+
+    <span class="o">...</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+    <span class="c1"># 接着上面来
+</span>    <span class="k">if</span> <span class="n">t</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># plot and show learning process
+</span>        <span class="n">plt</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">prediction</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="s">'r-'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s">'Loss=</span><span class="si">%.4</span><span class="s">f'</span> <span class="o">%</span> <span class="n">loss</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">fontdict</span><span class="o">=</span><span class="p">{</span><span class="s">'size'</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s">'color'</span><span class="p">:</span>  <span class="s">'red'</span><span class="p">})</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/torch/3-1-1.png">
+ <img class="course-image lazy-img" src="/static/results/torch/3-1-1.png" alt="关系拟合 (回归)" title="关系拟合 (回归)" />
+</a></p>
+
+<p>所以这也就是在我 <a href="https://github.com/MorvanZhou/PyTorch-Tutorial/blob/master/tutorial-contents/301_regression.py" target="_blank">github 代码</a> 中的每一步的意义啦.</p>
+
+:ET

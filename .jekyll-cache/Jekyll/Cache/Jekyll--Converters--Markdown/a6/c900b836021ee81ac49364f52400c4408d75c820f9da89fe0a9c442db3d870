@@ -1,0 +1,84 @@
+I"P!<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/PyTorch-Tutorial/blob/master/tutorial-contents/502_GPU.py" target="_blank">本节的全部代码</a></li>
+  <li><a href="http://pytorch.org/" target="_blank">PyTorch 官网</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="要点">要点
+  <a href="/tutorials/machine-learning/torch/5-02-GPU/#要点" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>在 GPU 训练可以大幅提升运算速度. 而且 Torch 也有一套很好的 GPU 运算体系. 但是要强调的是:</p>
+<ul>
+  <li>你的电脑里有合适的 GPU 显卡(NVIDIA), 且支持 CUDA 模块. <a href="https://developer.nvidia.com/cuda-gpus" target="_blank">请在NVIDIA官网查询</a></li>
+  <li>必须安装 GPU 版的 Torch, <a href="/tutorials/machine-learning/torch/1-2-install/">点击这里查看如何安装</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="用-GPU-训练-CNN">用 GPU 训练 CNN
+  <a href="/tutorials/machine-learning/torch/5-02-GPU/#用-GPU-训练-CNN" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>这份 GPU 的代码是依据<a href="https://github.com/MorvanZhou/PyTorch-Tutorial/blob/master/tutorial-contents/401_CNN.py" target="_blank">之前这份CNN</a>的代码修改的.
+大概修改的地方包括将数据的形式变成 GPU 能读的形式, 然后将 CNN 也变成 GPU 能读的形式. 做法就是在后面加上 <code class="highlighter-rouge">.cuda()</code>, 很简单.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">...</span>
+
+<span class="n">test_data</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s">'./mnist/'</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c1"># !!!!!!!! 修改 test data 形式 !!!!!!!!! #
+</span><span class="n">test_x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">test_data</span><span class="o">.</span><span class="n">test_data</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="nb">type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">)[:</span><span class="mi">2000</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span><span class="o">/</span><span class="mf">255.</span>   <span class="c1"># Tensor on GPU
+</span><span class="n">test_y</span> <span class="o">=</span> <span class="n">test_data</span><span class="o">.</span><span class="n">test_labels</span><span class="p">[:</span><span class="mi">2000</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>再来把我们的 CNN 参数也变成 GPU 兼容形式.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">CNN</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="o">...</span>
+
+<span class="n">cnn</span> <span class="o">=</span> <span class="n">CNN</span><span class="p">()</span>
+
+<span class="c1"># !!!!!!!! 转换 cnn 去 CUDA !!!!!!!!! #
+</span><span class="n">cnn</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>      <span class="c1"># Moves all model parameters and buffers to the GPU.
+</span></code></pre></div></div>
+
+<p>然后就是在 train 的时候, 将每次的training data 变成 GPU 形式. + <code class="highlighter-rouge">.cuda()</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">epoch</span> <span class="o">..</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="o">...</span><span class="p">:</span>
+        <span class="c1"># !!!!!!!! 这里有修改 !!!!!!!!! #
+</span>        <span class="n">b_x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>    <span class="c1"># Tensor on GPU
+</span>        <span class="n">b_y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>    <span class="c1"># Tensor on GPU
+</span>
+        <span class="o">...</span>
+
+        <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="mi">50</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">test_output</span> <span class="o">=</span> <span class="n">cnn</span><span class="p">(</span><span class="n">test_x</span><span class="p">)</span>
+
+            <span class="c1"># !!!!!!!! 这里有修改  !!!!!!!!! #
+</span>            <span class="n">pred_y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="nb">max</span><span class="p">(</span><span class="n">test_output</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>  <span class="c1"># 将操作放去 GPU
+</span>
+            <span class="n">accuracy</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">pred_y</span> <span class="o">==</span> <span class="n">test_y</span><span class="p">)</span> <span class="o">/</span> <span class="n">test_y</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="o">...</span>
+
+<span class="n">test_output</span> <span class="o">=</span> <span class="n">cnn</span><span class="p">(</span><span class="n">test_x</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+
+<span class="c1"># !!!!!!!! 这里有修改 !!!!!!!!! #
+</span><span class="n">pred_y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="nb">max</span><span class="p">(</span><span class="n">test_output</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>  <span class="c1"># 将操作放去 GPU
+</span><span class="o">...</span>
+<span class="k">print</span><span class="p">(</span><span class="n">test_y</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="s">'real number'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>大功告成~</p>
+
+<p>所以这也就是在我 <a href="https://github.com/MorvanZhou/PyTorch-Tutorial/blob/master/tutorial-contents/502_GPU.py" target="_blank">github 代码</a> 中的每一步的意义啦.</p>
+
+<h2 class="tut-h2-pad" id="转移至-CPU">转移至 CPU
+  <a href="/tutorials/machine-learning/torch/5-02-GPU/#转移至-CPU" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>如果你有些计算还是需要在 CPU 上进行的话呢, 比如 <code class="highlighter-rouge">plt</code> 的可视化, 我们需要将这些计算或者数据转移至 CPU.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cpu_data</span> <span class="o">=</span> <span class="n">gpu_data</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+</code></pre></div></div>
+
+:ET

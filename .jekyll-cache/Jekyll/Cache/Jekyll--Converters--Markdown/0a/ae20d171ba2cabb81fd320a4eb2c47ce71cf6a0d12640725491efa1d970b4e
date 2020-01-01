@@ -1,0 +1,220 @@
+I"a7<p>学习资料:</p>
+<ul>
+  <li><a href="/tutorials/machine-learning/tensorflow/1-1-A-ANN-and-NN/">Tensorflow 教程</a></li>
+  <li><a href="/tutorials/machine-learning/torch/1-1-A-ANN-and-NN/">Pytorch 神经网络教程</a></li>
+  <li><a href="https://github.com/MorvanZhou/train-classifier-from-scratch" target="_blank">本节学习代码</a></li>
+  <li>用到的<a href="http://archive.ics.uci.edu/ml/datasets/Car+Evaluation" target="_blank">UCI数据</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="为什么做这个实践">为什么做这个实践
+  <a href="/tutorials/machine-learning/ML-practice/build-car-classifier-from-scratch1/#为什么做这个实践" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>大家都喜欢看实践, 因为即使学了很多机器学习的知识(比如说在<a href="/">莫烦Python</a>上的很多教程), 我们大多数时候碰到真正的问题却束手无策.
+理论与实践结合还是太少太少了. 做这个教程的主要目的就是为了均衡你的这种学习的不平衡. 让你也能真正动手实战. 让你在实战中收获更多.</p>
+
+<p>首先, 这一个汽车状态的分类器需要用到的知识有:</p>
+
+<ul>
+  <li>数据的预处理 (你可以学习我的 <a href="/tutorials/data-manipulation/np-pd/">Numpy &amp; Pandas</a> 来快速入门)</li>
+  <li>画图可视化 (你可以通过我的 <a href="/tutorials/data-manipulation/plt/">Matplotlib</a> 来了解 Python 的这个画图神器)</li>
+  <li>神经网络 (你可以学习我的 <a href="/tutorials/machine-learning/tensorflow/">Tensorflow</a> 或者 <a href="/tutorials/machine-learning/torch/">Pytorch</a> 这两个主流 Python 框架的教程)</li>
+</ul>
+
+<p>有了这些预备知识的储备, 你做完这个实战练习绝对是一件小菜一碟的事. 如果你对上面的知识还不是特别熟, 你也可以选择边往下走, 边挑着看不懂的 google 百度.</p>
+
+<h2 class="tut-h2-pad" id="要做成怎样">要做成怎样
+  <a href="/tutorials/machine-learning/ML-practice/build-car-classifier-from-scratch1/#要做成怎样" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>这个实践很简单, 我们需要训练出来一个神经网络的分类器,
+用来对数据中的类别进行分类. 其实在现实生活中, 我们有很多形式的数据, 纯数字或文本的数据是最多的.
+所以我选择了这样一个分类的练习来做实战. 这种类型的分类器非常常见, 特别是在工业界,
+比如通过对一个工业零件的压力等测试, 判断一个这个零件是否要更换了. 这样来最小化故障的损失.
+而这个练习, 则是通过一些评估的数据来判断这辆车的状态.</p>
+
+<p>最后我们的结果展示成这样.
+通过对数据的分析, 加工, 然后放入神经网络学习, 让它在 test data 的识别准确率上达到 95% 以上.</p>
+
+<video class="tut-content-video" controls="" loop="" autoplay="" muted="">
+  <source src="/static/results/ML-practice/car_classifier1-1.mp4" type="video/mp4" />
+  Your browser does not support HTML5 video.
+</video>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="我们的数据">我们的数据
+  <a href="/tutorials/machine-learning/ML-practice/build-car-classifier-from-scratch1/#我们的数据" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><a href="/static/results/ML-practice/car_classifier1-2.png">
+ <img class="course-image lazy-img" src="/static/results/ML-practice/car_classifier1-2.png" alt="从头开始做一个汽车状态分类器1: 分析数据" title="从头开始做一个汽车状态分类器1: 分析数据" />
+</a></p>
+
+<p>首先我们需要了解一下这一次所要用到的数据是什么. 这个车辆状况的数据是我在网上一个<a href="http://archive.ics.uci.edu/ml/datasets/Car+Evaluation" target="_blank">数据库</a>找到的.
+具体的数据描述也能在那个网页找到. 下面我来简单的说明一下.</p>
+
+<p>车辆的状态分为四类:</p>
+<ul>
+  <li>unacc (Unacceptable 状况很差)</li>
+  <li>acc   (Acceptable 状况一般)</li>
+  <li>good  (Good 状况好)</li>
+  <li>vgood (Very good 状况非常好)</li>
+</ul>
+
+<p>那我们又是通过什么来判断这辆车的状态好坏呢?</p>
+<ul>
+  <li>buying (购买价: vhigh, high, med, low)</li>
+  <li>maint  (维护价: vhigh, high, med, low)</li>
+  <li>doors  (几个门: 2, 3, 4, 5more)</li>
+  <li>persons (载人量: 2, 4, more)</li>
+  <li>lug_boot (贮存空间: small, med, big)</li>
+  <li>safety  (安全性: low, med, high)</li>
+</ul>
+
+<p>如果展示出这些数据, 我们就能清楚的看到这些数据的表示形式了.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>buying</th>
+      <th>maint</th>
+      <th>doors</th>
+      <th>persons</th>
+      <th>lug_boot</th>
+      <th>safety</th>
+      <th>condition</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>vhigh</td>
+      <td>vhigh</td>
+      <td>2</td>
+      <td>2</td>
+      <td>small</td>
+      <td>low</td>
+      <td>unacc</td>
+    </tr>
+    <tr>
+      <td>vhigh</td>
+      <td>vhigh</td>
+      <td>2</td>
+      <td>2</td>
+      <td>small</td>
+      <td>med</td>
+      <td>unacc</td>
+    </tr>
+    <tr>
+      <td>vhigh</td>
+      <td>vhigh</td>
+      <td>2</td>
+      <td>2</td>
+      <td>small</td>
+      <td>high</td>
+      <td>unacc</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>好了, 第一个问题来了, 我们能不能直接这样喂给神经网络让它学习呢?
+如果你有过一些处理神经网络的经历, 你就会察觉到, 这里的数据有很多都是文字形式的,
+比如 <code class="highlighter-rouge">vhigh</code>, <code class="highlighter-rouge">small</code> 等.
+而神经网络能够读取的数据形式都是数字. 这可怎么办? 或者说, 我们要通过什么样的途径,
+将这些文字数据转换成数字呢?</p>
+
+<p>接下来我介绍两种途径, 然后谈谈每一种的优缺点.</p>
+
+<p><strong>途径一</strong></p>
+
+<p>我们观察到这些文字描述不超过几个类别, 比如在 buying 下面, 总共也就这几种情况 (vhigh, high, med, low),
+那我们能不能直接将每种情况给它一个数字代替呢? 比如 (vhigh=0, high=1, med=2, low=3).</p>
+
+<p><strong>途径二</strong></p>
+
+<p>同样是类别, 如果你听说过那个手写数字 MNIST 的数据集 (可以看看这个<a href="/tutorials/machine-learning/tensorflow/5-01-classifier/">教程</a>),
+你会发现, 0/1/2/3/4/5/6/7/8/9 这十个数字不是直传入神经网络, 而是进行了一次 onehot 的处理. 也就是将数字变成只有 0/1 的形式, 比如下面:</p>
+
+<ul>
+  <li>0 -&gt; [1,0,0,0,0,0,0,0,0,0]</li>
+  <li>1 -&gt; [0,1,0,0,0,0,0,0,0,0]</li>
+  <li>2 -&gt; [0,0,1,0,0,0,0,0,0,0]</li>
+  <li>…</li>
+  <li>9 -&gt; [0,0,0,0,0,0,0,0,0,1]</li>
+</ul>
+
+<p>转换的途径一般有这两种, 那我们选哪个? 途径一非常简单, 不同的类别变成不同的数字, 但是试想这样的情况,
+如果现在是红色, 蓝色, 黄色这三个类别需要转换, 如果红色=0, 蓝色=1, 黄色=2,
+红色到蓝色差了1, 红色到黄色差了2, 但是在真实的世界中, 各种颜色之间真的有数量差? 红色到蓝色的差别真的比红色到黄色大?
+显然不是, 所以这样的类别转换数字的途径还是存在一定的问题.</p>
+
+<p>而途径二, 我们如果转换成 onehot 形式, 红黄蓝它们就没有这种距离上的差距概念, 而是每个类别都是独立, 特别的, 不能互相比较的.
+这才是比较好的类别转换形式. 我觉得有必要提的是, 像(vhigh=0, high=1, med=2, low=3)这样的类别, 可能还是存在一些从高到底的顺序,
+这样的类别, 理论上也是可以使用途径一. 大家到了最后可以测试一下途径一和途径二的差别. 这个实战练习, 我是基于途径二的转换.</p>
+
+<h2 class="tut-h2-pad" id="数据预处理">数据预处理
+  <a href="/tutorials/machine-learning/ML-practice/build-car-classifier-from-scratch1/#数据预处理" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>了解了我们的数据, 也知道要怎么样处理数据, 我们现在用开始用 python 来处理这些数据吧.
+因为网上的数据是现成的, 我们可以直接<a href="http://archive.ics.uci.edu/ml/machine-learning-databases/car/" target="_blank">下载</a>这个数据,
+或者是通过 Python 代码来实现下载这个功能. 按耐不住, 想一次性看到所有处理数据代码的朋友点<a href="https://github.com/MorvanZhou/train-classifier-from-scratch/blob/master/data_processing.py" target="_blank">这里</a>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlretrieve</span>
+
+<span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="n">download</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="c1"># download data from : http://archive.ics.uci.edu/ml/datasets/Car+Evaluation
+</span>    <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
+        <span class="n">data_path</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">urlretrieve</span><span class="p">(</span><span class="s">"http://archive.ics.uci.edu/ml/machine-learning-databases/car/car.data"</span><span class="p">,</span> <span class="s">"car.csv"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Downloaded to car.csv"</span><span class="p">)</span>
+
+    <span class="c1"># use pandas to view the data structure
+</span>    <span class="n">col_names</span> <span class="o">=</span> <span class="p">[</span><span class="s">"buying"</span><span class="p">,</span> <span class="s">"maint"</span><span class="p">,</span> <span class="s">"doors"</span><span class="p">,</span> <span class="s">"persons"</span><span class="p">,</span> <span class="s">"lug_boot"</span><span class="p">,</span> <span class="s">"safety"</span><span class="p">,</span> <span class="s">"class"</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">"car.csv"</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">col_names</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
+</code></pre></div></div>
+
+<p>这个功能, 让我们可以选择下载网上的数据 (大概51KB), 这个文件将会以 “car.csv” 文件名保存, 或者你已经下载好了, 将 <code class="highlighter-rouge">download=False</code> 直接载入本地数据.</p>
+
+<p><a href="/static/results/ML-practice/car_classifier1-3.png">
+ <img class="course-image lazy-img" src="/static/results/ML-practice/car_classifier1-3.png" alt="从头开始做一个汽车状态分类器1: 分析数据" title="从头开始做一个汽车状态分类器1: 分析数据" />
+</a></p>
+
+<p>我们同样可以输出一下每类数据类型有多少, 检验一下是否和网上的描述一致.</p>
+
+<p><a href="/static/results/ML-practice/car_classifier1-4.png">
+ <img class="course-image lazy-img" src="/static/results/ML-practice/car_classifier1-4.png" alt="从头开始做一个汽车状态分类器1: 分析数据" title="从头开始做一个汽车状态分类器1: 分析数据" />
+</a></p>
+
+<p>确认无误之后, 我们就开始使用上面提到的途径二来对这些类别数据做 onehot 预处理. 好在如果你使用 pandas,
+它有一个很 handy 的功能 <code class="highlighter-rouge">pd.get_dummies()</code>, 来帮你实现 onehot 形式的数据转化.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">convert2onehot</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="c1"># covert data to onehot representation
+</span>    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/ML-practice/car_classifier1-5.png">
+ <img class="course-image lazy-img" src="/static/results/ML-practice/car_classifier1-5.png" alt="从头开始做一个汽车状态分类器1: 分析数据" title="从头开始做一个汽车状态分类器1: 分析数据" />
+</a></p>
+
+<p>因为转换成 onehot 之后, 屏幕放不下, 所以上面的图只显示了一部分的结果. 不过我们已经清楚地看到,
+它将类别项上的 class 标记成了1, 而其他的是0. 有了这些处理好的数据, 我们就能在下一节开始训练了.</p>
+
+<p>接着我们就开始继续往下面添砖加瓦吧. 看看如何<a href="/tutorials/machine-learning/ML-practice/build-car-classifier-from-scratch2/">搭建模型</a>, 并且测试我们的模型.</p>
+
+<p><em>实战:从头开始做一个汽车状态分类器</em></p>
+
+<ul>
+  <li><em><a href="/tutorials/machine-learning/ML-practice/build-car-classifier-from-scratch1/">分析数据</a></em></li>
+  <li><em><a href="/tutorials/machine-learning/ML-practice/build-car-classifier-from-scratch2/">搭建模型</a></em></li>
+</ul>
+
+:ET

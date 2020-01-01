@@ -1,0 +1,86 @@
+I"q$<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/kerasTUT/7-RNN_Classifier_example.py" target="_blank">代码链接</a></li>
+  <li>机器学习-简介系列 <a href="/tutorials/machine-learning/ML-intro/2-3-RNN/">RNN 简介</a></li>
+  <li>Tensorflow <a href="/tutorials/machine-learning/tensorflow/5-08-RNN2/">RNN教程</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="方法介绍">方法介绍
+  <a href="/tutorials/machine-learning/keras/2-4-RNN-classifier/#方法介绍" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>这次我们用循环神经网络(RNN, Recurrent Neural Networks)进行分类（classification），采用MNIST数据集，主要用到<code class="highlighter-rouge">SimpleRNN</code>层。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">SimpleRNN</span><span class="p">,</span> <span class="n">Activation</span><span class="p">,</span> <span class="n">Dense</span>
+</code></pre></div></div>
+
+<p>MNIST里面的图像分辨率是28×28，为了使用RNN，我们将图像理解为序列化数据。
+每一行作为一个输入单元，所以输入数据大小<code class="highlighter-rouge">INPUT_SIZE = 28</code>；
+先是第1行输入，再是第2行，第3行，第4行，…，第28行输入，
+这就是一张图片也就是一个序列，所以步长<code class="highlighter-rouge">TIME_STEPS = 28</code>。</p>
+
+<p>训练数据要进行归一化处理，因为原始数据是8bit灰度图像所以需要除以255。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">)</span> <span class="o">/</span> <span class="mf">255.</span>      <span class="c1"># normalize
+</span><span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">)</span> <span class="o">/</span> <span class="mf">255.</span>        <span class="c1"># normalize
+</span></code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="搭建模型">搭建模型
+  <a href="/tutorials/machine-learning/keras/2-4-RNN-classifier/#搭建模型" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>首先添加RNN层，输入为训练数据，输出数据大小由<code class="highlighter-rouge">CELL_SIZE</code>定义。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">SimpleRNN</span><span class="p">(</span>
+    <span class="c1"># for batch_input_shape, if using tensorflow as the backend, we have to put None for the batch_size.
+</span>    <span class="c1"># Otherwise, model.evaluate() will get error.
+</span>    <span class="n">batch_input_shape</span><span class="o">=</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">TIME_STEPS</span><span class="p">,</span> <span class="n">INPUT_SIZE</span><span class="p">),</span>       
+    <span class="n">output_dim</span><span class="o">=</span><span class="n">CELL_SIZE</span><span class="p">,</span>
+    <span class="n">unroll</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+<span class="p">))</span>
+</code></pre></div></div>
+
+<p>然后添加输出层，激励函数选择<code class="highlighter-rouge">softmax</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="n">OUTPUT_SIZE</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Activation</span><span class="p">(</span><span class="s">'softmax'</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>设置优化方法，<code class="highlighter-rouge">loss</code>函数和<code class="highlighter-rouge">metrics</code>方法之后就可以开始训练了。
+每次训练的时候并不是取所有的数据，只是取<code class="highlighter-rouge">BATCH_SIZE</code>个序列，或者称为<code class="highlighter-rouge">BATCH_SIZE</code>张图片，这样可以大大降低运算时间，提高训练效率。</p>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="训练">训练
+  <a href="/tutorials/machine-learning/keras/2-4-RNN-classifier/#训练" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4001</span><span class="p">):</span>
+    <span class="c1"># data shape = (batch_num, steps, inputs/outputs)
+</span>    <span class="n">X_batch</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">BATCH_INDEX</span><span class="p">:</span> <span class="n">BATCH_INDEX</span><span class="o">+</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+    <span class="n">Y_batch</span> <span class="o">=</span> <span class="n">y_train</span><span class="p">[</span><span class="n">BATCH_INDEX</span><span class="p">:</span> <span class="n">BATCH_INDEX</span><span class="o">+</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">cost</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_on_batch</span><span class="p">(</span><span class="n">X_batch</span><span class="p">,</span> <span class="n">Y_batch</span><span class="p">)</span>
+    <span class="n">BATCH_INDEX</span> <span class="o">+=</span> <span class="n">BATCH_SIZE</span>
+    <span class="n">BATCH_INDEX</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">BATCH_INDEX</span> <span class="o">&gt;=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">else</span> <span class="n">BATCH_INDEX</span>
+</code></pre></div></div>
+
+<p>输出<code class="highlighter-rouge">test</code>上的<code class="highlighter-rouge">loss</code>和<code class="highlighter-rouge">accuracy</code>结果</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="mi">500</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">cost</span><span class="p">,</span> <span class="n">accuracy</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">y_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'test cost: '</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="s">'test accuracy: '</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/keras/2-4-1.png">
+ <img class="course-image lazy-img" src="/static/results/keras/2-4-1.png" alt="RNN Classifier 循环神经网络" title="RNN Classifier 循环神经网络" />
+</a></p>
+
+<p>有兴趣的话可以修改<code class="highlighter-rouge">BATCH_SIZE</code>和<code class="highlighter-rouge">CELL_SIZE</code>的值，试试这两个参数对训练时间和精度的影响。</p>
+
+:ET

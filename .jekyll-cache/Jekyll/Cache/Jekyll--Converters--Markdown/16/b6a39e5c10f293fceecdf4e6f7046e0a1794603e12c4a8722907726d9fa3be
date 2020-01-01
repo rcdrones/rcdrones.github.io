@@ -1,0 +1,153 @@
+I"�F<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/PyTorch-Tutorial/blob/master/tutorial-contents/503_dropout.py" target="_blank">本节的全部代码</a></li>
+  <li><a href="https://github.com/MorvanZhou/Tensorflow-Tutorial/blob/master/tutorial-contents/501_dropout.py" target="_blank">Tensorflow 的 50行 Dropout 代码</a></li>
+  <li><a href="/tutorials/machine-learning/ML-intro/3-05-overfitting/">我制作的 什么是过拟合 动画简介</a></li>
+  <li><a href="/tutorials/machine-learning/ML-intro/3-09-l1l2regularization/">我制作的 L1/L2 正规化 动画简介</a></li>
+  <li><a href="http://pytorch.org/" target="_blank">PyTorch 官网</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="要点">要点
+  <a href="/tutorials/machine-learning/torch/5-03-dropout/#要点" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>过拟合让人头疼, 明明训练时误差已经降得足够低, 可是测试的时候误差突然飙升. 这很有可能就是出现了过拟合现象.
+强烈推荐通过<a href="/tutorials/machine-learning/ML-intro/3-05-overfitting/">这个动画</a>的形式短时间了解什么是过拟合, 怎么解决过拟合.
+下面动图就显示了我们成功缓解了过拟合现象.</p>
+
+<p><a href="/static/results/torch/5-3-1.gif">
+ <img class="course-image lazy-img" src="/static/results/torch/5-3-1.gif" alt="Dropout 缓解过拟合" title="Dropout 缓解过拟合" />
+</a></p>
+
+<h2 class="tut-h2-pad" id="做点数据">做点数据
+  <a href="/tutorials/machine-learning/torch/5-03-dropout/#做点数据" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>自己做一些伪数据, 用来模拟真实情况. 数据少, 才能凸显过拟合问题, 所以我们就做10个数据点.</p>
+
+<p><a href="/static/results/torch/5-3-2.png">
+ <img class="course-image lazy-img" src="/static/results/torch/5-3-2.png" alt="Dropout 缓解过拟合" title="Dropout 缓解过拟合" />
+</a></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>    <span class="c1"># reproducible
+</span>
+<span class="n">N_SAMPLES</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">N_HIDDEN</span> <span class="o">=</span> <span class="mi">300</span>
+
+<span class="c1"># training data
+</span><span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N_SAMPLES</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="mf">0.3</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N_SAMPLES</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N_SAMPLES</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># test data
+</span><span class="n">test_x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N_SAMPLES</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">test_y</span> <span class="o">=</span> <span class="n">test_x</span> <span class="o">+</span> <span class="mf">0.3</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N_SAMPLES</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N_SAMPLES</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># show data
+</span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">c</span><span class="o">=</span><span class="s">'magenta'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'train'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">test_x</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">test_y</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">c</span><span class="o">=</span><span class="s">'cyan'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'test'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">'upper left'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">((</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="搭建神经网络">搭建神经网络
+  <a href="/tutorials/machine-learning/torch/5-03-dropout/#搭建神经网络" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>我们在这里搭建两个神经网络, 一个没有 <code class="highlighter-rouge">dropout</code>, 一个有 <code class="highlighter-rouge">dropout</code>. 没有 <code class="highlighter-rouge">dropout</code> 的容易出现 过拟合, 那我们就命名为 <code class="highlighter-rouge">net_overfitting</code>,
+另一个就是 <code class="highlighter-rouge">net_dropped</code>. <code class="highlighter-rouge">torch.nn.Dropout(0.5)</code> 这里的 0.5 指的是随机有 50% 的神经元会被关闭/丢弃.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">net_overfitting</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N_HIDDEN</span><span class="p">),</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">N_HIDDEN</span><span class="p">,</span> <span class="n">N_HIDDEN</span><span class="p">),</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">N_HIDDEN</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">net_dropped</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N_HIDDEN</span><span class="p">),</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.5</span><span class="p">),</span>  <span class="c1"># drop 50% of the neuron
+</span>    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">N_HIDDEN</span><span class="p">,</span> <span class="n">N_HIDDEN</span><span class="p">),</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.5</span><span class="p">),</span>  <span class="c1"># drop 50% of the neuron
+</span>    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">N_HIDDEN</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<span class="p">)</span>
+</code></pre></div></div>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="训练">训练
+  <a href="/tutorials/machine-learning/torch/5-03-dropout/#训练" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>训练的时候, 这两个神经网络分开训练. 训练的环境都一样.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">optimizer_ofit</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">net_overfitting</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">optimizer_drop</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">net_dropped</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">loss_func</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">500</span><span class="p">):</span>
+    <span class="n">pred_ofit</span> <span class="o">=</span> <span class="n">net_overfitting</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">pred_drop</span> <span class="o">=</span> <span class="n">net_dropped</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="n">loss_ofit</span> <span class="o">=</span> <span class="n">loss_func</span><span class="p">(</span><span class="n">pred_ofit</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">loss_drop</span> <span class="o">=</span> <span class="n">loss_func</span><span class="p">(</span><span class="n">pred_drop</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="n">optimizer_ofit</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">optimizer_drop</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">loss_ofit</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">loss_drop</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">optimizer_ofit</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+    <span class="n">optimizer_drop</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="对比测试结果">对比测试结果
+  <a href="/tutorials/machine-learning/torch/5-03-dropout/#对比测试结果" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>在这个 <code class="highlighter-rouge">for</code> 循环里, 我们加上画测试图的部分. 注意在测试时, 要将网络改成 <code class="highlighter-rouge">eval()</code> 形式, 特别是 <code class="highlighter-rouge">net_dropped</code>, <code class="highlighter-rouge">net_overfitting</code> 改不改其实无所谓.
+画好图再改回 <code class="highlighter-rouge">train()</code> 模式.</p>
+
+<p><a href="/static/results/torch/5-3-1.gif">
+ <img class="course-image lazy-img" src="/static/results/torch/5-3-1.gif" alt="Dropout 缓解过拟合" title="Dropout 缓解过拟合" />
+</a></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="o">...</span>
+
+    <span class="n">optimizer_ofit</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+    <span class="n">optimizer_drop</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+    <span class="c1"># 接着上面来
+</span>    <span class="k">if</span> <span class="n">t</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>     <span class="c1"># 每 10 步画一次图
+</span>        <span class="c1"># 将神经网络转换成测试形式, 画好图之后改回 训练形式
+</span>        <span class="n">net_overfitting</span><span class="o">.</span><span class="nb">eval</span><span class="p">()</span>
+        <span class="n">net_dropped</span><span class="o">.</span><span class="nb">eval</span><span class="p">()</span>  <span class="c1"># 因为 drop 网络在 train 的时候和 test 的时候参数不一样.
+</span>
+        <span class="o">...</span>
+        <span class="n">test_pred_ofit</span> <span class="o">=</span> <span class="n">net_overfitting</span><span class="p">(</span><span class="n">test_x</span><span class="p">)</span>
+        <span class="n">test_pred_drop</span> <span class="o">=</span> <span class="n">net_dropped</span><span class="p">(</span><span class="n">test_x</span><span class="p">)</span>
+        <span class="o">...</span>
+
+        <span class="c1"># 将两个网络改回 训练形式
+</span>        <span class="n">net_overfitting</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+        <span class="n">net_dropped</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/torch/5-3-3.png">
+ <img class="course-image lazy-img" src="/static/results/torch/5-3-3.png" alt="Dropout 缓解过拟合" title="Dropout 缓解过拟合" />
+</a></p>
+
+<p>所以这也就是在我 <a href="https://github.com/MorvanZhou/PyTorch-Tutorial/blob/master/tutorial-contents/503_dropout.py" target="_blank">github 代码</a> 中的每一步的意义啦.</p>
+
+:ET

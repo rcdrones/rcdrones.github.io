@@ -1,0 +1,82 @@
+I"�<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/sklearnTUT/sk6_model_attribute_method.py" target="_blank">相关代码</a></li>
+</ul>
+
+<p>上次学了  <code class="highlighter-rouge">Sklearn</code> 中的 <code class="highlighter-rouge">data sets</code>，今天来看 Model 的属性和功能。</p>
+
+<p>这里以 <code class="highlighter-rouge">LinearRegressor</code> 为例，所以先导入包，数据，还有模型。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">datasets</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+
+<span class="n">loaded_data</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_boston</span><span class="p">()</span>
+<span class="n">data_X</span> <span class="o">=</span> <span class="n">loaded_data</span><span class="o">.</span><span class="n">data</span>
+<span class="n">data_y</span> <span class="o">=</span> <span class="n">loaded_data</span><span class="o">.</span><span class="n">target</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="训练和预测">训练和预测
+  <a href="/tutorials/machine-learning/sklearn/2-4-model-attributes/#训练和预测" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>接下来 <code class="highlighter-rouge">model.fit</code> 和 <code class="highlighter-rouge">model.predict</code> 就属于 Model 的功能，用来训练模型，用训练好的模型预测。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data_X</span><span class="p">,</span> <span class="n">data_y</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">data_X</span><span class="p">[:</span><span class="mi">4</span><span class="p">,</span> <span class="p">:]))</span>
+
+<span class="s">"""
+[ 30.00821269  25.0298606   30.5702317   28.60814055]
+"""</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="参数和分数">参数和分数
+  <a href="/tutorials/machine-learning/sklearn/2-4-model-attributes/#参数和分数" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>然后，<code class="highlighter-rouge">model.coef_</code> 和 <code class="highlighter-rouge">model.intercept_ </code> 属于 Model 的属性，
+例如对于 <code class="highlighter-rouge">LinearRegressor</code> 这个模型，这两个属性分别输出模型的斜率和截距（与y轴的交点）。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">intercept_</span><span class="p">)</span>
+
+
+<span class="s">"""
+[ -1.07170557e-01   4.63952195e-02   2.08602395e-02   2.68856140e+00
+  -1.77957587e+01   3.80475246e+00   7.51061703e-04  -1.47575880e+00
+   3.05655038e-01  -1.23293463e-02  -9.53463555e-01   9.39251272e-03
+  -5.25466633e-01]
+36.4911032804
+"""</span>
+</code></pre></div></div>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<p><code class="highlighter-rouge">model.get_params()</code> 也是功能，它可以取出之前定义的参数。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_params</span><span class="p">())</span>
+
+
+<span class="s">"""
+{'copy_X': True, 'normalize': False, 'n_jobs': 1, 'fit_intercept': True}
+"""</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">model.score(data_X, data_y)</code> 它可以对 Model 用 <code class="highlighter-rouge">R^2</code> 的方式进行打分，输出精确度。关于 <code class="highlighter-rouge">R^2 coefficient of determination</code> 可以查看 <a href="https://en.wikipedia.org/wiki/Coefficient_of_determination" target="_blank">wiki</a></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">data_X</span><span class="p">,</span> <span class="n">data_y</span><span class="p">))</span> <span class="c1"># R^2 coefficient of determination
+</span>
+<span class="s">"""
+0.740607742865
+"""</span>
+</code></pre></div></div>
+
+:ET

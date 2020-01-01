@@ -1,0 +1,132 @@
+I"R@<p>学习资料:</p>
+<ul>
+  <li><a href="/tutorials/machine-learning/tensorflow/1-1-A-ANN-and-NN/">Tensorflow 教程</a></li>
+  <li><a href="/tutorials/machine-learning/torch/1-1-A-ANN-and-NN/">Pytorch 神经网络教程</a></li>
+  <li><a href="https://github.com/MorvanZhou/train-classifier-from-scratch" target="_blank">本节学习代码</a></li>
+  <li>用到的<a href="http://archive.ics.uci.edu/ml/datasets/Car+Evaluation" target="_blank">UCI数据</a></li>
+</ul>
+
+<p><a href="/tutorials/machine-learning/ML-practice/build-car-classifier-from-scratch1/">上次</a>
+我们已经处理好了需要用到的数据, 这就已经解决了一大堆问题了. 在机器学习/深度学习中, 其实花时间最多的不是训练, 而是数据的预处理.
+大多数人都感叹, 如果搭建模型训练花了10分钟, 那处理数据就得花一天. 哈哈哈. 你已经攻克了最难的地方了. 这节内容, 就是非常容易,
+我们搭建一个模型, 训练, 并可视化它.</p>
+
+<h2 class="tut-h2-pad" id="导入数据">导入数据
+  <a href="/tutorials/machine-learning/ML-practice/build-car-classifier-from-scratch2/#导入数据" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>我们使用 tensorflow 搭建神经网络 (<a href="/tutorials/machine-learning/tensorflow/1-1-why/">Tensorflow 教程</a>),
+其实你也可以按我的 <a href="/tutorials/machine-learning/torch/1-1-why/">Pytorch 教程</a>
+使用 Pytorch 来编写这个网络, 没太多差别. 然后使用 matplotlib 可视化学习过程, 使用之前写好的 data_processing 来导入, 加工数据.
+因为我们的数据都是类别数据, 所以我们将要使用的数据都是 onehot 形式的数据.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">data_processing</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">data_processing</span><span class="o">.</span><span class="n">load_data</span><span class="p">(</span><span class="n">download</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">new_data</span> <span class="o">=</span> <span class="n">data_processing</span><span class="o">.</span><span class="n">convert2onehot</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>加工好数据以后, 为了比较严谨地测试模型的准确率, 我们首先打乱数据的顺序, 然后将训练和测试数据以 7/3 比例分开.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># prepare training data
+</span><span class="n">new_data</span> <span class="o">=</span> <span class="n">new_data</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>       <span class="c1"># change to numpy array and float32
+</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span>
+<span class="n">sep</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.7</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">new_data</span><span class="p">))</span>
+<span class="n">train_data</span> <span class="o">=</span> <span class="n">new_data</span><span class="p">[:</span><span class="n">sep</span><span class="p">]</span>                         <span class="c1"># training data (70%)
+</span><span class="n">test_data</span> <span class="o">=</span> <span class="n">new_data</span><span class="p">[</span><span class="n">sep</span><span class="p">:]</span>                          <span class="c1"># test data (30%)
+</span></code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="搭建网络">搭建网络
+  <a href="/tutorials/machine-learning/ML-practice/build-car-classifier-from-scratch2/#搭建网络" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>接着我们就搭建神经网络, <code class="highlighter-rouge">input</code> 数据的后面4个是真实数据的4类型的 onehot 形式.
+我们添加两层隐藏层, 用 softmax 来输出每种类型的概率. 使用 tensorflow 的功能计算 loss 和 accuracy.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># build network
+</span><span class="n">tf_input</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="mi">25</span><span class="p">],</span> <span class="s">"input"</span><span class="p">)</span>
+<span class="n">tfx</span> <span class="o">=</span> <span class="n">tf_input</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">21</span><span class="p">]</span>
+<span class="n">tfy</span> <span class="o">=</span> <span class="n">tf_input</span><span class="p">[:,</span> <span class="mi">21</span><span class="p">:]</span>
+
+<span class="n">l1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span><span class="n">tfx</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">"l1"</span><span class="p">)</span>
+<span class="n">l2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">"l2"</span><span class="p">)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">dense</span><span class="p">(</span><span class="n">l2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">"l3"</span><span class="p">)</span>
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">"pred"</span><span class="p">)</span>
+
+<span class="n">loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">softmax_cross_entropy</span><span class="p">(</span><span class="n">onehot_labels</span><span class="o">=</span><span class="n">tfy</span><span class="p">,</span> <span class="n">logits</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+<span class="n">accuracy</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">accuracy</span><span class="p">(</span>          <span class="c1"># return (acc, update_op), and create 2 local variables
+</span>    <span class="n">labels</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">tfy</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">predictions</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),)[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">opt</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">GradientDescentOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">train_op</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+
+<span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+<span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">(),</span> <span class="n">tf</span><span class="o">.</span><span class="n">local_variables_initializer</span><span class="p">()))</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/ML-practice/car_classifier2-1.png">
+ <img class="course-image lazy-img" src="/static/results/ML-practice/car_classifier2-1.png" alt="从头开始做一个汽车状态分类器2: 搭建模型" title="从头开始做一个汽车状态分类器2: 搭建模型" />
+</a></p>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="训练网络">训练网络
+  <a href="/tutorials/machine-learning/ML-practice/build-car-classifier-from-scratch2/#训练网络" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>搭建好图, 然后通过 tensorboard 检查一下有没有错误, 最后就能开始训练啦.
+通过4000次循环, 这里我们使用 Mini-batch update, 先随机生成 batch 的索引, 然后在 train_data 中选择数据当作这次的 batch.
+这样运算起来比较快. 还有更快的方式, 比如使用 epoch 在每次 epoch 的时候 shuffle 一次数据, 然后在这个 shuffle 完的数据中按先后索引 batch 数据.
+这都是使用 numpy 进行 mini-batch 运行速度上的经验之谈了.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4000</span><span class="p">):</span>
+    <span class="c1"># training
+</span>    <span class="n">batch_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">train_data</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+    <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">train_op</span><span class="p">,</span> <span class="p">{</span><span class="n">tf_input</span><span class="p">:</span> <span class="n">train_data</span><span class="p">[</span><span class="n">batch_index</span><span class="p">]})</span>
+
+    <span class="k">if</span> <span class="n">t</span> <span class="o">%</span> <span class="mi">50</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># testing
+</span>        <span class="n">acc_</span><span class="p">,</span> <span class="n">pred_</span><span class="p">,</span> <span class="n">loss_</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">prediction</span><span class="p">,</span> <span class="n">loss</span><span class="p">],</span> <span class="p">{</span><span class="n">tf_input</span><span class="p">:</span> <span class="n">test_data</span><span class="p">})</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"Step: </span><span class="si">%</span><span class="s">i"</span> <span class="o">%</span> <span class="n">t</span><span class="p">,</span><span class="s">"| Accurate: </span><span class="si">%.2</span><span class="s">f"</span> <span class="o">%</span> <span class="n">acc_</span><span class="p">,</span><span class="s">"| Loss: </span><span class="si">%.2</span><span class="s">f"</span> <span class="o">%</span> <span class="n">loss_</span><span class="p">,)</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="可视化学习过程">可视化学习过程
+  <a href="/tutorials/machine-learning/ML-practice/build-car-classifier-from-scratch2/#可视化学习过程" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>可视化的代码, 我不在这里呈现了, 想看代码的朋友来我的 <a href="https://github.com/MorvanZhou/train-classifier-from-scratch/blob/master/model.py" target="_blank">github</a>.
+这个可视化展示的是在整个训练过程中, 原本 target 有多少这种类型的数据, 我们发现, 其实每种车状况的数据量还是不同的,
+虽然有点 <a href="/tutorials/machine-learning/ML-intro/3-07-imbalanced-data/">imbalance 的问题</a>,
+但是貌似模型没有被这种 imbalance 问题给带偏. 这是好事. 要不然, 我们还要对这套模型或者数据做手脚, 来解决 imbalance 问题.</p>
+
+<video class="tut-content-video" controls="" loop="" autoplay="" muted="">
+  <source src="/static/results/ML-practice/car_classifier1-1.mp4" type="video/mp4" />
+  Your browser does not support HTML5 video.
+</video>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<p>好啦, 我们现在就已经成功的走过了一遍分类器的实践. 我们发现, 在机器学习中, 搭建模型和训练并不一定是最难的地方,
+很多时候处理和分析数据也是很麻烦很繁琐的. 我们需要把握数据的规律, 寻找数据的正确表达形式. 好让神经网络比较容易接受.</p>
+
+<p><em>实战:从头开始做一个汽车状态分类器</em></p>
+
+<ul>
+  <li><em><a href="/tutorials/machine-learning/ML-practice/build-car-classifier-from-scratch1/">分析数据</a></em></li>
+  <li><em><a href="/tutorials/machine-learning/ML-practice/build-car-classifier-from-scratch2/">搭建模型</a></em></li>
+</ul>
+:ET

@@ -1,0 +1,103 @@
+I"e$<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/matplotlibTUT/plt17_plot_in_plot.py" target="_blank">相关代码</a></li>
+</ul>
+
+<p>这次我们来讲matplotlib里一个很有意思的功能，叫做图中图(plot in plot)，最后的效果如下：</p>
+
+<p><a href="/static/results/plt/4_3_1.png">
+ <img class="course-image lazy-img" src="/static/results/plt/4_3_1.png" alt="图中图" title="图中图" />
+</a></p>
+
+<p>可以看到，整个Figure 1包含了三个图，其中两个小图<code class="highlighter-rouge">title inside 1</code>和<code class="highlighter-rouge">title inside 2</code>又出现在大图<code class="highlighter-rouge">title</code>中。这是如何做到的呢？</p>
+
+<h2 class="tut-h2-pad" id="数据">数据
+  <a href="/tutorials/data-manipulation/plt/4-3-plot-in-plot/#数据" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>首先是一些准备工作：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 导入pyplot模块
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># 初始化figure
+</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+
+<span class="c1"># 创建数据
+</span><span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="大图">大图
+  <a href="/tutorials/data-manipulation/plt/4-3-plot-in-plot/#大图" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>接着，我们来绘制大图。首先确定大图左下角的位置以及宽高：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">left</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span>
+</code></pre></div></div>
+
+<p>注意，4个值都是占整个<code class="highlighter-rouge">figure</code>坐标系的百分比。在这里，假设<code class="highlighter-rouge">figure</code>的大小是10x10，那么大图就被包含在由(1, 1)开始，宽8，高8的坐标系内。</p>
+
+<p>将大图坐标系添加到<code class="highlighter-rouge">figure</code>中，颜色为r(red)，取名为title：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="n">left</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">])</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s">'r'</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">'x'</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">'y'</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">'title'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>效果如下：</p>
+
+<p><a href="/static/results/plt/4_3_2.png">
+ <img class="course-image lazy-img" src="/static/results/plt/4_3_2.png" alt="图中图" title="图中图" />
+</a></p>
+
+<h2 class="tut-h2-pad" id="小图">小图
+  <a href="/tutorials/data-manipulation/plt/4-3-plot-in-plot/#小图" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>接着，我们来绘制左上角的小图，步骤和绘制大图一样，注意坐标系位置和大小的改变：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">left</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="n">left</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">])</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="s">'b'</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">'x'</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">'y'</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">'title inside 1'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>效果如下：</p>
+
+<p><a href="/static/results/plt/4_3_3.png">
+ <img class="course-image lazy-img" src="/static/results/plt/4_3_3.png" alt="图中图" title="图中图" />
+</a></p>
+
+<p>最后，我们来绘制右下角的小图。这里我们采用一种更简单方法，即直接往plt里添加新的坐标系：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">([</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">,</span> <span class="s">'g'</span><span class="p">)</span> <span class="c1"># 注意对y进行了逆序处理
+</span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'x'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'y'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">'title inside 2'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>最后显示图像：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/plt/4_3_1.png">
+ <img class="course-image lazy-img" src="/static/results/plt/4_3_1.png" alt="图中图" title="图中图" />
+</a></p>
+
+:ET

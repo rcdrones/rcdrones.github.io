@@ -1,0 +1,74 @@
+I"�<p>学习资料:</p>
+<ul>
+  <li>全套<a href="https://github.com/MorvanZhou/tutorials/blob/master/basic/29_zip_lambda_map.py" target="_blank">代码</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="zip">zip
+  <a href="/tutorials/python-basic/basic/13-03-zip-lambda-map/#zip" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><code class="highlighter-rouge">zip</code>函数接受任意多个（包括0个和1个）序列作为参数，<strong>合并</strong>后返回一个<code class="highlighter-rouge">tuple</code>列表,请看示例：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">b</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span>
+<span class="n">ab</span><span class="o">=</span><span class="nb">zip</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ab</span><span class="p">))</span>  <span class="c1">#需要加list来可视化这个功能
+</span><span class="s">"""
+[(1, 4), (2, 5), (3, 6)]
+"""</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">zip</code> 中的运算</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">b</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span>
+<span class="n">ab</span><span class="o">=</span><span class="nb">zip</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ab</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">):</span>
+     <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="n">j</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+<span class="s">"""
+0.5 8
+1.0 10
+1.5 12
+"""</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="lambda">lambda
+  <a href="/tutorials/python-basic/basic/13-03-zip-lambda-map/#lambda" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><code class="highlighter-rouge">lambda</code>定义一个简单的函数，实现简化代码的功能，看代码会更好理解。</p>
+
+<p><code class="highlighter-rouge">fun = lambda x,y : x+y</code>, 冒号前的<code class="highlighter-rouge">x,y</code>为自变量，冒号后<code class="highlighter-rouge">x+y</code>为具体运算。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fun</span><span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span><span class="n">x</span><span class="o">+</span><span class="n">y</span>
+<span class="n">x</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s">'x='</span><span class="p">))</span>    <span class="c1">#这里要定义int整数，否则会默认为字符串
+</span><span class="n">y</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s">'y='</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">fun</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">))</span>
+
+<span class="s">"""
+x=6
+y=6
+12
+"""</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="map">map
+  <a href="/tutorials/python-basic/basic/13-03-zip-lambda-map/#map" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><code class="highlighter-rouge">map</code>是把函数和参数绑定在一起。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+	<span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">fun</span><span class="p">,[</span><span class="mi">1</span><span class="p">],[</span><span class="mi">2</span><span class="p">]))</span>
+<span class="s">"""
+[3]
+"""</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">fun</span><span class="p">,[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]))</span>
+<span class="s">"""
+[4,6]
+"""</span>
+</code></pre></div></div>
+
+:ET

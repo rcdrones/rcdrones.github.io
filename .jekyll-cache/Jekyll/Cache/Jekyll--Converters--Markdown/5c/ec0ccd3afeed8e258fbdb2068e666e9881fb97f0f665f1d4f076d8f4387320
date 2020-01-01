@@ -1,0 +1,61 @@
+I"u<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/theanoTUT/theano4_basic_usage.py" target="_blank">相关代码</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="Theano-的基本用法">Theano 的基本用法
+  <a href="/tutorials/machine-learning/theano/2-1-basic-usage/#Theano-的基本用法" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>在 theano 中学会定义矩阵 <code class="highlighter-rouge">matrix</code> 和功能 <code class="highlighter-rouge">function</code> 是一个比较重要的事, 我们在这里简单的提及了一下在 theano 将要运用到的东西.</p>
+
+<p>theano 和 tensorflow 类似，都是基于建立神经网络每个组件，在组件联系起来，数据放入组件，得到结果。</p>
+
+<p>首先, 我们这次需要加载 theano 和 numpy 两个模块, 并且使用 theano 来创建 <code class="highlighter-rouge">function</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">theano.tensor</span> <span class="k">as</span> <span class="n">T</span>
+<span class="kn">from</span> <span class="nn">theano</span> <span class="kn">import</span> <span class="n">function</span>
+</code></pre></div></div>
+
+<p>定义<code class="highlighter-rouge">X</code>和<code class="highlighter-rouge">Y</code>两个常量 (scalar)，把结构建立好之后，把结构放在<code class="highlighter-rouge">function</code>，在把数据放在<code class="highlighter-rouge">function</code>。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># basic
+</span><span class="n">x</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">dscalar</span><span class="p">(</span><span class="s">'x'</span><span class="p">)</span>  <span class="c1"># 建立 x 的容器
+</span><span class="n">y</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">dscalar</span><span class="p">(</span><span class="s">'y'</span><span class="p">)</span>  <span class="c1"># 建立 y 的容器
+</span><span class="n">z</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="n">y</span>     <span class="c1">#  建立方程
+</span>
+<span class="c1"># 使用 function 定义 theano 的方程, 
+# 将输入值 x, y 放在 [] 里,  输出值 z 放在后面
+</span><span class="n">f</span> <span class="o">=</span> <span class="n">function</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">],</span> <span class="n">z</span><span class="p">)</span>  
+
+<span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>  <span class="c1"># 将确切的 x, y 值放入方程中
+# 5.0
+</span></code></pre></div></div>
+
+<p>使用 theano 中 的 <code class="highlighter-rouge">pp</code> (pretty-print) 能够打印出原始方程:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">theano</span> <span class="kn">import</span> <span class="n">pp</span>
+<span class="k">print</span><span class="p">(</span><span class="n">pp</span><span class="p">(</span><span class="n">z</span><span class="p">))</span> 
+<span class="c1"># (x + y)
+</span></code></pre></div></div>
+
+<p>定义矩阵，以及利用矩阵做相关运算:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">dmatrix</span><span class="p">(</span><span class="s">'x'</span><span class="p">)</span>  <span class="c1"># 矩阵 x 的容器
+</span><span class="n">y</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">dmatrix</span><span class="p">(</span><span class="s">'y'</span><span class="p">)</span>  <span class="c1"># 矩阵 y 的容器
+</span><span class="n">z</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>   <span class="c1"># 定义矩阵加法
+</span><span class="n">f</span> <span class="o">=</span> <span class="n">function</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">],</span> <span class="n">z</span><span class="p">)</span> <span class="c1"># 定义方程
+</span>
+<span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)),</span> 
+        <span class="mi">10</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+        <span class="p">)</span>
+      <span class="p">)</span>
+<span class="s">"""
+[[ 10.  11.  12.  13.]
+ [ 14.  15.  16.  17.]
+ [ 18.  19.  20.  21.]]
+"""</span>
+</code></pre></div></div>
+:ET

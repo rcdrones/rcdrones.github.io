@@ -1,0 +1,41 @@
+I".<p>学习资料:</p>
+<ul>
+  <li>官方安装 <a href="http://scikit-learn.org/stable/install.html" target="_blank">教程</a></li>
+  <li>Windows 使用 <a href="https://www.continuum.io/downloads" target="_blank">Anaconda</a> 安装</li>
+</ul>
+
+<h2 class="tut-h2-pad" id="pip-安装">pip 安装
+  <a href="/tutorials/machine-learning/sklearn/1-2-install/#pip-安装" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>安装 Scikit-learn (sklearn) 最简单的方法就是使用 pip 安装它.</p>
+
+<p>首先确认自己电脑中有安装</p>
+
+<ul>
+  <li>Python (&gt;=2.6 或 &gt;=3.3 版本)</li>
+  <li>Numpy (&gt;=1.6.1)</li>
+  <li>Scipy (&gt;=0.9)</li>
+</ul>
+
+<p>如果还不确定如何安装 Numpy 请查看这个 <a href="/tutorials/data-manipulation/np-pd/1-2-install/">安装 Numpy</a>
+教程. 如果能顺利安装 Numpy 那 Scipy 的安装就没有问题了.</p>
+
+<p>然后找到你的 Terminal (MacOS or Linux), 或者 CMD (Windows).
+输入以下语句:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># python 2+ 版本复制:</span>
+pip <span class="nb">install</span> <span class="nt">-U</span> scikit-learn
+
+<span class="c"># python 3+ 版本复制:</span>
+pip3 <span class="nb">install</span> <span class="nt">-U</span> scikit-learn
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="Windows-注意事项">Windows 注意事项
+  <a href="/tutorials/machine-learning/sklearn/1-2-install/#Windows-注意事项" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>如果你是 Windows 用户, 你也可以选择使用 <code class="highlighter-rouge">Anaconda</code> 来安装所有 python 的科学计算模块.
+<a href="https://www.continuum.io/downloads" target="_blank">Anaconda的相关资料在这</a></p>
+
+:ET

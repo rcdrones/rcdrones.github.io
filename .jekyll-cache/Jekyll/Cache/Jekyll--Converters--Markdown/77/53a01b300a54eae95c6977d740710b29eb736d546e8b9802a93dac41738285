@@ -1,0 +1,13 @@
+I"a<p>学习资料</p>
+<ul>
+  <li>全套<a href="/tutorials/python-basic/tkinter">tkinter教程</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="窗口视窗">窗口视窗
+  <a href="/tutorials/python-basic/basic/13-07-tkinter/#窗口视窗" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>Tkinter 是使用 python 进行窗口视窗设计的模块.
+简单的构造, 多平台, 多系统的兼容性, 能让它成为让你快速入门定制窗口文件的好助手.
+它在 python 窗口视窗模块中是一款简单型的. 所以用来入门, 熟悉 窗口视窗的使用, 非常有必要.</p>
+:ET

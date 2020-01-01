@@ -1,0 +1,93 @@
+I"8<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/contents/3_Sarsa_maze" target="_blank">全部代码</a></li>
+  <li><a href="/tutorials/machine-learning/ML-intro/4-04-sarsa/">什么是 Sarsa 短视频</a></li>
+  <li>模拟视频效果<a href="https://www.youtube.com/playlist?list=PLXO45tsB95cLYyEsEylpPvTY-8ErPt2O_" target="_blank">Youtube</a>, <a href="http://list.youku.com/albumlist/show/id_27485743" target="_blank">Youku</a></li>
+  <li>学习书籍 <a href="/static/files/Reinforcement_learning_An_introduction.pdf" target="_blank">Reinforcement learning: An introduction</a></li>
+</ul>
+
+<p>接着上节内容, 我们来实现 <code class="highlighter-rouge">RL_brain</code> 的 <code class="highlighter-rouge">SarsaTable</code> 部分, 这也是 RL 的大脑部分, 负责决策和思考.</p>
+
+<h2 class="tut-h2-pad" id="代码主结构">代码主结构
+  <a href="/tutorials/machine-learning/reinforcement-learning/3-2-tabular-sarsa2/#代码主结构" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>和之前定义 Qlearning 中的 <code class="highlighter-rouge">QLearningTable</code> 一样, 因为使用 tabular 方式的 <code class="highlighter-rouge">Sarsa</code> 和 <code class="highlighter-rouge">Qlearning</code> 的相似度极高,</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">SarsaTable</span><span class="p">:</span>
+    <span class="c1"># 初始化 (与之前一样)
+</span>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">reward_decay</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">e_greedy</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>
+
+    <span class="c1"># 选行为 (与之前一样)
+</span>    <span class="k">def</span> <span class="nf">choose_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observation</span><span class="p">):</span>
+
+    <span class="c1"># 学习更新参数 (有改变)
+</span>    <span class="k">def</span> <span class="nf">learn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s_</span><span class="p">):</span>
+
+    <span class="c1"># 检测 state 是否存在 (与之前一样)
+</span>    <span class="k">def</span> <span class="nf">check_state_exist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+</code></pre></div></div>
+
+<p>我们甚至可以定义一个 主class <code class="highlighter-rouge">RL</code>, 然后将 <code class="highlighter-rouge">QLearningTable</code> 和 <code class="highlighter-rouge">SarsaTable</code> 作为 主class <code class="highlighter-rouge">RL</code> 的衍生, 这个主 <code class="highlighter-rouge">RL</code> 可以这样定义.
+所以我们将之前的 <code class="highlighter-rouge">__init__</code>, <code class="highlighter-rouge">check_state_exist</code>, <code class="highlighter-rouge">choose_action</code>, <code class="highlighter-rouge">learn</code> 全部都放在这个主结构中, 之后根据不同的算法更改对应的内容就好了.
+所以还没弄懂这些功能的朋友们, 请回到之前的教程再看一遍.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+
+<span class="k">class</span> <span class="nc">RL</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_space</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">reward_decay</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">e_greedy</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>
+        <span class="o">...</span> <span class="c1"># 和 QLearningTable 中的代码一样
+</span>
+    <span class="k">def</span> <span class="nf">check_state_exist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+        <span class="o">...</span> <span class="c1"># 和 QLearningTable 中的代码一样
+</span>
+    <span class="k">def</span> <span class="nf">choose_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observation</span><span class="p">):</span>
+        <span class="o">...</span> <span class="c1"># 和 QLearningTable 中的代码一样
+</span>
+    <span class="k">def</span> <span class="nf">learn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">pass</span> <span class="c1"># 每种的都有点不同, 所以用 pass
+</span></code></pre></div></div>
+
+<p>如果是这样定义父类的 <code class="highlighter-rouge">RL</code> class, 通过继承关系, 那之子类 <code class="highlighter-rouge">QLearningTable</code> class 就能简化成这样:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">QLearningTable</span><span class="p">(</span><span class="n">RL</span><span class="p">):</span>   <span class="c1"># 继承了父类 RL
+</span>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">reward_decay</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">e_greedy</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">QLearningTable</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">actions</span><span class="p">,</span> <span class="n">learning_rate</span><span class="p">,</span> <span class="n">reward_decay</span><span class="p">,</span> <span class="n">e_greedy</span><span class="p">)</span>    <span class="c1"># 表示继承关系
+</span>
+    <span class="k">def</span> <span class="nf">learn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s_</span><span class="p">):</span>   <span class="c1"># learn 的方法在每种类型中有不一样, 需重新定义
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">check_state_exist</span><span class="p">(</span><span class="n">s_</span><span class="p">)</span>
+        <span class="n">q_predict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">s_</span> <span class="o">!=</span> <span class="s">'terminal'</span><span class="p">:</span>
+            <span class="n">q_target</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">s_</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="nb">max</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">q_target</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">*</span> <span class="p">(</span><span class="n">q_target</span> <span class="o">-</span> <span class="n">q_predict</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="学习">学习
+  <a href="/tutorials/machine-learning/reinforcement-learning/3-2-tabular-sarsa2/#学习" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>有了父类的 <code class="highlighter-rouge">RL</code>, 我们这次的编写就很简单, 只需要编写 <code class="highlighter-rouge">SarsaTable</code> 中 <code class="highlighter-rouge">learn</code> 这个功能就完成了. 因为其他功能都和父类是一样的.
+这就是我们所有的 <code class="highlighter-rouge">SarsaTable</code> 于父类 <code class="highlighter-rouge">RL</code> 不同之处的代码. 是不是很简单.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">SarsaTable</span><span class="p">(</span><span class="n">RL</span><span class="p">):</span>   <span class="c1"># 继承 RL class
+</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">reward_decay</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">e_greedy</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SarsaTable</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">actions</span><span class="p">,</span> <span class="n">learning_rate</span><span class="p">,</span> <span class="n">reward_decay</span><span class="p">,</span> <span class="n">e_greedy</span><span class="p">)</span>    <span class="c1"># 表示继承关系
+</span>
+    <span class="k">def</span> <span class="nf">learn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s_</span><span class="p">,</span> <span class="n">a_</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_state_exist</span><span class="p">(</span><span class="n">s_</span><span class="p">)</span>
+        <span class="n">q_predict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">s_</span> <span class="o">!=</span> <span class="s">'terminal'</span><span class="p">:</span>
+            <span class="n">q_target</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">s_</span><span class="p">,</span> <span class="n">a_</span><span class="p">]</span>  <span class="c1"># q_target 基于选好的 a_ 而不是 Q(s_) 的最大值
+</span>        <span class="k">else</span><span class="p">:</span>
+            <span class="n">q_target</span> <span class="o">=</span> <span class="n">r</span>  <span class="c1"># 如果 s_ 是终止符
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">q_table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">*</span> <span class="p">(</span><span class="n">q_target</span> <span class="o">-</span> <span class="n">q_predict</span><span class="p">)</span>  <span class="c1"># 更新 q_table
+</span></code></pre></div></div>
+
+<p>如果想一次性看到全部代码, 请去我的 <a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/contents/3_Sarsa_maze" target="_blank">Github</a></p>
+
+:ET

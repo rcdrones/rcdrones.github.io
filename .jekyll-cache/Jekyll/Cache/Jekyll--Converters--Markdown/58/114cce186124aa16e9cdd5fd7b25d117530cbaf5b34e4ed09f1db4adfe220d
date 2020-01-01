@@ -1,0 +1,178 @@
+I"�Q<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/PyTorch-Tutorial/blob/master/tutorial-contents/404_autoencoder.py" target="_blank">本节的全部代码</a></li>
+  <li><a href="https://github.com/MorvanZhou/Tensorflow-Tutorial/blob/master/tutorial-contents/404_AutoEncoder.py" target="_blank">Tensorflow 的 50行 AutoEncoder 代码</a></li>
+  <li><a href="/tutorials/machine-learning/ML-intro/2-5-autoencoder/">我制作的 自编码 动画简介</a></li>
+  <li><a href="http://pytorch.org/" target="_blank">PyTorch 官网</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="要点">要点
+  <a href="/tutorials/machine-learning/torch/4-04-autoencoder/#要点" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>神经网络也能进行非监督学习, 只需要训练数据, 不需要标签数据. 自编码就是这样一种形式.
+自编码能自动分类数据, 而且也能嵌套在半监督学习的上面, 用少量的有标签样本和大量的无标签样本学习.
+如果对自编码还没有太多概念, 强烈推荐我的这个<a href="/tutorials/machine-learning/ML-intro/2-5-autoencoder/">动画短片</a>, 让你秒懂自编码.</p>
+
+<p>这次我们还用 MNIST 手写数字数据来压缩再解压图片.</p>
+
+<p><a href="/static/results/torch/4-4-1.gif">
+ <img class="course-image lazy-img" src="/static/results/torch/4-4-1.gif" alt="AutoEncoder (自编码/非监督学习)" title="AutoEncoder (自编码/非监督学习)" />
+</a></p>
+
+<p>然后用压缩的特征进行非监督分类.</p>
+
+<p><a href="/static/results/torch/4-4-2.gif">
+ <img class="course-image lazy-img" src="/static/results/torch/4-4-2.gif" alt="AutoEncoder (自编码/非监督学习)" title="AutoEncoder (自编码/非监督学习)" />
+</a></p>
+
+<h2 class="tut-h2-pad" id="训练数据">训练数据
+  <a href="/tutorials/machine-learning/torch/4-04-autoencoder/#训练数据" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>自编码只用训练集就好了, 而且只需要训练 training data 的 image, 不用训练 labels.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="n">nn</span>
+<span class="kn">import</span> <span class="nn">torch.utils.data</span> <span class="k">as</span> <span class="n">Data</span>
+<span class="kn">import</span> <span class="nn">torchvision</span>
+
+<span class="c1"># 超参数
+</span><span class="n">EPOCH</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="n">LR</span> <span class="o">=</span> <span class="mf">0.005</span>
+<span class="n">DOWNLOAD_MNIST</span> <span class="o">=</span> <span class="bp">True</span>   <span class="c1"># 下过数据的话, 就可以设置成 False
+</span><span class="n">N_TEST_IMG</span> <span class="o">=</span> <span class="mi">5</span>          <span class="c1"># 到时候显示 5张图片看效果, 如上图一
+</span>
+<span class="c1"># Mnist digits dataset
+</span><span class="n">train_data</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span>
+    <span class="n">root</span><span class="o">=</span><span class="s">'./mnist/'</span><span class="p">,</span>
+    <span class="n">train</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>                                     <span class="c1"># this is training data
+</span>    <span class="n">transform</span><span class="o">=</span><span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>    <span class="c1"># Converts a PIL.Image or numpy.ndarray to
+</span>                                                    <span class="c1"># torch.FloatTensor of shape (C x H x W) and normalize in the range [0.0, 1.0]
+</span>    <span class="n">download</span><span class="o">=</span><span class="n">DOWNLOAD_MNIST</span><span class="p">,</span>                        <span class="c1"># download it if you don't have it
+</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/torch/4-4-3.png">
+ <img class="course-image lazy-img" src="/static/results/torch/4-4-3.png" alt="AutoEncoder (自编码/非监督学习)" title="AutoEncoder (自编码/非监督学习)" />
+</a></p>
+
+<p>这就是一张我们要训练的手写数字 4.</p>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="AutoEncoder">AutoEncoder
+  <a href="/tutorials/machine-learning/torch/4-04-autoencoder/#AutoEncoder" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>AutoEncoder 形式很简单, 分别是 <code class="highlighter-rouge">encoder</code> 和 <code class="highlighter-rouge">decoder</code>, 压缩和解压, 压缩后得到压缩的特征值, 再从压缩的特征值解压成原图片.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">AutoEncoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AutoEncoder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+
+        <span class="c1"># 压缩
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">28</span><span class="o">*</span><span class="mi">28</span><span class="p">,</span> <span class="mi">128</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Tanh</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Tanh</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Tanh</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>   <span class="c1"># 压缩成3个特征, 进行 3D 图像可视化
+</span>        <span class="p">)</span>
+        <span class="c1"># 解压
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Tanh</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Tanh</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Tanh</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">28</span><span class="o">*</span><span class="mi">28</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">(),</span>       <span class="c1"># 激励函数让输出值在 (0, 1)
+</span>        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">encoded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">decoded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">encoded</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">encoded</span><span class="p">,</span> <span class="n">decoded</span>
+
+<span class="n">autoencoder</span> <span class="o">=</span> <span class="n">AutoEncoder</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="训练">训练
+  <a href="/tutorials/machine-learning/torch/4-04-autoencoder/#训练" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>训练, 并可视化训练的过程. 我们可以有效的利用 <code class="highlighter-rouge">encoder</code> 和 <code class="highlighter-rouge">decoder</code> 来做很多事,
+比如这里我们用 <code class="highlighter-rouge">decoder</code> 的信息输出看和原图片的对比, 还能用 <code class="highlighter-rouge">encoder</code> 来看经过压缩后, 神经网络对原图片的理解.
+<code class="highlighter-rouge">encoder</code> 能将不同图片数据大概的分离开来. 这样就是一个无监督学习的过程.</p>
+
+<p><a href="/static/results/torch/4-4-1.gif">
+ <img class="course-image lazy-img" src="/static/results/torch/4-4-1.gif" alt="AutoEncoder (自编码/非监督学习)" title="AutoEncoder (自编码/非监督学习)" />
+</a></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">autoencoder</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">LR</span><span class="p">)</span>
+<span class="n">loss_func</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">EPOCH</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">b_label</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_loader</span><span class="p">):</span>
+        <span class="n">b_x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="o">*</span><span class="mi">28</span><span class="p">)</span>   <span class="c1"># batch x, shape (batch, 28*28)
+</span>        <span class="n">b_y</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="o">*</span><span class="mi">28</span><span class="p">)</span>   <span class="c1"># batch y, shape (batch, 28*28)
+</span>
+        <span class="n">encoded</span><span class="p">,</span> <span class="n">decoded</span> <span class="o">=</span> <span class="n">autoencoder</span><span class="p">(</span><span class="n">b_x</span><span class="p">)</span>
+
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_func</span><span class="p">(</span><span class="n">decoded</span><span class="p">,</span> <span class="n">b_y</span><span class="p">)</span>      <span class="c1"># mean square error
+</span>        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>               <span class="c1"># clear gradients for this training step
+</span>        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>                     <span class="c1"># backpropagation, compute gradients
+</span>        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>                    <span class="c1"># apply gradients
+</span></code></pre></div></div>
+
+<p><a href="/static/results/torch/4-4-4.png">
+ <img class="course-image lazy-img" src="/static/results/torch/4-4-4.png" alt="AutoEncoder (自编码/非监督学习)" title="AutoEncoder (自编码/非监督学习)" />
+</a></p>
+
+<h2 class="tut-h2-pad" id="画3D图">画3D图
+  <a href="/tutorials/machine-learning/torch/4-04-autoencoder/#画3D图" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><a href="/static/results/torch/4-4-2.gif">
+ <img class="course-image lazy-img" src="/static/results/torch/4-4-2.gif" alt="AutoEncoder (自编码/非监督学习)" title="AutoEncoder (自编码/非监督学习)" />
+</a></p>
+
+<p>3D 的可视化图挺有趣的, 还能挪动观看, 更加直观, 好理解.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 要观看的数据
+</span><span class="n">view_data</span> <span class="o">=</span> <span class="n">train_data</span><span class="o">.</span><span class="n">train_data</span><span class="p">[:</span><span class="mi">200</span><span class="p">]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="o">*</span><span class="mi">28</span><span class="p">)</span><span class="o">.</span><span class="nb">type</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">)</span><span class="o">/</span><span class="mf">255.</span>
+<span class="n">encoded_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">autoencoder</span><span class="p">(</span><span class="n">view_data</span><span class="p">)</span>    <span class="c1"># 提取压缩的特征值
+</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">Axes3D</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>    <span class="c1"># 3D 图
+# x, y, z 的数据值
+</span><span class="n">X</span> <span class="o">=</span> <span class="n">encoded_data</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">encoded_data</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">encoded_data</span><span class="o">.</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">values</span> <span class="o">=</span> <span class="n">train_data</span><span class="o">.</span><span class="n">train_labels</span><span class="p">[:</span><span class="mi">200</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>  <span class="c1"># 标签值
+</span><span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">rainbow</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">255</span><span class="o">*</span><span class="n">s</span><span class="o">/</span><span class="mi">9</span><span class="p">))</span>    <span class="c1"># 上色
+</span>    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">backgroundcolor</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>  <span class="c1"># 标位子
+</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="nb">min</span><span class="p">(),</span> <span class="n">X</span><span class="o">.</span><span class="nb">max</span><span class="p">())</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="nb">min</span><span class="p">(),</span> <span class="n">Y</span><span class="o">.</span><span class="nb">max</span><span class="p">())</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_zlim</span><span class="p">(</span><span class="n">Z</span><span class="o">.</span><span class="nb">min</span><span class="p">(),</span> <span class="n">Z</span><span class="o">.</span><span class="nb">max</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/torch/4-4-5.png">
+ <img class="course-image lazy-img" src="/static/results/torch/4-4-5.png" alt="AutoEncoder (自编码/非监督学习)" title="AutoEncoder (自编码/非监督学习)" />
+</a></p>
+
+<p>所以这也就是在我 <a href="https://github.com/MorvanZhou/PyTorch-Tutorial/blob/master/tutorial-contents/404_autoencoder.py" target="_blank">github 代码</a> 中的每一步的意义啦.</p>
+
+:ET

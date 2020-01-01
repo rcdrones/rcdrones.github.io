@@ -1,0 +1,42 @@
+I"E
+<h2 class="tut-h2-pad" id="创建字典">创建字典
+  <a href="/tutorials/python-basic/basic/11-4-dictionary/#创建字典" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>如果说<code class="highlighter-rouge">List</code>是有顺序地输出输入的话，那么字典的存档形式则是无需顺序的， 我们来看一个例子：</p>
+
+<p>在字典中，有<code class="highlighter-rouge">key</code>和 <code class="highlighter-rouge">value</code>两种元素，每一个<code class="highlighter-rouge">key</code>对应一个<code class="highlighter-rouge">value</code>, <code class="highlighter-rouge">key</code>是名字, <code class="highlighter-rouge">value</code>是内容。数字和字符串都可以当做<code class="highlighter-rouge">key</code>或者<code class="highlighter-rouge">value</code>，
+在同一个字典中, 并不需要所有的<code class="highlighter-rouge">key</code>或<code class="highlighter-rouge">value</code>有相同的形式。
+这样说, <code class="highlighter-rouge">List</code> 可以说是一种<code class="highlighter-rouge">key</code>为有序数列的字典。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">]</span>
+
+<span class="n">d1</span> <span class="o">=</span> <span class="p">{</span><span class="s">'apple'</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s">'pear'</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="s">'orange'</span><span class="p">:</span><span class="mi">3</span><span class="p">}</span>
+<span class="n">d2</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span><span class="s">'a'</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span><span class="s">'b'</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="s">'c'</span><span class="p">}</span>
+<span class="n">d3</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span><span class="s">'a'</span><span class="p">,</span> <span class="s">'b'</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="s">'c'</span><span class="p">:</span><span class="mi">3</span><span class="p">}</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">d1</span><span class="p">[</span><span class="s">'apple'</span><span class="p">])</span>  <span class="c1"># 1
+</span><span class="k">print</span><span class="p">(</span><span class="n">a_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>    <span class="c1"># 1
+</span>
+<span class="k">del</span> <span class="n">d1</span><span class="p">[</span><span class="s">'pear'</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">d1</span><span class="p">)</span>   <span class="c1"># {'orange': 3, 'apple': 1}
+</span>
+<span class="n">d1</span><span class="p">[</span><span class="s">'b'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="k">print</span><span class="p">(</span><span class="n">d1</span><span class="p">)</span>   <span class="c1"># {'orange': 3, 'b': 20, 'pear': 2, 'apple': 1}
+</span></code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="字典存储类型">字典存储类型
+  <a href="/tutorials/python-basic/basic/11-4-dictionary/#字典存储类型" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>以上的例子可以对列表中的元素进行增减。在打印出整个列表时，可以发现各个元素并没有按规律打印出来，进一步验证了字典是一个无序的容器。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">func</span><span class="p">():</span>
+    <span class="k">return</span> <span class="mi">0</span>
+
+<span class="n">d4</span> <span class="o">=</span> <span class="p">{</span><span class="s">'apple'</span><span class="p">:[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="s">'pear'</span><span class="p">:{</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="s">'a'</span><span class="p">},</span> <span class="s">'orange'</span><span class="p">:</span><span class="n">func</span><span class="p">}</span>
+<span class="k">print</span><span class="p">(</span><span class="n">d4</span><span class="p">[</span><span class="s">'pear'</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span>    <span class="c1"># a
+</span></code></pre></div></div>
+
+<p>字典还可以以更多样的形式出现，例如字典的元素可以是一个List，或者再是一个列表，再或者是一个function。索引需要的项目时，只需要正确指定对应的<code class="highlighter-rouge">key</code>就可以了。</p>
+:ET

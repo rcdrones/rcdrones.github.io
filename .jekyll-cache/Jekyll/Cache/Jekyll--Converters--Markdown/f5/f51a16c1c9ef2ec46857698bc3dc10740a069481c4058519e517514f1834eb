@@ -1,0 +1,110 @@
+I""<p>学习资料:</p>
+<ul>
+  <li><a href="/static/results/git/initial-files/for_gitTUT_4-2.zip">这节例子的初始文件</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="merge-分支冲突">merge 分支冲突
+  <a href="/tutorials/others/git/4-2-merge-conflict/#merge-分支冲突" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>今天的情况是这样, 想象不仅有人在做开发版 <code class="highlighter-rouge">dev</code> 的更新, 还有人在修改 <code class="highlighter-rouge">master</code> 中的一些 bug.
+当我们再 <code class="highlighter-rouge">merge dev</code> 的时候, 冲突就来了. 因为 git 不知道应该怎么处理 <code class="highlighter-rouge">merge</code> 时, 在 <code class="highlighter-rouge">master</code>
+和 <code class="highlighter-rouge">dev</code> 的不同修改.</p>
+
+<p>当创建了一个分支后, 我们同时对两个分支都进行了修改.</p>
+
+<p>比如在:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">master</code> 中的 <code class="highlighter-rouge">1.py</code> 加上 <code class="highlighter-rouge"># edited in master</code>.</li>
+  <li><code class="highlighter-rouge">dev</code> 中的 <code class="highlighter-rouge">1.py</code> 加上 <code class="highlighter-rouge"># edited in dev</code>.</li>
+</ul>
+
+<p>在下面可以看出在 <code class="highlighter-rouge">master</code> 和 <code class="highlighter-rouge">dev</code> 中不同的 <code class="highlighter-rouge">commit</code>:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 这是 master 的 log</span>
+<span class="k">*</span> 3d7796e change 4 <span class="k">in </span>master <span class="c"># 这一条 commit 和 dev 的不一样</span>
+<span class="k">*</span> 47f167e back to change 1 and add comment <span class="k">for </span>1.py
+<span class="k">*</span> 904e1ba change 2
+<span class="k">*</span> c6762a1 change 1
+<span class="k">*</span> 13be9a7 create 1.py
+<span class="nt">-----------------------------</span>
+<span class="c"># 这是 dev 的 log</span>
+<span class="k">*</span> f7d2e3a change 3 <span class="k">in </span>dev   <span class="c"># 这一条 commit 和 master 的不一样</span>
+<span class="k">*</span> 47f167e back to change 1 and add comment <span class="k">for </span>1.py
+<span class="k">*</span> 904e1ba change 2
+<span class="k">*</span> c6762a1 change 1
+<span class="k">*</span> 13be9a7 create 1.py
+</code></pre></div></div>
+
+<p>当我们想要 <code class="highlighter-rouge">merge</code> <code class="highlighter-rouge">dev</code> 到 <code class="highlighter-rouge">master</code> 的时候:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git branch
+  dev
+<span class="k">*</span> master
+<span class="nt">-------------------------</span>
+<span class="nv">$ </span>git merge dev
+
+<span class="c"># 输出</span>
+Auto-merging 1.py
+CONFLICT <span class="o">(</span>content<span class="o">)</span>: Merge conflict <span class="k">in </span>1.py
+Automatic merge failed<span class="p">;</span> fix conflicts and <span class="k">then </span>commit the result.
+</code></pre></div></div>
+
+<p>git 发现的我们的 <code class="highlighter-rouge">1.py</code> 在 <code class="highlighter-rouge">master</code> 和 <code class="highlighter-rouge">dev</code> 上的版本是不同的, 所以提示 <code class="highlighter-rouge">merge</code> 有冲突. 具体的冲突, 
+git 已经帮我们标记出来, 我们打开 <code class="highlighter-rouge">1.py</code> 就能看到:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="c1"># I went back to change 1
+</span><span class="o">&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span> <span class="n">HEAD</span>
+<span class="c1"># edited in master
+</span><span class="o">=======</span>
+<span class="c1"># edited in dev
+</span><span class="o">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</span> <span class="n">dev</span>
+</code></pre></div></div>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<p>所以我们只要在 <code class="highlighter-rouge">1.py</code> 中手动合并一下两者的不同就 OK 啦. 我们将当前 <code class="highlighter-rouge">HEAD</code> (也就是<code class="highlighter-rouge">master</code>) 中的描述 和 <code class="highlighter-rouge">dev</code> 中的描述合并一下.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="c1"># I went back to change 1
+</span>
+<span class="c1"># edited in master and dev
+</span></code></pre></div></div>
+
+<p>然后再 <code class="highlighter-rouge">commit</code> 现在的文件, 冲突就解决啦.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git commit <span class="nt">-am</span> <span class="s2">"solve conflict"</span>
+</code></pre></div></div>
+
+<p>再来看看 <code class="highlighter-rouge">master</code> 的 <code class="highlighter-rouge">log</code>:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git log <span class="nt">--oneline</span> <span class="nt">--graph</span>
+
+<span class="c"># 输出</span>
+<span class="k">*</span>   7810065 solve conflict
+|<span class="se">\ </span> 
+| <span class="k">*</span> f7d2e3a change 3 <span class="k">in </span>dev
+<span class="k">*</span> | 3d7796e change 4 <span class="k">in </span>master
+|/  
+<span class="k">*</span> 47f167e back to change 1 and add comment <span class="k">for </span>1.py
+<span class="k">*</span> 904e1ba change 2
+<span class="k">*</span> c6762a1 change 1
+<span class="k">*</span> 13be9a7 create 1.py
+</code></pre></div></div>
+
+<p>回到这张图, 
+他也诠释了两个分支都有更改的时候的样子, 在这种情况下 <code class="highlighter-rouge">merge</code>, 我们就要使用上述的流程.</p>
+
+<p><a href="/static/results/git/4-2-1.png">
+ <img class="course-image lazy-img" src="/static/results/git/4-2-1.png" alt="merge 分支冲突" title="merge 分支冲突" />
+</a></p>
+
+:ET

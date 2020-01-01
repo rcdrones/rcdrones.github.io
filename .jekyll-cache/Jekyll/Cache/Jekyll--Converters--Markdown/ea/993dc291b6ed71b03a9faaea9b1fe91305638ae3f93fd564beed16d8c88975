@@ -1,0 +1,67 @@
+I"�<p>学习资料:</p>
+<ul>
+  <li>Python <a href="https://docs.python.org/3.5/library/array.html" target="_blank">C type code种类</a></li>
+</ul>
+
+<p>这节我们学习如何定义共享内存。只有用共享内存才能让CPU之间有交流。</p>
+
+<h2 class="tut-h2-pad" id="Shared-Value">Shared Value
+  <a href="/tutorials/python-basic/multiprocessing/6-shared-memory/#Shared-Value" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>我们可以通过使用<code class="highlighter-rouge">Value</code>数据存储在一个共享的内存表中。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="n">mp</span>
+
+<span class="n">value1</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="s">'i'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> 
+<span class="n">value2</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="s">'d'</span><span class="p">,</span> <span class="mf">3.14</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>其中<code class="highlighter-rouge">d</code>和<code class="highlighter-rouge">i</code>参数用来设置数据类型的，<code class="highlighter-rouge">d</code>表示一个双精浮点类型，<code class="highlighter-rouge">i</code>表示一个带符号的整型。更多的形式请查看本页最后的表.</p>
+
+<h2 class="tut-h2-pad" id="Shared-Array">Shared Array
+  <a href="/tutorials/python-basic/multiprocessing/6-shared-memory/#Shared-Array" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>在Python的<code class="highlighter-rouge">mutiprocessing</code>中，有还有一个<code class="highlighter-rouge">Array</code>类，可以和共享内存交互，来实现在进程之间共享数据。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">array</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="s">'i'</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>这里的<code class="highlighter-rouge">Array</code>和numpy中的不同，它只能是一维的，不能是多维的。同样和<code class="highlighter-rouge">Value</code> 一样，需要定义数据形式，否则会报错。
+我们会在后一节举例说明这两种的使用方法.</p>
+
+<p><strong>错误形式</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">array</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="s">'i'</span><span class="p">,</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span> <span class="c1"># 2维list
+</span>
+<span class="s">"""
+TypeError: an integer is required
+"""</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="参考数据形式">参考数据形式
+  <a href="/tutorials/python-basic/multiprocessing/6-shared-memory/#参考数据形式" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>各参数代表的数据类型</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>| Type code | C Type             | Python Type       | Minimum size in bytes |
+| --------- | ------------------ | ----------------- | --------------------- |
+| `'b'`     | signed char        | int               | 1                     |
+| `'B'`     | unsigned char      | int               | 1                     |
+| `'u'`     | Py_UNICODE         | Unicode character | 2                     |
+| `'h'`     | signed short       | int               | 2                     |
+| `'H'`     | unsigned short     | int               | 2                     |
+| `'i'`     | signed int         | int               | 2                     |
+| `'I'`     | unsigned int       | int               | 2                     |
+| `'l'`     | signed long        | int               | 4                     |
+| `'L'`     | unsigned long      | int               | 4                     |
+| `'q'`     | signed long long   | int               | 8                     |
+| `'Q'`     | unsigned long long | int               | 8                     |
+| `'f'`     | float              | float             | 4                     |
+| `'d'`     | double             | float             | 8                     |
+</code></pre></div></div>
+
+<p>(来源：<a href="https://docs.python.org/3/library/array.html" target="_blank">https://docs.python.org/3/library/array.html</a>）</p>
+:ET

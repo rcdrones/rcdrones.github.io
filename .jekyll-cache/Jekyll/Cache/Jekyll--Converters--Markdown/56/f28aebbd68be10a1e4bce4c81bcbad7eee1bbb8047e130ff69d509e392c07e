@@ -1,0 +1,140 @@
+I"[3<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/kerasTUT/4-regressor_example.py" target="_blank">代码链接</a></li>
+  <li>机器学习-简介系列 <a href="/tutorials/machine-learning/ML-intro/2-1-NN/">什么是神经网络</a></li>
+</ul>
+
+<p>神经网络可以用来模拟回归问题 (regression)，例如给下面一组数据，用一条线来对数据进行拟合，并可以预测新输入 <code class="highlighter-rouge">x</code> 的输出值。</p>
+
+<p><a href="/static/results/keras/2-1-2.png">
+ <img class="course-image lazy-img" src="/static/results/keras/2-1-2.png" alt="Regressor 回归" title="Regressor 回归" />
+</a></p>
+
+<h2 class="tut-h2-pad" id="导入模块并创建数据">导入模块并创建数据
+  <a href="/tutorials/machine-learning/keras/2-1-regressor/#导入模块并创建数据" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><code class="highlighter-rouge">models.Sequential</code>，用来一层一层一层的去建立神经层；
+<code class="highlighter-rouge">layers.Dense</code> 意思是这个神经层是全连接层。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1337</span><span class="p">)</span>  <span class="c1"># for reproducibility
+</span><span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Sequential</span>
+<span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Dense</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span> <span class="c1"># 可视化模块
+</span>
+<span class="c1"># create some data
+</span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>    <span class="c1"># randomize the data
+</span><span class="n">Y</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">X</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="p">))</span>
+<span class="c1"># plot data
+</span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="mi">160</span><span class="p">],</span> <span class="n">Y</span><span class="p">[:</span><span class="mi">160</span><span class="p">]</span>     <span class="c1"># train 前 160 data points
+</span><span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">160</span><span class="p">:],</span> <span class="n">Y</span><span class="p">[</span><span class="mi">160</span><span class="p">:]</span>       <span class="c1"># test 后 40 data points
+</span></code></pre></div></div>
+
+<p><a href="/static/results/keras/2-1-1.png">
+ <img class="course-image lazy-img" src="/static/results/keras/2-1-1.png" alt="Regressor 回归" title="Regressor 回归" />
+</a></p>
+
+<h2 class="tut-h2-pad" id="建立模型">建立模型
+  <a href="/tutorials/machine-learning/keras/2-1-regressor/#建立模型" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>然后用 <code class="highlighter-rouge">Sequential</code> 建立 <code class="highlighter-rouge">model</code>，
+再用 <code class="highlighter-rouge">model.add</code> 添加神经层，添加的是 <code class="highlighter-rouge">Dense</code> 全连接神经层。</p>
+
+<p>参数有两个，一个是输入数据和输出数据的维度，本代码的例子中 <code class="highlighter-rouge">x</code> 和 <code class="highlighter-rouge">y</code> 是一维的。</p>
+
+<p>如果需要添加下一个神经层的时候，不用再定义输入的纬度，因为它默认就把前一层的输出作为当前层的输入。在这个例子里，只需要一层就够了。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="n">output_dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">input_dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="激活模型">激活模型
+  <a href="/tutorials/machine-learning/keras/2-1-regressor/#激活模型" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>接下来要激活神经网络，上一步只是定义模型。</p>
+
+<p>参数中，误差函数用的是 <code class="highlighter-rouge">mse</code> 均方误差；优化器用的是 <code class="highlighter-rouge">sgd</code> 随机梯度下降法。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># choose loss function and optimizing method
+</span><span class="n">model</span><span class="o">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s">'mse'</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="s">'sgd'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>以上三行就构建好了一个神经网络，它比 Tensorflow 要少了很多代码，很简单。</p>
+
+<h2 class="tut-h2-pad" id="训练模型">训练模型
+  <a href="/tutorials/machine-learning/keras/2-1-regressor/#训练模型" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>训练的时候用 <code class="highlighter-rouge">model.train_on_batch</code> 一批一批的训练 <code class="highlighter-rouge">X_train</code>, <code class="highlighter-rouge">Y_train</code>。默认的返回值是 <code class="highlighter-rouge">cost</code>，每100步输出一下结果。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># training
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Training -----------'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">301</span><span class="p">):</span>
+    <span class="n">cost</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_on_batch</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'train cost: '</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span>
+
+<span class="s">"""
+Training -----------
+train cost:  4.111329555511475
+train cost:  0.08777070790529251
+train cost:  0.007415373809635639
+train cost:  0.003544030711054802
+"""</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="检验模型">检验模型
+  <a href="/tutorials/machine-learning/keras/2-1-regressor/#检验模型" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>用到的函数是 <code class="highlighter-rouge">model.evaluate</code>，输入测试集的<code class="highlighter-rouge">x</code>和<code class="highlighter-rouge">y</code>， 输出 <code class="highlighter-rouge">cost</code>，<code class="highlighter-rouge">weights</code> 和 <code class="highlighter-rouge">biases</code>。其中 <code class="highlighter-rouge">weights</code> 和 <code class="highlighter-rouge">biases</code> 是取在模型的第一层 <code class="highlighter-rouge">model.layers[0]</code> 学习到的参数。从学习到的结果你可以看到, weights 比较接近0.5，bias 接近 2。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># test
+</span><span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">Testing ------------'</span><span class="p">)</span>
+<span class="n">cost</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'test cost:'</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span>
+<span class="n">W</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_weights</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Weights='</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="s">'</span><span class="se">\n</span><span class="s">biases='</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+<span class="s">"""
+Testing ------------
+40/40 [==============================] - 0s
+test cost: 0.004269329831
+Weights= [[ 0.54246825]] 
+biases= [ 2.00056005]
+"""</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="可视化结果">可视化结果
+  <a href="/tutorials/machine-learning/keras/2-1-regressor/#可视化结果" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>最后可以画出预测结果，与测试集的值进行对比。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># plotting the prediction
+</span><span class="n">Y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">Y_pred</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/keras/2-1-2.png">
+ <img class="course-image lazy-img" src="/static/results/keras/2-1-2.png" alt="Regressor 回归" title="Regressor 回归" />
+</a></p>
+
+:ET

@@ -1,0 +1,133 @@
+I"C<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/contents/5.3_Dueling_DQN" target="_blank">全部代码</a></li>
+  <li><a href="/tutorials/machine-learning/ML-practice/RL-build-arm-from-scratch1/">强化学习实战</a></li>
+  <li>论文 <a href="https://arxiv.org/abs/1511.06581" target="_blank">Dueling Network Architectures for Deep Reinforcement Learning</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="要点">要点
+  <a href="/tutorials/machine-learning/reinforcement-learning/4-7-dueling-DQN/#要点" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><strong>本篇教程是基于 Deep Q network (DQN) 的选学教程.
+以下教程缩减了在 DQN 方面的介绍, 着重强调 Dueling DQN 和 DQN 在代码上不同的地方.
+所以还没了解 DQN 的同学们, 有关于 DQN 的知识,
+请从 <a href="/tutorials/machine-learning/ML-intro/4-06-DQN/">这个视频</a>
+和 <a href="/tutorials/machine-learning/reinforcement-learning/4-1-DQN1/">这个Python教程</a> 开始学习.</strong></p>
+
+<p>只要稍稍修改 DQN 中神经网络的结构, 就能大幅提升学习效果, 加速收敛. 这种新方法叫做
+Dueling DQN. 用一句话来概括 Dueling DQN 就是. 它将每个动作的 Q 拆分成了 state 的 Value
+加上 每个动作的 Advantage.</p>
+
+<video class="tut-content-video" controls="" loop="" autoplay="" muted="">
+  <source src="/static/results/reinforcement-learning/Pendulum DQN.mp4" type="video/mp4" />
+  Your browser does not support HTML5 video.
+</video>
+
+<h2 class="tut-h2-pad" id="Dueling-算法">Dueling 算法
+  <a href="/tutorials/machine-learning/reinforcement-learning/4-7-dueling-DQN/#Dueling-算法" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>上一个 Paper 中的经典解释图片, 上者是一般的 DQN 的 Q值 神经网络.
+下者就是 Dueling DQN 中的 Q值 神经网络了. 那具体是哪里不同了呢?</p>
+
+<p><a href="/static/results/reinforcement-learning/4-7-1.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/4-7-1.png" alt="Dueling DQN (Tensorflow)" title="Dueling DQN (Tensorflow)" />
+</a></p>
+
+<p>下面这个公式解释了不同之处. 原来 DQN 神经网络直接输出的是每种动作的 Q值,
+而 Dueling DQN 每个动作的 Q值 是有下面的公式确定的.</p>
+
+<p><a href="/static/results/reinforcement-learning/4-7-2.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/4-7-2.png" alt="Dueling DQN (Tensorflow)" title="Dueling DQN (Tensorflow)" />
+</a></p>
+
+<p>它分成了这个 state 的值, 加上每个动作在这个 state 上的 advantage.
+因为有时候在某种 state, 无论做什么动作, 对下一个 state 都没有多大影响. 比如 paper 中的这张图.</p>
+
+<p><a href="/static/results/reinforcement-learning/4-7-3.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/4-7-3.png" alt="Dueling DQN (Tensorflow)" title="Dueling DQN (Tensorflow)" />
+</a></p>
+
+<p>这是开车的游戏, 左边是 state value, 发红的部分证明了 state value 和前面的路线有关,
+右边是 advantage, 发红的部分说明了 advantage 很在乎旁边要靠近的车子, 这时的动作会受更多
+advantage 的影响. 发红的地方左右了自己车子的移动原则.</p>
+
+<h2 class="tut-h2-pad" id="更新方法">更新方法
+  <a href="/tutorials/machine-learning/reinforcement-learning/4-7-dueling-DQN/#更新方法" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>下面的修改都是基于我之前写的 <a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/blob/master/contents/5_Deep_Q_Network/RL_brain.py" target="_blank">DQN 代码</a>.
+这次修改的部分比较少. 我们把它们写在一块. 如果想直接看全部代码, <a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/contents/5.3_Dueling_DQN" target="_blank">请戳这里</a>.</p>
+
+<p><a href="/static/results/reinforcement-learning/4-7-4.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/4-7-4.png" alt="Dueling DQN (Tensorflow)" title="Dueling DQN (Tensorflow)" />
+</a></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DuelingDQN</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">dueling</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">sess</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+        <span class="o">...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dueling</span> <span class="o">=</span> <span class="n">dueling</span>  <span class="c1"># 会建立两个 DQN, 其中一个是 Dueling DQN
+</span>        <span class="o">...</span>
+        <span class="k">if</span> <span class="n">sess</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>    <span class="c1"># 针对建立两个 DQN 的模式修改了 tf.Session() 的建立方式
+</span>            <span class="bp">self</span><span class="o">.</span><span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sess</span> <span class="o">=</span> <span class="n">sess</span>
+        <span class="o">...</span>
+
+    <span class="k">def</span> <span class="nf">_build_net</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">build_layers</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">c_names</span><span class="p">,</span> <span class="n">n_l1</span><span class="p">,</span> <span class="n">w_initializer</span><span class="p">,</span> <span class="n">b_initializer</span><span class="p">):</span>
+            <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s">'l1'</span><span class="p">):</span>   <span class="c1"># 第一层, 两种 DQN 都一样
+</span>                <span class="n">w1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s">'w1'</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features</span><span class="p">,</span> <span class="n">n_l1</span><span class="p">],</span> <span class="n">initializer</span><span class="o">=</span><span class="n">w_initializer</span><span class="p">,</span> <span class="n">collections</span><span class="o">=</span><span class="n">c_names</span><span class="p">)</span>
+                <span class="n">b1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s">'b1'</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_l1</span><span class="p">],</span> <span class="n">initializer</span><span class="o">=</span><span class="n">b_initializer</span><span class="p">,</span> <span class="n">collections</span><span class="o">=</span><span class="n">c_names</span><span class="p">)</span>
+                <span class="n">l1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">w1</span><span class="p">)</span> <span class="o">+</span> <span class="n">b1</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dueling</span><span class="p">:</span>
+                <span class="c1"># Dueling DQN
+</span>                <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s">'Value'</span><span class="p">):</span>    <span class="c1"># 专门分析 state 的 Value
+</span>                    <span class="n">w2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s">'w2'</span><span class="p">,</span> <span class="p">[</span><span class="n">n_l1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">initializer</span><span class="o">=</span><span class="n">w_initializer</span><span class="p">,</span> <span class="n">collections</span><span class="o">=</span><span class="n">c_names</span><span class="p">)</span>
+                    <span class="n">b2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s">'b2'</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">initializer</span><span class="o">=</span><span class="n">b_initializer</span><span class="p">,</span> <span class="n">collections</span><span class="o">=</span><span class="n">c_names</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">w2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b2</span>
+
+                <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s">'Advantage'</span><span class="p">):</span>    <span class="c1"># 专门分析每种动作的 Advantage
+</span>                    <span class="n">w2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s">'w2'</span><span class="p">,</span> <span class="p">[</span><span class="n">n_l1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_actions</span><span class="p">],</span> <span class="n">initializer</span><span class="o">=</span><span class="n">w_initializer</span><span class="p">,</span> <span class="n">collections</span><span class="o">=</span><span class="n">c_names</span><span class="p">)</span>
+                    <span class="n">b2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s">'b2'</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_actions</span><span class="p">],</span> <span class="n">initializer</span><span class="o">=</span><span class="n">b_initializer</span><span class="p">,</span> <span class="n">collections</span><span class="o">=</span><span class="n">c_names</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">w2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b2</span>
+
+                <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s">'Q'</span><span class="p">):</span>    <span class="c1"># 合并 V 和 A, 为了不让 A 直接学成了 Q, 我们减掉了 A 的均值
+</span>                    <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">-</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keep_dims</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>     <span class="c1"># Q = V(s) + A(s,a)
+</span>            <span class="k">else</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s">'Q'</span><span class="p">):</span>    <span class="c1"># 普通的 DQN 第二层
+</span>                    <span class="n">w2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s">'w2'</span><span class="p">,</span> <span class="p">[</span><span class="n">n_l1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_actions</span><span class="p">],</span> <span class="n">initializer</span><span class="o">=</span><span class="n">w_initializer</span><span class="p">,</span> <span class="n">collections</span><span class="o">=</span><span class="n">c_names</span><span class="p">)</span>
+                    <span class="n">b2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s">'b2'</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_actions</span><span class="p">],</span> <span class="n">initializer</span><span class="o">=</span><span class="n">b_initializer</span><span class="p">,</span> <span class="n">collections</span><span class="o">=</span><span class="n">c_names</span><span class="p">)</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">w2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b2</span>
+
+            <span class="k">return</span> <span class="n">out</span>
+        <span class="o">...</span>
+</code></pre></div></div>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="对比结果">对比结果
+  <a href="/tutorials/machine-learning/reinforcement-learning/4-7-dueling-DQN/#对比结果" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>对比的代码不在这里呈现, 如果想观看对比的详细代码, 请去往我的 <a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/blob/master/contents/5.3_Dueling_DQN/run_Pendulum.py" target="_blank">Github</a>.</p>
+
+<p>这次我们看看累积奖励 reward, 杆子立起来的时候奖励 = 0, 其他时候都是负值,
+所以当累积奖励没有在降低时, 说明杆子已经被成功立了很久了.</p>
+
+<p><a href="/static/results/reinforcement-learning/4-7-5.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/4-7-5.png" alt="Dueling DQN (Tensorflow)" title="Dueling DQN (Tensorflow)" />
+</a></p>
+
+<p>我们发现当可用动作越高, 学习难度就越大, 不过 Dueling DQN 还是会比 Natural DQN 学习得更快. 收敛效果更好.</p>
+
+:ET

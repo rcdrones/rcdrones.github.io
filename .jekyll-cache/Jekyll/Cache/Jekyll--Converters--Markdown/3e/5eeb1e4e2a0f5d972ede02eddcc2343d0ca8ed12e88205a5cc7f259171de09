@@ -1,0 +1,61 @@
+I"K
+<h2 class="tut-h2-pad" id="\n-换行命令">\n 换行命令
+  <a href="/tutorials/python-basic/basic/08-1-read-file/#\n-换行命令" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>定义 <code class="highlighter-rouge">text</code> 为字符串, 并查看使用 <code class="highlighter-rouge">\n</code> 和不适用 <code class="highlighter-rouge">\n</code> 的区别:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">text</span><span class="o">=</span><span class="s">'This is my first test. This is the second line. This the third '</span>
+<span class="k">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>  <span class="c1"># 无换行命令
+</span>
+<span class="s">"""
+This is my first test. This is the second line. This the third
+"""</span>
+
+<span class="n">text</span><span class="o">=</span><span class="s">'This is my first test.</span><span class="se">\n</span><span class="s">This is the second line.</span><span class="se">\n</span><span class="s">This the third line'</span>
+<span class="k">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>   <span class="c1"># 输入换行命令\n，要注意斜杆的方向。注意换行的格式和c++一样
+</span>
+<span class="s">"""
+This is my first test.
+This is the second line.
+This the third line
+"""</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="open-读文件方式">open 读文件方式
+  <a href="/tutorials/python-basic/basic/08-1-read-file/#open-读文件方式" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>使用 <code class="highlighter-rouge">open</code> 能够打开一个文件, <code class="highlighter-rouge">open</code> 的第一个参数为文件名和路径 ‘my file.txt’, 第二个参数为将要以什么方式打开它, 比如 <code class="highlighter-rouge">w</code> 为可写方式.
+如果计算机没有找到 ‘my file.txt’ 这个文件, <code class="highlighter-rouge">w</code> 方式能够创建一个新的文件, 并命名为 <code class="highlighter-rouge">my file.txt</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">my_file</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="s">'my file.txt'</span><span class="p">,</span><span class="s">'w'</span><span class="p">)</span>   <span class="c1">#用法: open('文件名','形式'), 其中形式有'w':write;'r':read.
+</span><span class="n">my_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>               <span class="c1">#该语句会写入先前定义好的 text
+</span><span class="n">my_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>                   <span class="c1">#关闭文件
+</span></code></pre></div></div>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="\t-tab-对齐">\t tab 对齐
+  <a href="/tutorials/python-basic/basic/08-1-read-file/#\t-tab-对齐" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>使用 <code class="highlighter-rouge">\t</code> 能够达到 <code class="highlighter-rouge">tab</code> 对齐的效果:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">text</span><span class="o">=</span><span class="s">'</span><span class="se">\t</span><span class="s">This is my first test.</span><span class="se">\n\t</span><span class="s">This is the second line.</span><span class="se">\n\t</span><span class="s">This is the third line'</span>
+<span class="k">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>  <span class="c1">#延伸 使用 \t 对齐
+</span>
+<span class="s">"""
+	This is my first test.
+	This is the second line.
+	This is the third line
+"""</span>
+</code></pre></div></div>
+
+:ET

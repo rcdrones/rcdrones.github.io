@@ -1,0 +1,65 @@
+I"�<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/tree/master/theanoTUT/theano10_regression_visualization" target="_blank">相关代码</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="matplotlib-可视化">matplotlib 可视化
+  <a href="/tutorials/machine-learning/theano/3-3-visualize/#matplotlib-可视化" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>接着上一节课的内容，这一小节，我们将要对我们建立的神经网络模型的输出结果在不同的训练阶段可视化（visualization）。
+建筑和训练神经网络的步骤和上次内容一样, 不同的是, 这次我们要有可视化的效果。 
+我们在这里引入了<code class="highlighter-rouge">matplotlib</code>这个工具包, 用来绘图及数据可视化。 
+大家可以利用我的视频教程来学习或复习Matplotlib这个工具：<a href="/tutorials/data-manipulation/plt/">Matplotlib 数据可视化神器 Python</a>。</p>
+
+<p>在训练开始前，我们重新画一下我们的目标数据：也就是我们要不断的刷新我们神经网络的输出值<code class="highlighter-rouge">prediction_value</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># plot the real data
+</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>现在我们开始真正的训练啦！我们要把神经网络训练1000次，同时呢，每训练50次更新一下图片的显示：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="c1"># training
+</span>    <span class="n">err</span> <span class="o">=</span> <span class="n">train</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">50</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># to visualize the result and improvement
+</span>        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">except</span> <span class="nb">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">prediction_value</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">x_data</span><span class="p">)</span>
+        <span class="c1"># plot the prediction
+</span>        <span class="n">lines</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">prediction_value</span><span class="p">,</span> <span class="s">'r-'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">.5</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>此处，<code class="highlighter-rouge">ax.lines.remove(lines[0])</code> 的作用是删除我们之前画的红线。这里我们采用<code class="highlighter-rouge">try... catch...</code> 结构来避免我们第一次没有被删除的目标。</p>
+
+<p>你大概会得到以下的类似结果：</p>
+
+<p><a href="/static/results/theano/3_3_1.gif">
+ <img class="course-image lazy-img" src="/static/results/theano/3_3_1.gif" alt="可视化结果 回归例子" title="可视化结果 回归例子" />
+</a></p>
+
+<p>结果显示我们的神经网络在一点一点的逼近我们的目标函数, 换句话说也就是说 神经网络在逐步的学习样本的原始分布。</p>
+
+<p>当然，只需要简单的修改代码，你就可以看最终的训练结果：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="c1"># training
+</span>    <span class="n">err</span> <span class="o">=</span> <span class="n">train</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">)</span>
+     
+<span class="n">prediction_value</span> <span class="o">=</span> <span class="n">predict</span><span class="p">(</span><span class="n">x_data</span><span class="p">)</span>
+<span class="c1"># plot the prediction
+</span><span class="n">lines</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">prediction_value</span><span class="p">,</span> <span class="s">'r-'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>在下一节看课程，我们将学习如何利用神经网络来解决简单的分类问题。</p>
+
+:ET

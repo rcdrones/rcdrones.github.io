@@ -1,0 +1,130 @@
+I"1<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/multiprocessingTUT/multiprocessing4_efficiency_comparison.py" target="_blank">相关代码</a></li>
+</ul>
+
+<p>上篇讲了多进程/多核的运算，这次我们来对比下多进程，多线程和什么都不做时的消耗时间，看看哪种方式更有效率。</p>
+
+<h2 class="tut-h2-pad" id="创建多进程-multiprocessing">创建多进程 multiprocessing
+  <a href="/tutorials/python-basic/multiprocessing/4-comparison/#创建多进程-multiprocessing" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>和上节一样，首先<code class="highlighter-rouge">import multiprocessing</code>并定义要实现的<code class="highlighter-rouge">job()</code>，同时为了容易比较，我们将计算的次数增加到1000000</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="n">mp</span>
+
+<span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000000</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">+=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">i</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">i</span><span class="o">**</span><span class="mi">3</span>
+    <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># queue
+</span></code></pre></div></div>
+
+<p>因为多进程是多核运算，所以我们将上节的多进程代码命名为<code class="highlighter-rouge">multicore()</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">multicore</span><span class="p">():</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">q</span><span class="p">,))</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">q</span><span class="p">,))</span>
+    <span class="n">p1</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">p2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">p1</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+    <span class="n">p2</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+    <span class="n">res1</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+    <span class="n">res2</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'multicore:'</span><span class="p">,</span><span class="n">res1</span> <span class="o">+</span> <span class="n">res2</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="创建多线程-multithread">创建多线程 multithread
+  <a href="/tutorials/python-basic/multiprocessing/4-comparison/#创建多线程-multithread" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>接下来创建多线程程序，创建多线程和多进程有很多相似的地方。首先<code class="highlighter-rouge">import threading</code>然后定义<code class="highlighter-rouge">multithread()</code>完成同样的任务</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">threading</span> <span class="k">as</span> <span class="n">td</span>
+
+<span class="k">def</span> <span class="nf">multithread</span><span class="p">():</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span> <span class="c1"># thread可放入process同样的queue中
+</span>    <span class="n">t1</span> <span class="o">=</span> <span class="n">td</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">q</span><span class="p">,))</span>
+    <span class="n">t2</span> <span class="o">=</span> <span class="n">td</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">q</span><span class="p">,))</span>
+    <span class="n">t1</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">t2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">t1</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+    <span class="n">t2</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+    <span class="n">res1</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+    <span class="n">res2</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'multithread:'</span><span class="p">,</span> <span class="n">res1</span> <span class="o">+</span> <span class="n">res2</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="创建普通函数">创建普通函数
+  <a href="/tutorials/python-basic/multiprocessing/4-comparison/#创建普通函数" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>最后我们定义最普通的函数。注意，在上面例子中我们建立了两个进程或线程，均对<code class="highlighter-rouge">job()</code>进行了两次运算，所以在<code class="highlighter-rouge">normal()</code>中我们也让它循环两次</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">normal</span><span class="p">():</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000000</span><span class="p">):</span>
+            <span class="n">res</span> <span class="o">+=</span> <span class="n">i</span> <span class="o">+</span> <span class="n">i</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">i</span><span class="o">**</span><span class="mi">3</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'normal:'</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="运行时间">运行时间
+  <a href="/tutorials/python-basic/multiprocessing/4-comparison/#运行时间" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>最后，为了对比各函数运行时间，我们需要<code class="highlighter-rouge">import time</code>， 然后依次运行定义好函数：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">st</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">normal</span><span class="p">()</span>
+    <span class="n">st1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'normal time:'</span><span class="p">,</span> <span class="n">st1</span> <span class="o">-</span> <span class="n">st</span><span class="p">)</span>
+    <span class="n">multithread</span><span class="p">()</span>
+    <span class="n">st2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'multithread time:'</span><span class="p">,</span> <span class="n">st2</span> <span class="o">-</span> <span class="n">st1</span><span class="p">)</span>
+    <span class="n">multicore</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'multicore time:'</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">st2</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>大功告成，下面我们来看下实际运行对比。</p>
+
+<h2 class="tut-h2-pad" id="结果对比">结果对比
+  <a href="/tutorials/python-basic/multiprocessing/4-comparison/#结果对比" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">"""
+# range(1000000)
+('normal:', 499999666667166666000000L)
+('normal time:', 1.1306169033050537)
+('thread:', 499999666667166666000000L)
+('multithread time:', 1.3054230213165283)
+('multicore:', 499999666667166666000000L)
+('multicore time:', 0.646507978439331)
+"""</span>
+</code></pre></div></div>
+
+<p>普通/多线程/多进程的运行时间分别是<code class="highlighter-rouge">1.13</code>，<code class="highlighter-rouge">1.3</code>和<code class="highlighter-rouge">0.64</code>秒。
+我们发现多核/多进程最快，说明在同时间运行了多个任务。
+而多线程的运行时间居然比什么都不做的程序还要慢一点，说明多线程还是有一定的短板的。
+戳<a href="/tutorials/python-basic/threading/5-GIL/">这里</a>查看“多线程的短板是什么”。</p>
+
+<p>我们将运算次数加十倍，再来看看三种方法的运行时间：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">"""
+# range(10000000)
+('normal:', 4999999666666716666660000000L)
+('normal time:', 40.041773080825806)
+('thread:', 4999999666666716666660000000L)
+('multithread time:', 41.777158975601196)
+('multicore:', 4999999666666716666660000000L)
+('multicore time:', 22.4337899684906)
+"""</span>
+</code></pre></div></div>
+
+<p>这次运行时间依然是 多进程 &lt; 普通 &lt; 多线程，由此我们可以清晰地看出哪种方法更有效率。</p>
+
+:ET

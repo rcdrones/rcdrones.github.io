@@ -1,0 +1,131 @@
+I"�<p>学习资料:</p>
+<ul>
+  <li><a href="/static/results/git/initial-files/for_gitTUT_4-4.zip">这节例子的初始文件</a></li>
+</ul>
+
+<p>想想有天在开开心心地改进代码, 突然接到老板的一个电话说要改之前的一个程序.
+怎么办? 虽然还需要很久时间才能改进完自己的代码, 
+可我有强迫症, 又不想把要改的程序和自己改进代码的部分一起 <code class="highlighter-rouge">commit</code> 了.</p>
+
+<p>这时 <code class="highlighter-rouge">stash</code> 就是我的救星了. 用 <code class="highlighter-rouge">stash</code> 能先将我的那改进的部分放在一边分隔开来. 
+再另外单独处理老板的任务.</p>
+
+<h2 class="tut-h2-pad" id="暂存修改">暂存修改
+  <a href="/tutorials/others/git/4-4-stash/#暂存修改" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>假设我们现在在 <code class="highlighter-rouge">dev</code> 分支上快乐地改代码:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git checkout dev
+</code></pre></div></div>
+
+<p>在 <code class="highlighter-rouge">dev</code> 中的 <code class="highlighter-rouge">1.py</code> 中加上一行 <code class="highlighter-rouge"># feel happy</code>, 然后老板的电话来了, 可是我还没有改进完这些代码.
+所以我就用 <code class="highlighter-rouge">stash</code> 将这些改变暂时放一边.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git status <span class="nt">-s</span>
+<span class="c"># 输出</span>
+ M 1.py
+<span class="nt">------------------</span> 
+<span class="nv">$ </span>git stash
+<span class="c"># 输出</span>
+Saved working directory and index state WIP on dev: f7d2e3a change 3 <span class="k">in </span>dev
+HEAD is now at f7d2e3a change 3 <span class="k">in </span>dev
+<span class="nt">-------------------</span>
+<span class="nv">$ </span>git status
+<span class="c"># 输出</span>
+On branch dev
+nothing to commit, working directory clean  <span class="c"># 干净得很</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="做其它任务">做其它任务
+  <a href="/tutorials/others/git/4-4-stash/#做其它任务" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>然后我们建立另一个 <code class="highlighter-rouge">branch</code> 用来完成老板的任务:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git checkout <span class="nt">-b</span> boss
+
+<span class="c"># 输出</span>
+Switched to a new branch <span class="s1">'boss'</span> <span class="c"># 创建并切换到 boss</span>
+</code></pre></div></div>
+
+<p>然后苦逼地完成着老板的任务, 比如添加 <code class="highlighter-rouge"># lovely boss</code> 去 <code class="highlighter-rouge">1.py</code>. 然后 <code class="highlighter-rouge">commit</code>, 完成老板的任务.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git commit <span class="nt">-am</span> <span class="s2">"job from boss"</span>
+<span class="nv">$ </span>git checkout master
+<span class="nv">$ </span>git merge <span class="nt">--no-ff</span> <span class="nt">-m</span> <span class="s2">"merged boss job"</span> boss
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">merge</code> 如果有冲突的话, 可以像<a href="/tutorials/others/git/4-2-merge-conflict/">上次那样</a>
+解决.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="c1"># I went back to change 1
+</span><span class="o">&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span> <span class="n">HEAD</span>
+
+<span class="c1"># edited in master and dev
+</span>
+<span class="o">=======</span>
+<span class="c1"># edited in dev
+</span>
+<span class="c1"># lovely boss
+</span><span class="o">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</span> <span class="n">boss</span>
+</code></pre></div></div>
+
+<p>通过以下步骤来完成老板的任务, 并观看一下 <code class="highlighter-rouge">master</code> 的 log:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git commit <span class="nt">-am</span> <span class="s2">"solve conflict"</span>
+<span class="nv">$ </span>git log <span class="nt">--oneline</span> <span class="nt">--graph</span>
+<span class="k">*</span>   1536bea solve conflict
+|<span class="se">\ </span> 
+| <span class="k">*</span> 27ba884 job from boss
+<span class="k">*</span> | 2d1961f change 4 <span class="k">in </span>master
+|/  
+<span class="k">*</span> f7d2e3a change 3 <span class="k">in </span>dev
+<span class="k">*</span> 47f167e back to change 1 and add comment <span class="k">for </span>1.py
+<span class="k">*</span> 904e1ba change 2
+<span class="k">*</span> c6762a1 change 1
+<span class="k">*</span> 13be9a7 create 1.py
+</code></pre></div></div>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="恢复暂存">恢复暂存
+  <a href="/tutorials/others/git/4-4-stash/#恢复暂存" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>轻松了, 现在可以继续开心的在 <code class="highlighter-rouge">dev</code> 上刷代码了.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git checkout dev
+<span class="nv">$ </span>git stash list    <span class="c"># 查看在 stash 中的缓存</span>
+
+<span class="c"># 输出</span>
+stash@<span class="o">{</span>0<span class="o">}</span>: WIP on dev: f7d2e3a change 3 <span class="k">in </span>dev
+</code></pre></div></div>
+
+<p>上面说明在 <code class="highlighter-rouge">dev</code> 中, 我们的确有 <code class="highlighter-rouge">stash</code> 的工作. 现在可以通过 <code class="highlighter-rouge">pop</code> 来提取这个并继续工作了.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git stash pop
+
+<span class="c"># 输出</span>
+On branch dev
+Changes not staged <span class="k">for </span>commit:
+  <span class="o">(</span>use <span class="s2">"git add &lt;file&gt;..."</span> to update what will be committed<span class="o">)</span>
+  <span class="o">(</span>use <span class="s2">"git checkout -- &lt;file&gt;..."</span> to discard changes <span class="k">in </span>working directory<span class="o">)</span>
+
+	modified:   1.py
+
+no changes added to commit <span class="o">(</span>use <span class="s2">"git add"</span> and/or <span class="s2">"git commit -a"</span><span class="o">)</span>
+Dropped refs/stash@<span class="o">{</span>0<span class="o">}</span> <span class="o">(</span>23332b7edc105a579b09b127336240a45756a91c<span class="o">)</span>
+<span class="nt">----------------------</span>
+<span class="nv">$ </span>git status <span class="nt">-s</span>
+<span class="c"># 输出</span>
+ M 1.py     <span class="c"># 和最开始一样了</span>
+</code></pre></div></div>
+:ET

@@ -1,0 +1,69 @@
+I"�<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/matplotlibTUT/plt18_secondary_yaxis.py" target="_blank">相关代码</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="第一个y坐标">第一个y坐标
+  <a href="/tutorials/data-manipulation/plt/4-4-sencondary-axis/#第一个y坐标" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>有时候我们会用到次坐标轴，即在同个图上有第2个y轴存在。同样可以用matplotlib做到，而且很简单。</p>
+
+<p>首先，我们做一些准备工作：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+
+<span class="n">y1</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="o">*</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="n">y2</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">y1</span>
+</code></pre></div></div>
+
+<p>可以看到，<code class="highlighter-rouge">y2</code>和<code class="highlighter-rouge">y1</code>是互相倒置的。接着，获取figure默认的坐标系 <code class="highlighter-rouge">ax1</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fig</span><span class="p">,</span> <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="第二个y坐标">第二个y坐标
+  <a href="/tutorials/data-manipulation/plt/4-4-sencondary-axis/#第二个y坐标" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>对<code class="highlighter-rouge">ax1</code>调用<code class="highlighter-rouge">twinx()</code>方法，生成如同镜面效果后的<code class="highlighter-rouge">ax2</code>：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ax2</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>接着进行绘图, 将 <code class="highlighter-rouge">y1</code>, <code class="highlighter-rouge">y2</code> 分别画在 <code class="highlighter-rouge">ax1</code>, <code class="highlighter-rouge">ax2</code> 上：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="s">'g-'</span><span class="p">)</span>   <span class="c1"># green, solid line
+</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">'X data'</span><span class="p">)</span>
+
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">'Y1 data'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'g'</span><span class="p">)</span>
+
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="s">'b-'</span><span class="p">)</span> <span class="c1"># blue
+</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">'Y2 data'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'b'</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>显示图像：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/plt/4_4_1.png">
+ <img class="course-image lazy-img" src="/static/results/plt/4_4_1.png" alt="次坐标轴" title="次坐标轴" />
+</a></p>
+
+:ET

@@ -1,0 +1,82 @@
+I"n%<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/kerasTUT/8-RNN_LSTM_Regressor_example.py" target="_blank">代码链接</a></li>
+  <li>机器学习-简介系列 <a href="/tutorials/machine-learning/ML-intro/2-3-RNN/">RNN</a></li>
+  <li>机器学习-简介系列 <a href="/tutorials/machine-learning/ML-intro/2-4-LSTM/">LSTM</a></li>
+  <li>Tensorflow <a href="/tutorials/machine-learning/tensorflow/5-08-RNN2/">RNN教程</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="生成序列">生成序列
+  <a href="/tutorials/machine-learning/keras/2-5-RNN-LSTM-Regressor/#生成序列" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>这次我们使用RNN来求解回归(Regression)问题.
+首先生成序列<code class="highlighter-rouge">sin(x)</code>,对应输出数据为<code class="highlighter-rouge">cos(x)</code>,设置序列步长为20，每次训练的<code class="highlighter-rouge">BATCH_SIZE</code>为50.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">get_batch</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">BATCH_START</span><span class="p">,</span> <span class="n">TIME_STEPS</span>
+    <span class="c1"># xs shape (50batch, 20steps)
+</span>    <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">BATCH_START</span><span class="p">,</span> <span class="n">BATCH_START</span><span class="o">+</span><span class="n">TIME_STEPS</span><span class="o">*</span><span class="n">BATCH_SIZE</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">TIME_STEPS</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">seq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+    <span class="n">BATCH_START</span> <span class="o">+=</span> <span class="n">TIME_STEPS</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">seq</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">res</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">xs</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/keras/2-5-1.png">
+ <img class="course-image lazy-img" src="/static/results/keras/2-5-1.png" alt="RNN Regressor 循环神经网络" title="RNN Regressor 循环神经网络" />
+</a></p>
+
+<h2 class="tut-h2-pad" id="搭建模型">搭建模型
+  <a href="/tutorials/machine-learning/keras/2-5-RNN-LSTM-Regressor/#搭建模型" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>然后添加LSTM RNN层，输入为训练数据，输出数据大小由<code class="highlighter-rouge">CELL_SIZE</code>定义。因为每一个输入都对应一个输出，所以<code class="highlighter-rouge">return_sequences=True</code>。
+每一个点的当前输出都受前面所有输出的影响，BATCH之间的参数也需要记忆，故<code class="highlighter-rouge">stateful=True</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">LSTM</span><span class="p">(</span>
+    <span class="n">batch_input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">TIME_STEPS</span><span class="p">,</span> <span class="n">INPUT_SIZE</span><span class="p">),</span>       <span class="c1"># Or: input_dim=INPUT_SIZE, input_length=TIME_STEPS,
+</span>    <span class="n">output_dim</span><span class="o">=</span><span class="n">CELL_SIZE</span><span class="p">,</span>
+    <span class="n">return_sequences</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>      <span class="c1"># True: output at all steps. False: output as last step.
+</span>    <span class="n">stateful</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>              <span class="c1"># True: the final state of batch1 is feed into the initial state of batch2
+</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>最后添加输出层，LSTM层的每一步都有输出，使用<code class="highlighter-rouge">TimeDistributed</code>函数。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">TimeDistributed</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="n">OUTPUT_SIZE</span><span class="p">)))</span>
+</code></pre></div></div>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="训练">训练
+  <a href="/tutorials/machine-learning/keras/2-5-RNN-LSTM-Regressor/#训练" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>设置优化方法，<code class="highlighter-rouge">loss</code>函数和<code class="highlighter-rouge">metrics</code>方法之后就可以开始训练了。
+训练501次，调用matplotlib函数采用动画的方式输出结果。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">501</span><span class="p">):</span>
+    <span class="c1"># data shape = (batch_num, steps, inputs/outputs)
+</span>    <span class="n">X_batch</span><span class="p">,</span> <span class="n">Y_batch</span><span class="p">,</span> <span class="n">xs</span> <span class="o">=</span> <span class="n">get_batch</span><span class="p">()</span>
+    <span class="n">cost</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train_on_batch</span><span class="p">(</span><span class="n">X_batch</span><span class="p">,</span> <span class="n">Y_batch</span><span class="p">)</span>
+    <span class="n">pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_batch</span><span class="p">,</span> <span class="n">BATCH_SIZE</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">Y_batch</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="s">'r'</span><span class="p">,</span> <span class="n">xs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">pred</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[:</span><span class="n">TIME_STEPS</span><span class="p">],</span> <span class="s">'b--'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">((</span><span class="o">-</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'train cost: '</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/keras/2-5-2.png">
+ <img class="course-image lazy-img" src="/static/results/keras/2-5-2.png" alt="RNN Regressor 循环神经网络" title="RNN Regressor 循环神经网络" />
+</a></p>
+
+:ET

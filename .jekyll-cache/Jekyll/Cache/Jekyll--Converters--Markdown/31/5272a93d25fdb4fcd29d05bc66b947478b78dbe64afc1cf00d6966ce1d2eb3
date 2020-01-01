@@ -1,0 +1,279 @@
+I"et<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/contents/10_A3C" target="_blank">全部代码</a></li>
+  <li><a href="/tutorials/machine-learning/ML-intro/4-10-A3C/">什么是 A3C 短视频</a></li>
+  <li><a href="/tutorials/machine-learning/ML-intro/4-08-AC/">什么是 Actor-Critic 短视频</a></li>
+  <li><a href="/tutorials/machine-learning/reinforcement-learning/6-1-actor-critic/">我的 Actor-Critic Python 教程</a></li>
+  <li><a href="/tutorials/python-basic/threading/">我的 Python Threading 多线程教程</a></li>
+  <li><a href="/tutorials/machine-learning/ML-practice/RL-build-arm-from-scratch1/">强化学习实战</a></li>
+  <li>论文 <a href="https://arxiv.org/pdf/1602.01783.pdf" target="_blank">Asynchronous Methods for Deep Reinforcement Learning</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="要点">要点
+  <a href="/tutorials/machine-learning/reinforcement-learning/6-3-A3C/#要点" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><strong>一句话概括 A3C:</strong>
+Google DeepMind 提出的一种解决 <code class="highlighter-rouge">Actor-Critic</code> 不收敛问题的算法. 它会创建多个并行的环境,
+让多个拥有副结构的 agent 同时在这些并行环境上更新主结构中的参数. 并行中的 agent 们互不干扰,
+而主结构的参数更新受到副结构提交更新的不连续性干扰, 所以更新的相关性被降低, 收敛性提高.</p>
+
+<p>因为这节内容是基于 <code class="highlighter-rouge">Actor-Critic</code>, 所以还不了解 <code class="highlighter-rouge">Actor-Critic</code> 的朋友们, 强烈推荐你在<a href="/tutorials/machine-learning/ML-intro/4-08-AC/">这个短视频</a>
+和<a href="/tutorials/machine-learning/reinforcement-learning/6-1-actor-critic/">这个 Python 教程</a>中获得了解,</p>
+
+<p>下面是这节内容的效果提前看:</p>
+
+<video class="tut-content-video" controls="" loop="" autoplay="" muted="">
+  <source src="/static/results/reinforcement-learning/Pendulum A3C.mp4" type="video/mp4" />
+  Your browser does not support HTML5 video.
+</video>
+
+<h2 class="tut-h2-pad" id="算法">算法
+  <a href="/tutorials/machine-learning/reinforcement-learning/6-3-A3C/#算法" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><code class="highlighter-rouge">A3C</code> 的算法实际上就是将 <code class="highlighter-rouge">Actor-Critic</code> 放在了多个线程中进行同步训练. 可以想象成几个人同时在玩一样的游戏, 而他们玩游戏的经验都会同步上传到一个中央大脑.
+然后他们又从中央大脑中获取最新的玩游戏方法.</p>
+
+<p><strong>这样, 对于这几个人, 他们的好处是:</strong> 中央大脑汇集了所有人的经验, 是最会玩游戏的一个, 他们能时不时获取到中央大脑的必杀招, 用在自己的场景中.</p>
+
+<p><strong>对于中央大脑的好处是:</strong> 中央大脑最怕一个人的连续性更新, 不只基于一个人推送更新这种方式能打消这种连续性.
+使中央大脑不必有用像 <code class="highlighter-rouge">DQN</code>, <code class="highlighter-rouge">DDPG</code> 那样的记忆库也能很好的更新.</p>
+
+<p><a href="/static/results/reinforcement-learning/6-3-1.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/6-3-1.png" alt="Asynchronous Advantage Actor-Critic (A3C) (Tensorflow)" title="Asynchronous Advantage Actor-Critic (A3C) (Tensorflow)" />
+</a></p>
+
+<p>为了达到这个目的, 我们要有两套体系, 可以看作中央大脑拥有 <code class="highlighter-rouge">global net</code> 和他的参数,
+每位玩家有一个 <code class="highlighter-rouge">global net</code> 的副本 <code class="highlighter-rouge">local net</code>, 可以定时向 <code class="highlighter-rouge">global net</code> 推送更新,
+然后定时从 <code class="highlighter-rouge">global net</code> 那获取综合版的更新.</p>
+
+<p>如果在 tensorboard 中查看我们今天要建立的体系, 这就是你会看到的.</p>
+
+<p><a href="/static/results/reinforcement-learning/6-3-2.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/6-3-2.png" alt="Asynchronous Advantage Actor-Critic (A3C) (Tensorflow)" title="Asynchronous Advantage Actor-Critic (A3C) (Tensorflow)" />
+</a></p>
+
+<p><code class="highlighter-rouge">W_0</code> 就是第0个 worker, 每个 worker 都可以分享 <code class="highlighter-rouge">global_net</code>.</p>
+
+<p><a href="/static/results/reinforcement-learning/6-3-3.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/6-3-3.png" alt="Asynchronous Advantage Actor-Critic (A3C) (Tensorflow)" title="Asynchronous Advantage Actor-Critic (A3C) (Tensorflow)" />
+</a></p>
+
+<p>如果我们调用 <code class="highlighter-rouge">sync</code> 中的 <code class="highlighter-rouge">pull</code>, 这个 worker 就会从 <code class="highlighter-rouge">global_net</code> 中获取到最新的参数.</p>
+
+<p><a href="/static/results/reinforcement-learning/6-3-4.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/6-3-4.png" alt="Asynchronous Advantage Actor-Critic (A3C) (Tensorflow)" title="Asynchronous Advantage Actor-Critic (A3C) (Tensorflow)" />
+</a></p>
+
+<p>如果我们调用 <code class="highlighter-rouge">sync</code> 中的 <code class="highlighter-rouge">push</code>, 这个 worker 就会将自己的个人更新推送去 <code class="highlighter-rouge">global_net</code>.</p>
+
+<p>这次我们使用一个连续动作的环境 Pendulum 举例. 如果直接看所有代码, <a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/contents/10_A3C/A3C_continuous_action.py" target="_blank">请看我的 Github</a>,
+如果你处理的是一个离散动作环境, 可以参考这个Github 中的<a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/contents/10_A3C/A3C_discrete_action.py" target="_blank">这个文件</a>.</p>
+
+<p>接下来我们就开始定义连续动作的 A3C 啦.</p>
+
+<h2 class="tut-h2-pad" id="主结构">主结构
+  <a href="/tutorials/machine-learning/reinforcement-learning/6-3-A3C/#主结构" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>我们用 Tensorflow 搭建神经网络, 对于我们的 Actor, tensorboard 中可以看清晰的看到我们是如果搭建的:</p>
+
+<p><a href="/static/results/reinforcement-learning/6-3-5.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/6-3-5.png" alt="Asynchronous Advantage Actor-Critic (A3C) (Tensorflow)" title="Asynchronous Advantage Actor-Critic (A3C) (Tensorflow)" />
+</a></p>
+
+<p>我们使用了 Normal distribution 来选择动作, 所以在搭建神经网络的时候, <code class="highlighter-rouge">actor</code> 这边要输出动作的均值和方差.
+然后放入 Normal distribution 去选择动作. 计算 <code class="highlighter-rouge">actor</code> loss 的时候我们还需要使用到 <code class="highlighter-rouge">critic</code> 提供的 <code class="highlighter-rouge">TD error</code>
+作为 gradient ascent 的导向.</p>
+
+<p><a href="/static/results/reinforcement-learning/6-3-6.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/6-3-6.png" alt="Asynchronous Advantage Actor-Critic (A3C) (Tensorflow)" title="Asynchronous Advantage Actor-Critic (A3C) (Tensorflow)" />
+</a></p>
+
+<p><code class="highlighter-rouge">critic</code> 很简单啦, 只需要得到他对于 state 的价值就好了. 用于计算 <code class="highlighter-rouge">TD error</code>.</p>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="Actor-Critic-网络">Actor Critic 网络
+  <a href="/tutorials/machine-learning/reinforcement-learning/6-3-A3C/#Actor-Critic-网络" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>其搭建的代码部分在这, 因为写下来全部代码比较眼花, 所以会有点伪代码 (如果想一次性看全部, 请去我的<a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/contents/10_A3C/A3C_continuous_action.py" target="_blank">Github</a>):</p>
+
+<p>我们将 <code class="highlighter-rouge">Actor</code> 和 <code class="highlighter-rouge">Critic</code> 合并成一整套系统, 这样方便运行.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 这个 class 可以被调用生成一个 global net.
+# 也能被调用生成一个 worker 的 net, 因为他们的结构是一样的,
+# 所以这个 class 可以被重复利用.
+</span><span class="k">class</span> <span class="nc">ACNet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">globalAC</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="c1"># 当创建 worker 网络的时候, 我们传入之前创建的 globalAC 给这个 worker
+</span>        <span class="k">if</span> <span class="err">这是</span> <span class="k">global</span><span class="p">:</span>   <span class="c1"># 判断当下建立的网络是 local 还是 global
+</span>            <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s">'Global_Net'</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_build_net</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s">'worker'</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_build_net</span><span class="p">()</span>
+
+            <span class="c1"># 接着计算 critic loss 和 actor loss
+</span>            <span class="c1"># 用这两个 loss 计算要推送的 gradients
+</span>
+            <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">name_scope</span><span class="p">(</span><span class="s">'sync'</span><span class="p">):</span>  <span class="c1"># 同步
+</span>                <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">name_scope</span><span class="p">(</span><span class="s">'pull'</span><span class="p">):</span>
+                    <span class="c1"># 更新去 global
+</span>                <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">name_scope</span><span class="p">(</span><span class="s">'push'</span><span class="p">):</span>
+                    <span class="c1"># 获取 global 参数
+</span>
+    <span class="k">def</span> <span class="nf">_build_net</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># 在这里搭建 Actor 和 Critic 的网络
+</span>        <span class="k">return</span> <span class="err">均值</span><span class="p">,</span> <span class="err">方差</span><span class="p">,</span> <span class="n">state_value</span>
+
+    <span class="k">def</span> <span class="nf">update_global</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feed_dict</span><span class="p">):</span>
+        <span class="c1"># 进行 push 操作
+</span>
+    <span class="k">def</span> <span class="nf">pull_global</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># 进行 pull 操作
+</span>
+    <span class="k">def</span> <span class="nf">choose_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+        <span class="c1"># 根据 s 选动作
+</span></code></pre></div></div>
+
+<p>这些只是在创建网络而已, <code class="highlighter-rouge">worker</code> 还有属于自己的 class, 用来执行在每个线程里的工作.</p>
+
+<h2 class="tut-h2-pad" id="Worker">Worker
+  <a href="/tutorials/machine-learning/reinforcement-learning/6-3-A3C/#Worker" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>每个 <code class="highlighter-rouge">worker</code> 有自己的 class, class 里面有他的工作内容 <code class="highlighter-rouge">work</code>, 看全部请来我的 <a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/contents/10_A3C/A3C_continuous_action.py" target="_blank">Github</a>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Worker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">globalAC</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">GAME</span><span class="p">)</span><span class="o">.</span><span class="n">unwrapped</span> <span class="c1"># 创建自己的环境
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>    <span class="c1"># 自己的名字
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">AC</span> <span class="o">=</span> <span class="n">ACNet</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">globalAC</span><span class="p">)</span> <span class="c1"># 自己的 local net, 并绑定上 globalAC
+</span>
+    <span class="k">def</span> <span class="nf">work</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># s, a, r 的缓存, 用于 n_steps 更新
+</span>        <span class="n">buffer_s</span><span class="p">,</span> <span class="n">buffer_a</span><span class="p">,</span> <span class="n">buffer_r</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">COORD</span><span class="o">.</span><span class="n">should_stop</span><span class="p">()</span> <span class="ow">and</span> <span class="n">GLOBAL_EP</span> <span class="o">&lt;</span> <span class="n">MAX_GLOBAL_EP</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">ep_t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">MAX_EP_STEP</span><span class="p">):</span>
+                <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">AC</span><span class="o">.</span><span class="n">choose_action</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                <span class="n">s_</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+                <span class="n">buffer_s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>  <span class="c1"># 添加各种缓存
+</span>                <span class="n">buffer_a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="n">buffer_r</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+                <span class="c1"># 每 UPDATE_GLOBAL_ITER 步 或者回合完了, 进行 sync 操作
+</span>                <span class="k">if</span> <span class="n">total_step</span> <span class="o">%</span> <span class="n">UPDATE_GLOBAL_ITER</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">done</span><span class="p">:</span>
+                    <span class="c1"># 获得用于计算 TD error 的 下一 state 的 value
+</span>                    <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
+                        <span class="n">v_s_</span> <span class="o">=</span> <span class="mi">0</span>   <span class="c1"># terminal
+</span>                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">v_s_</span> <span class="o">=</span> <span class="n">SESS</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AC</span><span class="o">.</span><span class="n">v</span><span class="p">,</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">AC</span><span class="o">.</span><span class="n">s</span><span class="p">:</span> <span class="n">s_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]})[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+                    <span class="n">buffer_v_target</span> <span class="o">=</span> <span class="p">[]</span>    <span class="c1"># 下 state value 的缓存, 用于算 TD
+</span>                    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">buffer_r</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>    <span class="c1"># 进行 n_steps forward view
+</span>                        <span class="n">v_s_</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="n">GAMMA</span> <span class="o">*</span> <span class="n">v_s_</span>
+                        <span class="n">buffer_v_target</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v_s_</span><span class="p">)</span>
+                    <span class="n">buffer_v_target</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+
+                    <span class="n">buffer_s</span><span class="p">,</span> <span class="n">buffer_a</span><span class="p">,</span> <span class="n">buffer_v_target</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">buffer_s</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">buffer_a</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">buffer_v_target</span><span class="p">)</span>
+
+                    <span class="n">feed_dict</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">AC</span><span class="o">.</span><span class="n">s</span><span class="p">:</span> <span class="n">buffer_s</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">AC</span><span class="o">.</span><span class="n">a_his</span><span class="p">:</span> <span class="n">buffer_a</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">AC</span><span class="o">.</span><span class="n">v_target</span><span class="p">:</span> <span class="n">buffer_v_target</span><span class="p">,</span>
+                    <span class="p">}</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">AC</span><span class="o">.</span><span class="n">update_global</span><span class="p">(</span><span class="n">feed_dict</span><span class="p">)</span>    <span class="c1"># 推送更新去 globalAC
+</span>                    <span class="n">buffer_s</span><span class="p">,</span> <span class="n">buffer_a</span><span class="p">,</span> <span class="n">buffer_r</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>   <span class="c1"># 清空缓存
+</span>                    <span class="bp">self</span><span class="o">.</span><span class="n">AC</span><span class="o">.</span><span class="n">pull_global</span><span class="p">()</span>   <span class="c1"># 获取 globalAC 的最新参数
+</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s_</span>
+                <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
+                    <span class="n">GLOBAL_EP</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># 加一回合
+</span>                    <span class="k">break</span>   <span class="c1"># 结束这回合
+</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="Worker-并行工作">Worker 并行工作
+  <a href="/tutorials/machine-learning/reinforcement-learning/6-3-A3C/#Worker-并行工作" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>这里才是真正的重点! Worker 的并行计算.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s">"/cpu:0"</span><span class="p">):</span>
+    <span class="n">GLOBAL_AC</span> <span class="o">=</span> <span class="n">ACNet</span><span class="p">(</span><span class="n">GLOBAL_NET_SCOPE</span><span class="p">)</span>  <span class="c1"># 建立 Global AC
+</span>    <span class="n">workers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_WORKERS</span><span class="p">):</span>  <span class="c1"># 创建 worker, 之后在并行
+</span>        <span class="n">workers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Worker</span><span class="p">(</span><span class="n">GLOBAL_AC</span><span class="p">))</span>   <span class="c1"># 每个 worker 都有共享这个 global AC
+</span>
+<span class="n">COORD</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Coordinator</span><span class="p">()</span>  <span class="c1"># Tensorflow 用于并行的工具
+</span>
+<span class="n">worker_threads</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">worker</span> <span class="ow">in</span> <span class="n">workers</span><span class="p">:</span>
+    <span class="n">job</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">worker</span><span class="o">.</span><span class="n">work</span><span class="p">()</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job</span><span class="p">)</span>    <span class="c1"># 添加一个工作线程
+</span>    <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">worker_threads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="n">COORD</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">worker_threads</span><span class="p">)</span>  <span class="c1"># tf 的线程调度
+</span></code></pre></div></div>
+
+<p>我的电脑里可以建立 4个 worker, 也就可以把它们放在4个线程中并行探索更新.
+最后的学习结果可以用这个获取 moving average 的 reward 的图来概括.</p>
+
+<p><a href="/static/results/reinforcement-learning/6-3-7.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/6-3-7.png" alt="Asynchronous Advantage Actor-Critic (A3C) (Tensorflow)" title="Asynchronous Advantage Actor-Critic (A3C) (Tensorflow)" />
+</a></p>
+
+<p>上面讲到的是一个 continuous action 的例子, <a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/contents/10_A3C/A3C_continuous_action.py" target="_blank">全部代码在这里</a>清晰可见.
+还有一个是 discrete action 的例子. 使用的是 Cartpole 的实验, <a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/contents/10_A3C/A3C_discrete_action.py" target="_blank">代码在这</a>.
+同时, 我还做了一个 A3C 加上 RNN 的例子, 同样是用 Pendulum 的例子, <a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/contents/10_A3C/A3C_RNN.py" target="_blank">代码在这</a>.</p>
+
+<h2 class="tut-h2-pad" id="机械手臂">机械手臂
+  <a href="/tutorials/machine-learning/reinforcement-learning/6-3-A3C/#机械手臂" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>我也用这套 A3C 测试过自己写的机器手臂的环境, 发现效果也还行. 有兴趣的朋友可以<a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/experiments/Robot_arm" target="_blank">看到这里</a>.</p>
+
+<video class="tut-content-video" controls="" loop="" autoplay="" muted="">
+  <source src="/static/results/reinforcement-learning/experiment_arm.mp4" type="video/mp4" />
+  Your browser does not support HTML5 video.
+</video>
+
+<p>有很多人留言说想要我做一个关于这个机器手臂的教程, 不负众望, 你可以在<a href="/tutorials/machine-learning/ML-practice/RL-build-arm-from-scratch1/">这里</a>
+看到我怎么从零开始, 手写环境, debug 测试, 来制作一个强化学习的机器手臂.</p>
+
+<h2 class="tut-h2-pad" id="multiprocessing-+-A3C">multiprocessing + A3C
+  <a href="/tutorials/machine-learning/reinforcement-learning/6-3-A3C/#multiprocessing-+-A3C" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>除此之外, 我心里一直有一个疙瘩, 因为这个 A3C 中, 我用的是 python 的 <a href="/tutorials/python-basic/threading/">threading</a>, 懂 python 的朋友知道,
+threading 有 <a href="/tutorials/python-basic/threading/5-GIL/">GIL</a>, 运算速度是问题,
+我的 CPU 都不是满格的. 我一直想把这个 A3C 代码移植去 <a href="/tutorials/python-basic/multiprocessing/">multiprocessing</a>,
+提高效率. 但是 Tensorflow 的 session 就是和 multiprocessing 不兼容, Global Net 做不好. 怎么办?</p>
+
+<p><a href="https://www.tensorflow.org/deploy/distributed" target="_blank">Distributed Tensorflow</a> 是一个备选方案.
+但是这个要求你是在计算机集群上做, 不然速度上还不如这个 threading 的 A3C. 这时, 我不爽了,
+到在<a href="https://www.zhihu.com/question/63342728/answer/297818331" target="_blank">知乎上抱怨了一番</a>.
+和知友们聊了会, 然后我想出了下面这个方案.</p>
+
+<p>和 Tensorflow 一样, 我做过一些 <a href="/tutorials/machine-learning/torch/">Pytorch 的教程</a>, pytorch 也是做神经网络的.
+但是它是<a href="http://pytorch.org/docs/master/notes/multiprocessing.html" target="_blank">支持 multiprocessing</a> 的.
+我专门开了一个 repo, 把 Pytorch + multiprocessing 的代码<a href="https://github.com/MorvanZhou/pytorch-A3C" target="_blank">分享了出来</a>.
+这会儿, CPU 满格, 心情舒畅多了~</p>
+
+<p><a href="/static/results/reinforcement-learning/6-3-8.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/6-3-8.png" alt="Asynchronous Advantage Actor-Critic (A3C) (Tensorflow)" title="Asynchronous Advantage Actor-Critic (A3C) (Tensorflow)" />
+</a></p>
+
+:ET

@@ -1,0 +1,89 @@
+I""<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/multiprocessingTUT/multiprocessing3_queue.py" target="_blank">相关代码</a></li>
+</ul>
+
+<p>Queue的功能是将每个核或线程的运算结果放在队里中，
+等到每个线程或核运行完毕后再从队列中取出结果，
+继续加载运算。原因很简单, 多线程调用的函数不能有返回值, 所以使用Queue存储多个线程运算的结果</p>
+
+<h2 class="tut-h2-pad" id="把结果放在-Queue-里">把结果放在 Queue 里
+  <a href="/tutorials/python-basic/multiprocessing/3-queue/#把结果放在-Queue-里" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>定义一个被多线程调用的函数，<code class="highlighter-rouge">q</code> 就像一个队列，用来保存每次函数运行的结果</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#该函数没有返回值！！！
+</span><span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+    <span class="n">res</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="n">res</span><span class="o">+=</span><span class="n">i</span><span class="o">+</span><span class="n">i</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">i</span><span class="o">**</span><span class="mi">3</span>
+    <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>    <span class="c1">#queue
+</span></code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="主函数">主函数
+  <a href="/tutorials/python-basic/multiprocessing/3-queue/#主函数" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>定义一个多线程队列，用来存储结果</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>定义两个线程函数，用来处理同一个任务,
+<code class="highlighter-rouge">args</code> 的参数只要一个值的时候，参数后面需要加一个逗号，表示<code class="highlighter-rouge">args</code>是可迭代的，后面可能还有别的参数，不加逗号会出错</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">p1</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">q</span><span class="p">,))</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">q</span><span class="p">,))</span>
+</code></pre></div></div>
+
+<p>分别启动、连接两个线程</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">p1</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="n">p2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="n">p1</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+<span class="n">p2</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>上面是分两批处理的，所以这里分两批输出，将结果分别保存</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">res1</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="n">res2</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>打印最后的运算结果</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">res1</span><span class="o">+</span><span class="n">res2</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="完整的代码">完整的代码
+  <a href="/tutorials/python-basic/multiprocessing/3-queue/#完整的代码" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="n">mp</span>
+
+<span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
+    <span class="n">res</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="n">res</span><span class="o">+=</span><span class="n">i</span><span class="o">+</span><span class="n">i</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">i</span><span class="o">**</span><span class="mi">3</span>
+    <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>    <span class="c1">#queue
+</span>
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">q</span><span class="p">,))</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job</span><span class="p">,</span><span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">q</span><span class="p">,))</span>
+    <span class="n">p1</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">p2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">p1</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+    <span class="n">p2</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+    <span class="n">res1</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+    <span class="n">res2</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">res1</span><span class="o">+</span><span class="n">res2</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>运行的时候还是要在terminal中，最后运行结果为</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">499667166000</span>
+</code></pre></div></div>
+:ET

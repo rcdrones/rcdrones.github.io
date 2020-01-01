@@ -1,0 +1,117 @@
+I"E&<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/contents/5_Deep_Q_Network" target="_blank">全部代码</a></li>
+  <li><a href="/tutorials/machine-learning/ML-intro/4-06-DQN/">什么是 DQN 短视频</a></li>
+  <li>模拟视频效果<a href="https://www.youtube.com/playlist?list=PLXO45tsB95cLYyEsEylpPvTY-8ErPt2O_" target="_blank">Youtube</a>, <a href="http://list.youku.com/albumlist/show/id_27485743" target="_blank">Youku</a></li>
+  <li><a href="/tutorials/machine-learning/ML-practice/RL-build-arm-from-scratch1/">强化学习实战</a></li>
+  <li>论文 <a href="https://arxiv.org/abs/1312.5602" target="_blank">Playing Atari with Deep Reinforcement Learning</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="要点">要点
+  <a href="/tutorials/machine-learning/reinforcement-learning/4-1-DQN1/#要点" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>Deep Q Network 的简称叫 DQN, 是将 Q learning 的优势 和 Neural networks 结合了. 如果我们使用 tabular Q learning, 对于每一个 state, action 我们都需要存放在一张 q_table 的表中.
+如果像显示生活中, 情况可就比那个迷宫的状况复杂多了, 我们有千千万万个 state, 如果将这千万个 state 的值都放在表中, 受限于我们计算机硬件, 这样从表中获取数据, 更新数据是没有效率的.
+这就是 DQN 产生的原因了. 我们可以使用神经网络来 估算 这个 state 的值, 这样就不需要一张表了.</p>
+
+<p>这次的教程我们还是基于熟悉的 迷宫 环境, 重点在实现 DQN 算法, 之后我们再拿着做好的 DQN 算法去跑其他更有意思的环境.</p>
+
+<video class="tut-content-video" controls="" loop="" autoplay="" muted="">
+  <source src="/static/results/reinforcement-learning/maze dqn.mp4" type="video/mp4" />
+  Your browser does not support HTML5 video.
+</video>
+
+<h2 class="tut-h2-pad" id="算法">算法
+  <a href="/tutorials/machine-learning/reinforcement-learning/4-1-DQN1/#算法" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><a href="/static/results/reinforcement-learning/4-1-1.jpg">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/4-1-1.jpg" alt="DQN 算法更新 (Tensorflow)" title="DQN 算法更新 (Tensorflow)" />
+</a></p>
+
+<p>整个算法乍看起来很复杂, 不过我们拆分一下, 就变简单了. 也就是个 Q learning 主框架上加了些装饰.</p>
+
+<p>这些装饰包括:</p>
+
+<ul>
+  <li>记忆库 (用于重复学习)</li>
+  <li>神经网络计算 Q 值</li>
+  <li>暂时冻结 <code class="highlighter-rouge">q_target</code> 参数 (切断相关性)</li>
+</ul>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="算法的代码形式">算法的代码形式
+  <a href="/tutorials/machine-learning/reinforcement-learning/4-1-DQN1/#算法的代码形式" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>接下来我们对应上面的算法, 来实现主循环. 首先 import 所需模块.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">maze_env</span> <span class="kn">import</span> <span class="n">Maze</span>
+<span class="kn">from</span> <span class="nn">RL_brain</span> <span class="kn">import</span> <span class="n">DeepQNetwork</span>
+</code></pre></div></div>
+
+<p>下面的代码, 就是 DQN 于环境交互最重要的部分.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run_maze</span><span class="p">():</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="mi">0</span>    <span class="c1"># 用来控制什么时候学习
+</span>    <span class="k">for</span> <span class="n">episode</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">300</span><span class="p">):</span>
+        <span class="c1"># 初始化环境
+</span>        <span class="n">observation</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="c1"># 刷新环境
+</span>            <span class="n">env</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+
+            <span class="c1"># DQN 根据观测值选择行为
+</span>            <span class="n">action</span> <span class="o">=</span> <span class="n">RL</span><span class="o">.</span><span class="n">choose_action</span><span class="p">(</span><span class="n">observation</span><span class="p">)</span>
+
+            <span class="c1"># 环境根据行为给出下一个 state, reward, 是否终止
+</span>            <span class="n">observation_</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+
+            <span class="c1"># DQN 存储记忆
+</span>            <span class="n">RL</span><span class="o">.</span><span class="n">store_transition</span><span class="p">(</span><span class="n">observation</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">observation_</span><span class="p">)</span>
+
+            <span class="c1"># 控制学习起始时间和频率 (先累积一些记忆再开始学习)
+</span>            <span class="k">if</span> <span class="p">(</span><span class="n">step</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">step</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">RL</span><span class="o">.</span><span class="n">learn</span><span class="p">()</span>
+
+            <span class="c1"># 将下一个 state_ 变为 下次循环的 state
+</span>            <span class="n">observation</span> <span class="o">=</span> <span class="n">observation_</span>
+
+            <span class="c1"># 如果终止, 就跳出循环
+</span>            <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">step</span> <span class="o">+=</span> <span class="mi">1</span>   <span class="c1"># 总步数
+</span>
+    <span class="c1"># end of game
+</span>    <span class="k">print</span><span class="p">(</span><span class="s">'game over'</span><span class="p">)</span>
+    <span class="n">env</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">Maze</span><span class="p">()</span>
+    <span class="n">RL</span> <span class="o">=</span> <span class="n">DeepQNetwork</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">n_actions</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">n_features</span><span class="p">,</span>
+                      <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+                      <span class="n">reward_decay</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+                      <span class="n">e_greedy</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+                      <span class="n">replace_target_iter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>  <span class="c1"># 每 200 步替换一次 target_net 的参数
+</span>                      <span class="n">memory_size</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="c1"># 记忆上限
+</span>                      <span class="c1"># output_graph=True   # 是否输出 tensorboard 文件
+</span>                      <span class="p">)</span>
+    <span class="n">env</span><span class="o">.</span><span class="n">after</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">run_maze</span><span class="p">)</span>
+    <span class="n">env</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
+    <span class="n">RL</span><span class="o">.</span><span class="n">plot_cost</span><span class="p">()</span>  <span class="c1"># 观看神经网络的误差曲线
+</span></code></pre></div></div>
+
+<p>下一节我们会来讲解 <code class="highlighter-rouge">DeepQNetwork</code> 这种算法具体要怎么编.</p>
+
+<p>如果想一次性看到全部代码, 请去我的 <a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/contents/5_Deep_Q_Network" target="_blank">Github</a></p>
+:ET

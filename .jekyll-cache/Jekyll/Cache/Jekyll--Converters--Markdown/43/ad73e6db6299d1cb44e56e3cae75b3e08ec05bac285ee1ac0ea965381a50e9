@@ -1,0 +1,268 @@
+I"@<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/contents/5.2_Prioritized_Replay_DQN" target="_blank">全部代码</a></li>
+  <li><a href="/tutorials/machine-learning/ML-practice/RL-build-arm-from-scratch1/">强化学习实战</a></li>
+  <li>论文 <a href="https://arxiv.org/abs/1511.05952" target="_blank">Prioritized Experience Replay</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="要点">要点
+  <a href="/tutorials/machine-learning/reinforcement-learning/4-6-prioritized-replay/#要点" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><strong>本篇教程是基于 Deep Q network (DQN) 的选学教程.
+以下教程缩减了在 DQN 方面的介绍, 着重强调 DQN with Prioritized Replay 和 DQN 在代码上不同的地方.
+所以还没了解 DQN 的同学们, 有关于 DQN 的知识,
+请从 <a href="/tutorials/machine-learning/ML-intro/4-06-DQN/">这个视频</a>
+和 <a href="/tutorials/machine-learning/reinforcement-learning/4-1-DQN1/">这个Python教程</a> 开始学习.</strong></p>
+
+<p>这一次还是使用 MountainCar 来进行实验, 因为这次我们不需要重度改变他的 reward 了.
+所以只要是没有拿到小旗子, reward=-1, 拿到小旗子时, 我们定义它获得了 +10 的 reward.
+比起之前 DQN 中, 这个 reward 定义更加准确. 如果使用这种 reward 定义方式,
+可以想象 Natural DQN 会花很久的时间学习, 因为记忆库中只有很少很少的 +10 reward 可以学习. 正负样本不一样.
+而使用 Prioritized replay, 就会重视这种少量的, 但值得学习的样本.</p>
+
+<video class="tut-content-video" controls="" loop="" autoplay="" muted="">
+  <source src="/static/results/reinforcement-learning/mountaincar dqn.mp4" type="video/mp4" />
+  Your browser does not support HTML5 video.
+</video>
+
+<h2 class="tut-h2-pad" id="Prioritized-replay-算法">Prioritized replay 算法
+  <a href="/tutorials/machine-learning/reinforcement-learning/4-6-prioritized-replay/#Prioritized-replay-算法" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><a href="/static/results/reinforcement-learning/4-6-1.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/4-6-1.png" alt="Prioritized Experience Replay (DQN) (Tensorflow)" title="Prioritized Experience Replay (DQN) (Tensorflow)" />
+</a></p>
+
+<p>这一套算法重点就在我们 batch 抽样的时候并不是随机抽样, 而是按照 Memory 中的样本优先级来抽.
+所以这能更有效地找到我们需要学习的样本.</p>
+
+<p>那么样本的优先级是怎么定的呢? 原来我们可以用到 <code class="highlighter-rouge">TD-error</code>, 也就是 <code class="highlighter-rouge">Q现实 - Q估计</code> 来规定优先学习的程度.
+如果 <code class="highlighter-rouge">TD-error</code> 越大, 就代表我们的预测精度还有很多上升空间, 那么这个样本就越需要被学习, 也就是优先级 <code class="highlighter-rouge">p</code> 越高.</p>
+
+<p>有了 <code class="highlighter-rouge">TD-error</code> 就有了优先级 <code class="highlighter-rouge">p</code>, 那我们如何有效地根据 <code class="highlighter-rouge">p</code> 来抽样呢?
+如果每次抽样都需要针对 <code class="highlighter-rouge">p</code> 对所有样本排序, 这将会是一件非常消耗计算能力的事.
+好在我们还有其他方法, 这种方法不会对得到的样本进行排序. 这就是这篇 <a href="https://arxiv.org/abs/1511.05952" target="_blank">paper</a>
+中提到的 <code class="highlighter-rouge">SumTree</code>.</p>
+
+<p>SumTree 是一种树形结构, 每片树叶存储每个样本的优先级 <code class="highlighter-rouge">p</code>, 每个树枝节点只有两个分叉, 节点的值是两个分叉的合,
+所以 SumTree 的顶端就是所有 <code class="highlighter-rouge">p</code> 的合. 正如下面<a href="https://jaromiru.com/2016/11/07/lets-make-a-dqn-double-learning-and-prioritized-experience-replay/" target="_blank">图片(来自Jaromír Janisch)</a>,
+最下面一层树叶存储样本的 <code class="highlighter-rouge">p</code>, 叶子上一层最左边的 13 = 3 + 10, 按这个规律相加, 顶层的 root 就是全部 <code class="highlighter-rouge">p</code> 的合了.</p>
+
+<p><a href="https://jaromiru.com/2016/11/07/lets-make-a-dqn-double-learning-and-prioritized-experience-replay/"></a></p>
+
+<p><a href="/static/results/reinforcement-learning/4-6-2.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/4-6-2.png" alt="Prioritized Experience Replay (DQN) (Tensorflow)" title="Prioritized Experience Replay (DQN) (Tensorflow)" />
+</a></p>
+
+<p>&lt;/a&gt;</p>
+
+<p>抽样时, 我们会将 <code class="highlighter-rouge">p</code> 的总合 除以 batch size, 分成 batch size 那么多区间, (n=sum(p)/batch_size).
+如果将所有 node 的 priority 加起来是42的话, 我们如果抽6个样本, 这时的区间拥有的 priority 可能是这样.</p>
+
+<p><code class="highlighter-rouge">[0-7], [7-14], [14-21], [21-28], [28-35], [35-42]</code></p>
+
+<p>然后在每个区间里随机选取一个数. 比如在第区间 <code class="highlighter-rouge">[21-28]</code> 里选到了24, 就按照这个 24 从最顶上的42开始向下搜索.
+首先看到最顶上 <code class="highlighter-rouge">42</code> 下面有两个 child nodes, 拿着手中的24对比左边的 child <code class="highlighter-rouge">29</code>, 如果 左边的 child 比自己手中的值大, 那我们就走左边这条路,
+接着再对比 <code class="highlighter-rouge">29</code> 下面的左边那个点 <code class="highlighter-rouge">13</code>, 这时, 手中的 24 比 <code class="highlighter-rouge">13</code> 大, 那我们就走右边的路,
+并且将手中的值根据 <code class="highlighter-rouge">13</code> 修改一下, 变成 24-13 = 11. 接着拿着 11 和 <code class="highlighter-rouge">13</code> 左下角的 <code class="highlighter-rouge">12</code> 比, 结果 <code class="highlighter-rouge">12</code> 比 11 大,
+那我们就选 12 当做这次选到的 priority, 并且也选择 12 对应的数据.</p>
+
+<h2 class="tut-h2-pad" id="SumTree-有效抽样">SumTree 有效抽样
+  <a href="/tutorials/machine-learning/reinforcement-learning/4-6-prioritized-replay/#SumTree-有效抽样" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><strong>注意: 下面的代码和视频中有一点点不同, 下面的代码是根据评论中讨论的进行了修改, 多谢大家的评论.</strong></p>
+
+<p>首先要提的是, 这个 SumTree 的算法是对于 <a href="https://github.com/jaara/AI-blog/blob/master/SumTree.py" target="_blank">Jaromír Janisch 写的 Sumtree</a> 的修改版.
+Jaromír Janisch 的代码在更新 sumtree 的时候和抽样的时候多次用到了 recursive 递归结构, 我使用的是 while 循环, 测试要比递归结构运行快.
+在 class 中的功能也比它的代码少几个, 我优化了一下.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">SumTree</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="c1"># 建立 tree 和 data,
+</span>    <span class="c1"># 因为 SumTree 有特殊的数据结构,
+</span>    <span class="c1"># 所以两者都能用一个一维 np.array 来存储
+</span>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">capacity</span><span class="p">):</span>
+
+    <span class="c1"># 当有新 sample 时, 添加进 tree 和 data
+</span>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+
+    <span class="c1"># 当 sample 被 train, 有了新的 TD-error, 就在 tree 中更新
+</span>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree_idx</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+
+    <span class="c1"># 根据选取的 v 点抽取样本
+</span>    <span class="k">def</span> <span class="nf">get_leaf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+
+    <span class="c1"># 获取 sum(priorities)
+</span>    <span class="o">@</span><span class="nb">property</span>
+    <span class="k">def</span> <span class="nf">totoal_p</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</code></pre></div></div>
+
+<p>具体的抽要和更新值的规则和上面说的类似.
+具体的代码在这里呈现的话比较累赘, 详细代码请去往我的 <a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/blob/master/contents/5.2_Prioritized_Replay_DQN/RL_brain.py#L18-L86" target="_blank">Github对应的位置</a></p>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="Memory-类">Memory 类
+  <a href="/tutorials/machine-learning/reinforcement-learning/4-6-prioritized-replay/#Memory-类" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>这个 Memory 类也是基于 <a href="https://github.com/jaara/AI-blog/blob/master/Seaquest-DDQN-PER.py" target="_blank">Jaromír Janisch 所写的 Memory</a> 进行了修改和优化.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Memory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="c1"># 建立 SumTree 和各种参数
+</span>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">capacity</span><span class="p">):</span>
+
+    <span class="c1"># 存储数据, 更新 SumTree
+</span>    <span class="k">def</span> <span class="nf">store</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transition</span><span class="p">):</span>
+
+    <span class="c1"># 抽取 sample
+</span>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+
+    <span class="c1"># train 完被抽取的 samples 后更新在 tree 中的 sample 的 priority
+</span>    <span class="k">def</span> <span class="nf">batch_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree_idx</span><span class="p">,</span> <span class="n">abs_errors</span><span class="p">):</span>
+
+</code></pre></div></div>
+
+<p>具体的代码在这里呈现的话比较累赘, 详细代码请去往我的 <a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/blob/master/contents/5.2_Prioritized_Replay_DQN/RL_brain.py#L89-L129" target="_blank">Github对应的位置</a>
+下面有很多朋友经常问的一个问题, 这个 ISweight 到底怎么算. 需要提到的一点是, 代码中的计算方法是经过了简化的, 将 paper 中的步骤合并了一些.
+比如 <code class="highlighter-rouge">prob = p / self.tree.total_p; ISWeights = np.power(prob/min_prob, -self.beta)</code></p>
+
+<p><a href="/static/results/reinforcement-learning/4-6-5.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/4-6-5.png" alt="Prioritized Experience Replay (DQN) (Tensorflow)" title="Prioritized Experience Replay (DQN) (Tensorflow)" />
+</a></p>
+
+<p>下面是我的推导, 如果有不正确还请指出. 在paper 中, <code class="highlighter-rouge">ISWeight = (N*Pj)^(-beta) / maxi_wi</code> 里面的 <code class="highlighter-rouge">maxi_wi</code> 是为了 normalize ISWeight, 所以我们先把他放在一边.
+所以单纯的 importance sampling 就是 <code class="highlighter-rouge">(N*Pj)^(-beta)</code>, 那 <code class="highlighter-rouge">maxi_wi = maxi[(N*Pi)^(-beta)]</code>.</p>
+
+<p>如果将这两个式子合并,</p>
+
+<p><code class="highlighter-rouge">ISWeight = (N*Pj)^(-beta) / maxi[ (N*Pi)^(-beta) ]</code></p>
+
+<p>而且如果将 <code class="highlighter-rouge">maxi[ (N*Pi)^(-beta) ]</code> 中的 (-beta) 提出来, 这就变成了 <code class="highlighter-rouge">mini[ (N*Pi) ] ^ (-beta)</code></p>
+
+<p>看出来了吧, 有的东西可以抵消掉的. 最后</p>
+
+<p><code class="highlighter-rouge">ISWeight = (Pj / mini[Pi])^(-beta)</code></p>
+
+<p>这样我们就有了代码中的样子.</p>
+
+<p>还有代码中的 <code class="highlighter-rouge">alpha</code> 是一个决定我们要使用多少 ISweight 的影响, 如果 <code class="highlighter-rouge">alpha = 0</code>, 我们就没使用到任何 Importance Sampling.</p>
+
+<h2 class="tut-h2-pad" id="更新方法">更新方法
+  <a href="/tutorials/machine-learning/reinforcement-learning/4-6-prioritized-replay/#更新方法" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>基于之前的 <a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/blob/master/contents/5.1_Double_DQN/RL_brain.py" target="_blank">DQN 代码</a>,
+我们做出以下修改. 我们将 class 的名字改成 <code class="highlighter-rouge">DQNPrioritiedReplay</code>, 为了对比 Natural DQN,
+我们也保留原来大部分的 DQN 的代码. 我们在 <code class="highlighter-rouge">__init__</code> 中加一个 <code class="highlighter-rouge">prioritized</code> 参数来表示 DQN 是否具备 prioritized 能力.
+为了对比的需要, 我们的 <code class="highlighter-rouge">tf.Session()</code> 也单独传入. 并移除原本在 DQN 代码中的这一句:</p>
+
+<p><code class="highlighter-rouge">self.sess.run(tf.global_variables_initializer())</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DQNPrioritiedReplay</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">prioritized</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">sess</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prioritized</span> <span class="o">=</span> <span class="n">prioritized</span>
+        <span class="o">...</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prioritized</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">memory</span> <span class="o">=</span> <span class="n">Memory</span><span class="p">(</span><span class="n">capacity</span><span class="o">=</span><span class="n">memory_size</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">memory</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">memory_size</span><span class="p">,</span> <span class="n">n_features</span><span class="o">*</span><span class="mi">2</span><span class="o">+</span><span class="mi">2</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">sess</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sess</span> <span class="o">=</span> <span class="n">sess</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/reinforcement-learning/4-6-3.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/4-6-3.png" alt="Prioritized Experience Replay (DQN) (Tensorflow)" title="Prioritized Experience Replay (DQN) (Tensorflow)" />
+</a></p>
+
+<p>搭建神经网络时, 我们发现 DQN with Prioritized replay 只多了一个 <code class="highlighter-rouge">ISWeights</code>, 这个正是<a href="/tutorials/machine-learning/reinforcement-learning/4-6-prioritized-replay/#algorithm">刚刚算法中</a>提到的
+<code class="highlighter-rouge">Importance-Sampling Weights</code>, 用来恢复被 Prioritized replay 打乱的抽样概率分布.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DQNPrioritizedReplay</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_build_net</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="o">...</span>
+        <span class="c1"># self.prioritized 时 eval net 的 input 多加了一个 ISWeights
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_features</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s">'s'</span><span class="p">)</span>  <span class="c1"># input
+</span>        <span class="bp">self</span><span class="o">.</span><span class="n">q_target</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_actions</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s">'Q_target'</span><span class="p">)</span>  <span class="c1"># for calculating loss
+</span>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prioritized</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ISWeights</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s">'IS_weights'</span><span class="p">)</span>
+
+        <span class="o">...</span>
+        <span class="c1"># 为了得到 abs 的 TD error 并用于修改这些 sample 的 priority, 我们修改如下
+</span>        <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s">'loss'</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prioritized</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">abs_errors</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q_target</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_eval</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>    <span class="c1"># for updating Sumtree
+</span>                <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ISWeights</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">squared_difference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q_target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_eval</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">squared_difference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">q_target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_eval</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>因为和 Natural DQN 使用的 Memory 不一样, 所以在存储 transition 的时候方式也略不相同.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DQNPrioritizedReplay</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">store_transition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s_</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prioritized</span><span class="p">:</span>    <span class="c1"># prioritized replay
+</span>            <span class="n">transition</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">s</span><span class="p">,</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">],</span> <span class="n">s_</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">transition</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>       <span class="c1"># random replay
+</span>            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">'memory_counter'</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">memory_counter</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">transition</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">s</span><span class="p">,</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">r</span><span class="p">],</span> <span class="n">s_</span><span class="p">))</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory_counter</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory_size</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">transition</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">memory_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre></div></div>
+
+<p>接下来是相对于 <a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/blob/master/contents/5_Deep_Q_Network/RL_brain.py" target="_blank">Natural DQN 代码</a>,
+我们在 <code class="highlighter-rouge">learn()</code> 改变的部分也在如下展示.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DQNPrioritizedReplay</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">learn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="o">...</span>
+        <span class="c1"># 相对于 DQN 代码, 改变的部分
+</span>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prioritized</span><span class="p">:</span>
+            <span class="n">tree_idx</span><span class="p">,</span> <span class="n">batch_memory</span><span class="p">,</span> <span class="n">ISWeights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sample_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">memory_size</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
+            <span class="n">batch_memory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="p">[</span><span class="n">sample_index</span><span class="p">,</span> <span class="p">:]</span>
+
+        <span class="o">...</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prioritized</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">abs_errors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_op</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">abs_errors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">],</span>
+                                         <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">:</span> <span class="n">batch_memory</span><span class="p">[:,</span> <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features</span><span class="p">],</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">q_target</span><span class="p">:</span> <span class="n">q_target</span><span class="p">,</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">ISWeights</span><span class="p">:</span> <span class="n">ISWeights</span><span class="p">})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">batch_update</span><span class="p">(</span><span class="n">tree_idx</span><span class="p">,</span> <span class="n">abs_errors</span><span class="p">)</span>   <span class="c1"># update priority
+</span>        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_op</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">],</span>
+                                         <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="p">:</span> <span class="n">batch_memory</span><span class="p">[:,</span> <span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">n_features</span><span class="p">],</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">q_target</span><span class="p">:</span> <span class="n">q_target</span><span class="p">})</span>
+
+        <span class="o">...</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="对比结果">对比结果
+  <a href="/tutorials/machine-learning/reinforcement-learning/4-6-prioritized-replay/#对比结果" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><a href="/static/results/reinforcement-learning/4-6-4.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/4-6-4.png" alt="Prioritized Experience Replay (DQN) (Tensorflow)" title="Prioritized Experience Replay (DQN) (Tensorflow)" />
+</a></p>
+
+<p>运行我 Github 中的这个 <a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/blob/master/contents/5.2_Prioritized_Replay_DQN/run_MountainCar.py" target="_blank">MountainCar 脚本</a>,
+我们就不难发现, 我们都从两种方法最初拿到第一个 <code class="highlighter-rouge">R=+10</code> 奖励的时候算起, 看看经历过一次 <code class="highlighter-rouge">R=+10</code> 后, 他们有没有好好利用这次的奖励,
+可以看出, 有 Prioritized replay 的可以高效的利用这些不常拿到的奖励, 并好好学习他们. 所以 Prioritized replay 会更快结束每个 episode, 很快就到达了小旗子.</p>
+
+:ET

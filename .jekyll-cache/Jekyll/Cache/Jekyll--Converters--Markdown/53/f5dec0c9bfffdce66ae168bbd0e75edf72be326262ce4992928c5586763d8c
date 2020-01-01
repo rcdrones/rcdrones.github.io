@@ -1,0 +1,81 @@
+I"
+<h2 class="tut-h2-pad" id="树莓派历史">树莓派历史
+  <a href="/tutorials/rpi-basic/ass/01-1-pi4_intro2/#树莓派历史" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>Pi3 B 发布于2016年2月： 之前经历的版本有 Pi1 B、Pi1 B+、Pi2 B、Pi3 B。Pi3 B最大的变化是在Pi2 B的基础上升级了CPU还有带了WIFI。之前的版本都只能用有线100M网络。</p>
+
+<p>Pi3 B+ 发布于2018年3月： 比3B多了对WIFI 5G频段的支持。</p>
+
+<p>Pi4 B 发布于2019年6月： 升级的比较大。最显著的是分了3个内存版本(1G、2G、4G)。之前的代数，都只有一个确定的内存容量可供选择（35 45 55 usd）。 CPU 比3B+ 快2-4倍 . <a href="https://www.eefocus.com/mcu-dsp/444160/">点击性能对比</a></p>
+
+<h2 class="tut-h2-pad" id="版本选择">版本选择
+  <a href="/tutorials/rpi-basic/ass/01-1-pi4_intro2/#版本选择" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><img src="sel.jpg" alt="" /></p>
+
+<p>目前，我开发了2个项目。一个是树莓派的UPS（视频插图），一个是树莓派4智能风扇（视频插图），都是用4G来开发的。</p>
+
+<h2 class="tut-h2-pad" id="开箱">开箱
+  <a href="/tutorials/rpi-basic/ass/01-1-pi4_intro2/#开箱" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>3版本的纸盒包装。 底下是一张垫纸，和一小份说明书。</p>
+
+<p>防静电的处理方式：</p>
+
+<p><img src="esd.jpg" alt="" /></p>
+
+<p>自备无防静电的手套。就把手洗干净，并擦干（放掉了静电）。利用光盘拿法去拿板子。</p>
+
+<p>有静电手套：带上静电手套操作。</p>
+
+<h2 class="tut-h2-pad" id="和Pi3的差异">和Pi3的差异
+  <a href="/tutorials/rpi-basic/ass/01-1-pi4_intro2/#和Pi3的差异" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>Pi3 B E14 前后也出过2个版本。早期的一个版本CPU上没有散热片。后期的版本是CPU带了散热片。并且后期的版本CPU频率提高到1.4GHz。</p>
+
+<p>不同：</p>
+
+<ul>
+  <li>Pi3的内存和Wifi是放在板子的背后，Pi4所有ic都在正面。</li>
+  <li>Pi3的USB 都是USB2.0 ， Pi4 有2个USB2.0 + 2个USB3.0（蓝色）</li>
+  <li>网口位置不同。所以case 不通用。并且网口速度不一样，Pi4 为千兆网络</li>
+  <li>蓝牙是Wifi有升级。</li>
+  <li>电源Micro升级到Tpye-C。电流从原来的5V 2.5A，需求升级到5V 3A。</li>
+  <li>2个Mirco HDMI接口。</li>
+  <li>内存在正面，正方形。Pi3 长方形，内存散热片不通用。</li>
+</ul>
+
+<p>看不见的升级：</p>
+
+<ul>
+  <li>CPU是BCM2711 28nm工艺，1.5G。上一代3B+ 40nm 1.4G。内核从CORTEX-A53升级到COETEX-A72</li>
+  <li>GPU：Video Core 6 500Mhz ，上一代3B+是博通Video Core 4 400Mhz.增加了4K 60FPS的解码能力。</li>
+  <li>蓝牙升级到5.0，上一代是4.2。</li>
+</ul>
+
+<p>相同：</p>
+
+<ul>
+  <li>
+    <p>20x2P GPIO排针。向下兼容。</p>
+  </li>
+  <li>
+    <p>4个M2.5孔的位置和GPIO口的位置相同。（HAT扩展板向下兼容）</p>
+  </li>
+  <li>
+    <p>POE排针和Pi 3B+位置相同，并且POE HAT向下兼容。</p>
+  </li>
+</ul>
+
+<p>吐槽：</p>
+
+<ul>
+  <li>毛边（邮票孔 +铣床）</li>
+  <li>DIP位置的助焊剂痕迹。后焊工艺不同。</li>
+</ul>
+
+:ET

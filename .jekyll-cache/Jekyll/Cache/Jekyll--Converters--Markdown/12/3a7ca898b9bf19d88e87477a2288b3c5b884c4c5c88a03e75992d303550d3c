@@ -1,0 +1,41 @@
+I"
+
+<h2 class="tut-h2-pad" id="自变量命名规则">自变量命名规则
+  <a href="/tutorials/python-basic/basic/02-4-variable/#自变量命名规则" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>可以将一个数值，或者字符串串附值给自变量，如<code class="highlighter-rouge">apple=1</code> 中，<code class="highlighter-rouge">apple</code>为自变量的名称，<code class="highlighter-rouge">1</code>为自变量的值。 也可以将字符串赋值给自变量  <code class="highlighter-rouge">apple='iphone7 plus'</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">apple</span><span class="o">=</span><span class="mi">1</span>       <span class="c1">#赋值 数字
+</span><span class="k">print</span><span class="p">(</span><span class="n">apple</span><span class="p">)</span>
+<span class="s">""""
+1
+""""</span><span class="err">
+
+</span><span class="s">apple='iphone 7 plus'   #赋值 字符串</span><span class="err">
+</span><span class="s">print(apple)</span><span class="err">
+</span><span class="s">""""
+iphone 7 plus
+""""</span><span class="err">
+
+</span></code></pre></div></div>
+
+<p>如果需要用多个单词来表示自变量，需要加下划线，如<code class="highlighter-rouge">apple_2016='iphone 7 plus'</code> 请看代码</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">apple_2016</span><span class="o">=</span><span class="s">'iphone 7 plus and new macbook'</span>
+<span class="k">print</span><span class="p">(</span><span class="n">apple_2016</span><span class="p">)</span>
+<span class="s">""""
+iphone 7 plus and new macbook
+""""</span><span class="err">
+</span></code></pre></div></div>
+
+<p>一次定义多个自变量  <code class="highlighter-rouge">a,b,c=1,2,3</code>。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">13</span>
+<span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+<span class="s">""""
+11 12 13
+""""</span><span class="err">
+</span></code></pre></div></div>
+
+:ET

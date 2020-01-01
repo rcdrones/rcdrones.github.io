@@ -1,0 +1,123 @@
+I"4.<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/tree/master/sklearnTUT/sk8_cross_validation" target="_blank">相关代码</a></li>
+</ul>
+
+<p>Sklearn 中的 Cross Validation (交叉验证)对于我们选择正确的 Model 和 Model 的参数是非常有帮助的，
+有了他的帮助，我们能直观的看出不同 Model 或者参数对结构准确度的影响。</p>
+
+<h2 class="tut-h2-pad" id="Model-基础验证法">Model 基础验证法
+  <a href="/tutorials/machine-learning/sklearn/3-2-cross-validation1/#Model-基础验证法" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span> <span class="c1"># iris数据集
+</span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span> <span class="c1"># 分割数据模块
+</span><span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsClassifier</span> <span class="c1"># K最近邻(kNN，k-NearestNeighbor)分类算法
+</span>
+<span class="c1">#加载iris数据集
+</span><span class="n">iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">data</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">target</span>
+
+<span class="c1">#分割数据并
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="c1">#建立模型
+</span><span class="n">knn</span> <span class="o">=</span> <span class="n">KNeighborsClassifier</span><span class="p">()</span>
+
+<span class="c1">#训练模型
+</span><span class="n">knn</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1">#将准确率打印出
+</span><span class="k">print</span><span class="p">(</span><span class="n">knn</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">))</span>
+<span class="c1"># 0.973684210526
+</span></code></pre></div></div>
+
+<p>可以看到基础验证的准确率为<code class="highlighter-rouge">0.973684210526</code></p>
+
+<h2 class="tut-h2-pad" id="Model-交叉验证法(Cross-Validation)">Model 交叉验证法(Cross Validation)
+  <a href="/tutorials/machine-learning/sklearn/3-2-cross-validation1/#Model-交叉验证法(Cross-Validation)" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.cross_validation</span> <span class="kn">import</span> <span class="n">cross_val_score</span> <span class="c1"># K折交叉验证模块
+</span>
+<span class="c1">#使用K折交叉验证模块
+</span><span class="n">scores</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s">'accuracy'</span><span class="p">)</span>
+
+<span class="c1">#将5次的预测准确率打印出
+</span><span class="k">print</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+<span class="c1"># [ 0.96666667  1.          0.93333333  0.96666667  1.        ]
+</span>
+<span class="c1">#将5次的预测准确平均率打印出
+</span><span class="k">print</span><span class="p">(</span><span class="n">scores</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+<span class="c1"># 0.973333333333
+</span></code></pre></div></div>
+
+<p>可以看到交叉验证的准确平均率为<code class="highlighter-rouge">0.973333333333</code></p>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="以准确率(accuracy)判断">以准确率(accuracy)判断
+  <a href="/tutorials/machine-learning/sklearn/3-2-cross-validation1/#以准确率(accuracy)判断" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>一般来说<code class="highlighter-rouge">准确率(accuracy)</code>会用于判断分类(Classification)模型的好坏。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span> <span class="c1">#可视化模块
+</span>
+<span class="c1">#建立测试参数集
+</span><span class="n">k_range</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+
+<span class="n">k_scores</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1">#藉由迭代的方式来计算不同参数对模型的影响，并返回交叉验证后的平均准确率
+</span><span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">k_range</span><span class="p">:</span>
+    <span class="n">knn</span> <span class="o">=</span> <span class="n">KNeighborsClassifier</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s">'accuracy'</span><span class="p">)</span>
+    <span class="n">k_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scores</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+
+<span class="c1">#可视化数据
+</span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">k_range</span><span class="p">,</span> <span class="n">k_scores</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Value of K for KNN'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Cross-Validated Accuracy'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/sklearn/3_2_1.png">
+ <img class="course-image lazy-img" src="/static/results/sklearn/3_2_1.png" alt="交叉验证 1 Cross-validation" title="交叉验证 1 Cross-validation" />
+</a></p>
+
+<p>从图中可以得知，选择<code class="highlighter-rouge">12~18</code>的<code class="highlighter-rouge">k</code>值最好。高过<code class="highlighter-rouge">18</code>之后，准确率开始下降则是因为过拟合(Over fitting)的问题。</p>
+
+<h2 class="tut-h2-pad" id="以平均方差(Mean-squared-error)">以平均方差(Mean squared error)
+  <a href="/tutorials/machine-learning/sklearn/3-2-cross-validation1/#以平均方差(Mean-squared-error)" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>一般来说<code class="highlighter-rouge">平均方差(Mean squared error)</code>会用于判断回归(Regression)模型的好坏。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="n">k_range</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+<span class="n">k_scores</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">k_range</span><span class="p">:</span>
+    <span class="n">knn</span> <span class="o">=</span> <span class="n">KNeighborsClassifier</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="n">k</span><span class="p">)</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">cross_val_score</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s">'mean_squared_error'</span><span class="p">)</span>
+    <span class="n">k_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">k_range</span><span class="p">,</span> <span class="n">k_scores</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Value of K for KNN'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Cross-Validated MSE'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/sklearn/3_2_2.png">
+ <img class="course-image lazy-img" src="/static/results/sklearn/3_2_2.png" alt="交叉验证 1 Cross-validation" title="交叉验证 1 Cross-validation" />
+</a></p>
+
+<p>由图可以得知，平均方差越低越好，因此选择<code class="highlighter-rouge">13~18</code>左右的<code class="highlighter-rouge">K</code>值会最好。</p>
+:ET

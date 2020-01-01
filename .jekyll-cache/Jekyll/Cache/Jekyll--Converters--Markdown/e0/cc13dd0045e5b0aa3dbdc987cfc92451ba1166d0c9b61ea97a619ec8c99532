@@ -1,0 +1,195 @@
+I"W@<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/threadingTUT/thread6_lock.py" target="_blank">相关代码</a></li>
+</ul>
+
+<p><strong>导入线程标准模块</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">threading</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="不使用-Lock-的情况">不使用 Lock 的情况
+  <a href="/tutorials/python-basic/threading/6-lock/#不使用-Lock-的情况" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>函数一：全局变量A的值每次加1，循环10次，并打印</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">job1</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">A</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">A</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'job1'</span><span class="p">,</span><span class="n">A</span><span class="p">)</span>
+</code></pre></div></div>
+<p>函数二：全局变量A的值每次加10，循环10次，并打印</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">job2</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">A</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">A</span><span class="o">+=</span><span class="mi">10</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'job2'</span><span class="p">,</span><span class="n">A</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>主函数：定义两个线程，分别执行函数一和函数二</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">__name__</span><span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">A</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">t1</span><span class="o">=</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job1</span><span class="p">)</span>
+    <span class="n">t2</span><span class="o">=</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job2</span><span class="p">)</span>
+    <span class="n">t1</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">t2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">t1</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+    <span class="n">t2</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>完整代码：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">threading</span>
+
+<span class="k">def</span> <span class="nf">job1</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">A</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">A</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'job1'</span><span class="p">,</span><span class="n">A</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">job2</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">A</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">A</span><span class="o">+=</span><span class="mi">10</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'job2'</span><span class="p">,</span><span class="n">A</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">lock</span><span class="o">=</span><span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+    <span class="n">A</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">t1</span><span class="o">=</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job1</span><span class="p">)</span>
+    <span class="n">t2</span><span class="o">=</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job2</span><span class="p">)</span>
+    <span class="n">t1</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">t2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">t1</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+    <span class="n">t2</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>运行结果（在spyder编译器下运行的打印结果）：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">job1job2</span> <span class="mi">11</span>
+<span class="n">job2</span> <span class="mi">21</span>
+<span class="n">job2</span> <span class="mi">31</span>
+<span class="n">job2</span> <span class="mi">41</span>
+<span class="n">job2</span> <span class="mi">51</span>
+<span class="n">job2</span> <span class="mi">61</span>
+<span class="n">job2</span> <span class="mi">71</span>
+<span class="n">job2</span> <span class="mi">81</span>
+<span class="n">job2</span> <span class="mi">91</span>
+<span class="n">job2</span> <span class="mi">101</span>
+ <span class="mi">1</span>
+<span class="n">job1</span> <span class="mi">102</span>
+<span class="n">job1</span> <span class="mi">103</span>
+<span class="n">job1</span> <span class="mi">104</span>
+<span class="n">job1</span> <span class="mi">105</span>
+<span class="n">job1</span> <span class="mi">106</span>
+<span class="n">job1</span> <span class="mi">107</span>
+<span class="n">job1</span> <span class="mi">108</span>
+<span class="n">job1</span> <span class="mi">109</span>
+<span class="n">job1</span> <span class="mi">110</span>
+</code></pre></div></div>
+
+<p>可以看出，打印的结果非常混乱</p>
+
+<h2 class="tut-h2-pad" id="使用-Lock-的情况">使用 Lock 的情况
+  <a href="/tutorials/python-basic/threading/6-lock/#使用-Lock-的情况" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>lock在不同线程使用同一共享内存时，能够确保线程之间互不影响，使用lock的方法是，
+在每个线程执行运算修改共享内存之前，执行<code class="highlighter-rouge">lock.acquire()</code>将共享内存上锁，
+确保当前线程执行时，内存不会被其他线程访问，执行运算完毕后，使用<code class="highlighter-rouge">lock.release()</code>将锁打开，
+保证其他的线程可以使用该共享内存。</p>
+
+<p>函数一和函数二加锁</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">job1</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">A</span><span class="p">,</span><span class="n">lock</span>
+    <span class="n">lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">A</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'job1'</span><span class="p">,</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">job2</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">A</span><span class="p">,</span><span class="n">lock</span>
+    <span class="n">lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">A</span><span class="o">+=</span><span class="mi">10</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'job2'</span><span class="p">,</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>主函数中定义一个<code class="highlighter-rouge">Lock</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">__name__</span><span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">lock</span><span class="o">=</span><span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+    <span class="n">A</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">t1</span><span class="o">=</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job1</span><span class="p">)</span>
+    <span class="n">t2</span><span class="o">=</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job2</span><span class="p">)</span>
+    <span class="n">t1</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">t2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">t1</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+    <span class="n">t2</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>完整的代码</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">threading</span>
+
+<span class="k">def</span> <span class="nf">job1</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">A</span><span class="p">,</span><span class="n">lock</span>
+    <span class="n">lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">A</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'job1'</span><span class="p">,</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">job2</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">A</span><span class="p">,</span><span class="n">lock</span>
+    <span class="n">lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">A</span><span class="o">+=</span><span class="mi">10</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'job2'</span><span class="p">,</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">lock</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">lock</span><span class="o">=</span><span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+    <span class="n">A</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">t1</span><span class="o">=</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job1</span><span class="p">)</span>
+    <span class="n">t2</span><span class="o">=</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">job2</span><span class="p">)</span>
+    <span class="n">t1</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">t2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    <span class="n">t1</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+    <span class="n">t2</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>运行结果</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">job1</span> <span class="mi">1</span>
+<span class="n">job1</span> <span class="mi">2</span>
+<span class="n">job1</span> <span class="mi">3</span>
+<span class="n">job1</span> <span class="mi">4</span>
+<span class="n">job1</span> <span class="mi">5</span>
+<span class="n">job1</span> <span class="mi">6</span>
+<span class="n">job1</span> <span class="mi">7</span>
+<span class="n">job1</span> <span class="mi">8</span>
+<span class="n">job1</span> <span class="mi">9</span>
+<span class="n">job1</span> <span class="mi">10</span>
+<span class="n">job2</span> <span class="mi">20</span>
+<span class="n">job2</span> <span class="mi">30</span>
+<span class="n">job2</span> <span class="mi">40</span>
+<span class="n">job2</span> <span class="mi">50</span>
+<span class="n">job2</span> <span class="mi">60</span>
+<span class="n">job2</span> <span class="mi">70</span>
+<span class="n">job2</span> <span class="mi">80</span>
+<span class="n">job2</span> <span class="mi">90</span>
+<span class="n">job2</span> <span class="mi">100</span>
+<span class="n">job2</span> <span class="mi">110</span>
+</code></pre></div></div>
+
+<p>从打印结果来看，使用<code class="highlighter-rouge">lock</code>后，一个一个线程执行完。使用<code class="highlighter-rouge">lock</code>和不使用<code class="highlighter-rouge">lock</code>，最后打印输出的结果是不同的。</p>
+:ET

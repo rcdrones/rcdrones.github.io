@@ -1,0 +1,111 @@
+I"Y6<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/matplotlibTUT/plt16_grid_subplot.py" target="_blank">相关代码</a></li>
+</ul>
+
+<p>matplotlib 的 subplot 还可以是分格的,这里介绍三种方法.</p>
+
+<h2 class="tut-h2-pad" id="subplot2grid">subplot2grid
+  <a href="/tutorials/data-manipulation/plt/4-2-subplot2/#subplot2grid" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>使用<code class="highlighter-rouge">import</code>导入<code class="highlighter-rouge">matplotlib.pyplot</code>模块, 并简写成<code class="highlighter-rouge">plt</code>. 使用<code class="highlighter-rouge">plt.figure()</code>创建一个图像窗口</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>使用<code class="highlighter-rouge">plt.subplot2grid</code>来创建第1个小图, <code class="highlighter-rouge">(3,3)</code>表示将整个图像窗口分成3行3列, <code class="highlighter-rouge">(0,0)</code>表示从第0行第0列开始作图，<code class="highlighter-rouge">colspan=3</code>表示列的跨度为3, <code class="highlighter-rouge">rowspan=1</code>表示行的跨度为1. 
+<code class="highlighter-rouge">colspan</code>和<code class="highlighter-rouge">rowspan</code>缺省, 默认跨度为1.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colspan</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>    <span class="c1"># 画小图
+</span><span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">'ax1_title'</span><span class="p">)</span>  <span class="c1"># 设置小图的标题
+</span></code></pre></div></div>
+
+<p>使用<code class="highlighter-rouge">plt.subplot2grid</code>来创建第2个小图, <code class="highlighter-rouge">(3,3)</code>表示将整个图像窗口分成3行3列, <code class="highlighter-rouge">(1,0)</code>表示从第1行第0列开始作图，<code class="highlighter-rouge">colspan=2</code>表示列的跨度为2.
+同上画出 <code class="highlighter-rouge">ax3</code>, <code class="highlighter-rouge">(1,2)</code>表示从第1行第2列开始作图，<code class="highlighter-rouge">rowspan=2</code>表示行的跨度为2. 再画一个 <code class="highlighter-rouge">ax4</code> 和 <code class="highlighter-rouge">ax5</code>, 使用默认 <code class="highlighter-rouge">colspan, rowspan</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colspan</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax3</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">rowspan</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax4</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="n">ax5</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot2grid</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>使用<code class="highlighter-rouge">ax4.scatter</code>创建一个散点图, 使用<code class="highlighter-rouge">ax4.set_xlabel</code>和<code class="highlighter-rouge">ax4.set_ylabel</code>来对x轴和y轴命名.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ax4</span><span class="o">.</span><span class="n">scatter</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">'ax4_x'</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">'ax4_y'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/plt/4_2_1.png">
+ <img class="course-image lazy-img" src="/static/results/plt/4_2_1.png" alt="Subplot 分格显示" title="Subplot 分格显示" />
+</a></p>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="gridspec">gridspec
+  <a href="/tutorials/data-manipulation/plt/4-2-subplot2/#gridspec" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>使用<code class="highlighter-rouge">import</code>导入<code class="highlighter-rouge">matplotlib.pyplot</code>模块, 并简写成<code class="highlighter-rouge">plt</code>.
+使用<code class="highlighter-rouge">import</code>导入<code class="highlighter-rouge">matplotlib.gridspec</code>, 并简写成<code class="highlighter-rouge">gridspec</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.gridspec</span> <span class="k">as</span> <span class="n">gridspec</span>
+</code></pre></div></div>
+
+<p>使用<code class="highlighter-rouge">plt.figure()</code>创建一个图像窗口, 使用<code class="highlighter-rouge">gridspec.GridSpec</code>将整个图像窗口分成3行3列.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">gs</span> <span class="o">=</span> <span class="n">gridspec</span><span class="o">.</span><span class="n">GridSpec</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>使用<code class="highlighter-rouge">plt.subplot</code>来作图, <code class="highlighter-rouge">gs[0, :]</code>表示这个图占第0行和所有列, <code class="highlighter-rouge">gs[1, :2]</code>表示这个图占第1行和第2列前的所有列, 
+<code class="highlighter-rouge">gs[1:, 2]</code>表示这个图占第1行后的所有行和第2列, <code class="highlighter-rouge">gs[-1, 0]</code>表示这个图占倒数第1行和第0列, <code class="highlighter-rouge">gs[-1, -2]</code>表示这个图占倒数第1行和倒数第2列.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ax6</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:])</span>
+<span class="n">ax7</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">ax8</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="n">ax9</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">ax10</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/plt/4_2_2.png">
+ <img class="course-image lazy-img" src="/static/results/plt/4_2_2.png" alt="Subplot 分格显示" title="Subplot 分格显示" />
+</a></p>
+
+<h2 class="tut-h2-pad" id="subplots">subplots
+  <a href="/tutorials/data-manipulation/plt/4-2-subplot2/#subplots" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>使用<code class="highlighter-rouge">plt.subplots</code>建立一个2行2列的图像窗口，<code class="highlighter-rouge">sharex=True</code>表示共享x轴坐标, <code class="highlighter-rouge">sharey=True</code>表示共享y轴坐标. 
+<code class="highlighter-rouge">((ax11, ax12), (ax13, ax14))</code>表示第1行从左至右依次放<code class="highlighter-rouge">ax11</code>和<code class="highlighter-rouge">ax12</code>, 第2行从左至右依次放<code class="highlighter-rouge">ax13</code>和<code class="highlighter-rouge">ax14</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="p">((</span><span class="n">ax11</span><span class="p">,</span> <span class="n">ax12</span><span class="p">),</span> <span class="p">(</span><span class="n">ax13</span><span class="p">,</span> <span class="n">ax14</span><span class="p">))</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>使用<code class="highlighter-rouge">ax11.scatter</code>创建一个散点图.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ax11</span><span class="o">.</span><span class="n">scatter</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">plt.tight_layout()</code>表示紧凑显示图像, <code class="highlighter-rouge">plt.show()</code>表示显示图像.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><a href="/static/results/plt/4_2_3.png">
+ <img class="course-image lazy-img" src="/static/results/plt/4_2_3.png" alt="Subplot 分格显示" title="Subplot 分格显示" />
+</a></p>
+
+:ET

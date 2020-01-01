@@ -1,0 +1,41 @@
+I"~<p>如果我们用代码实现了一个小功能，但想要在程序代码中重复使用，不能在代码中到处粘贴这些代码，因为这样做违反
+了软件工程中 <a href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself" target="_blank">DRY原则</a>。 Python 提供了
+<strong>函数</strong>功能，可以将我们这部分功能抽象成一个函数以方便程序调用，或者提供给其他模块使用。</p>
+
+<h2 class="tut-h2-pad" id="基本使用">基本使用
+  <a href="/tutorials/python-basic/basic/05-1-def/#基本使用" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">function_name</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
+    <span class="n">expressions</span>
+</code></pre></div></div>
+
+<p>Python 使用 <code class="highlighter-rouge">def</code> 开始函数定义，紧接着是函数名，括号内部为函数的参数，内部为函数的
+具体功能实现代码，如果想要函数有返回值, 在 <code class="highlighter-rouge">expressions</code> 中的逻辑代码中用 <code class="highlighter-rouge">return</code> 返回。</p>
+
+<h2 class="tut-h2-pad" id="实例">实例
+  <a href="/tutorials/python-basic/basic/05-1-def/#实例" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">function</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'This is a function'</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="o">+</span><span class="mi">2</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>上面我们定义了一个名字为 <code class="highlighter-rouge">function</code> 的函数，函数没有接收参数，所以括号内部为空，紧接着就是
+函数的功能代码。如果执行该脚本，发现并没有输出任何输出，因为我们只定义了函数，而并没有执行函数。
+这时我们在 Python 命令提示符中输入函数调用 <code class="highlighter-rouge">function()</code>, 注意这里调用函数的括号不能省略。那么
+函数内部的功能代码将会执行，输出结果：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">This</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">function</span>
+<span class="mi">3</span>
+</code></pre></div></div>
+
+<p>如果我们想要在脚本中调用的脚本，只需要在脚本中最后添加函数调用语句</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">function</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>那么在执行脚本的时候，将会执行函数。</p>
+:ET

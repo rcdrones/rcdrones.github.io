@@ -1,0 +1,71 @@
+I"<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/tkinterTUT/tk7_checkbutton.py" target="_blank">相关代码</a></li>
+</ul>
+
+<p>运行之后的效果将会像下面的图片一样，此时不作任何操作.</p>
+
+<p><a href="/static/results/tkinter/2-06-01.jpg">
+ <img class="course-image lazy-img" src="/static/results/tkinter/2-06-01.jpg" alt="Checkbutton 勾选项" title="Checkbutton 勾选项" />
+</a></p>
+
+<p>如果只选中第一个选项，即图中的python, 效果就会如下.</p>
+
+<p><a href="/static/results/tkinter/2-06-02.jpg">
+ <img class="course-image lazy-img" src="/static/results/tkinter/2-06-02.jpg" alt="Checkbutton 勾选项" title="Checkbutton 勾选项" />
+</a></p>
+
+<p>如果只选中第二个选项，即图中的c++, 效果就会如下.</p>
+
+<p><a href="/static/results/tkinter/2-06-03.jpg">
+ <img class="course-image lazy-img" src="/static/results/tkinter/2-06-03.jpg" alt="Checkbutton 勾选项" title="Checkbutton 勾选项" />
+</a></p>
+
+<p>如果两个选项都选中, 效果就会如下.</p>
+
+<p><a href="/static/results/tkinter/2-06-04.jpg">
+ <img class="course-image lazy-img" src="/static/results/tkinter/2-06-04.jpg" alt="Checkbutton 勾选项" title="Checkbutton 勾选项" />
+</a></p>
+
+<p>如果两个选项都不选中, 效果就会如下.</p>
+
+<p><a href="/static/results/tkinter/2-06-05.jpg">
+ <img class="course-image lazy-img" src="/static/results/tkinter/2-06-05.jpg" alt="Checkbutton 勾选项" title="Checkbutton 勾选项" />
+</a></p>
+
+<h2 class="tut-h2-pad" id="Checkbutton部件">Checkbutton部件
+  <a href="/tutorials/python-basic/tkinter/2-06-checkbutton/#Checkbutton部件" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">var1</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">IntVar</span><span class="p">()</span>
+<span class="n">c1</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Checkbutton</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s">'Python'</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="n">var1</span><span class="p">,</span> <span class="n">onvalue</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">offvalue</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">command</span><span class="o">=</span><span class="n">print_selection</span><span class="p">)</span>
+<span class="n">c1</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>参数<code class="highlighter-rouge">onvalue</code>和前面讲的部件<code class="highlighter-rouge">radiobutton</code>中的value相似，
+当我们选中了这个checkbutton，<code class="highlighter-rouge">onvalue</code>的值1就会放入到<code class="highlighter-rouge">var1</code>中，
+然后var1将其赋值给参数<code class="highlighter-rouge">variable</code>，<code class="highlighter-rouge">offvalue</code>用法相似，但是<code class="highlighter-rouge">offvalue</code>是在没有选中这个checkbutton时，<code class="highlighter-rouge">offvalue</code>的值1放入var1，然后赋值给参数<code class="highlighter-rouge">variable</code>
+这是创建一个checkbutton部件，以此类推，可以创建多个checkbutton</p>
+
+<h2 class="tut-h2-pad" id="触发功能">触发功能
+  <a href="/tutorials/python-basic/tkinter/2-06-checkbutton/#触发功能" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">print_selection</span><span class="p">():</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">var1</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">var2</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>   <span class="c1">#如果选中第一个选项，未选中第二个选项
+</span>        <span class="n">l</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s">'I love only Python '</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">var1</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">var2</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span> <span class="c1">#如果选中第二个选项，未选中第一个选项
+</span>        <span class="n">l</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s">'I love only C++'</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">var1</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">var2</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>  <span class="c1">#如果两个选项都未选中
+</span>        <span class="n">l</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s">'I do not love either'</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s">'I love both'</span><span class="p">)</span>             <span class="c1">#如果两个选项都选中
+</span></code></pre></div></div>
+
+<p>相对于前面学过的 <code class="highlighter-rouge">print_selection</code>，这一段比较长，其实功能差不多，只不过加了<code class="highlighter-rouge">if...elif...else</code>来选择控制而已即如代码注释，<code class="highlighter-rouge">config</code>在前面已经讲过就是将参数<code class="highlighter-rouge">text</code>的值显示，这里的<code class="highlighter-rouge">var1.get() == 1</code>
+就是前面所说的var1获得的变量<code class="highlighter-rouge">onvalue=1</code>，<code class="highlighter-rouge">var1.get() == 0</code>即是<code class="highlighter-rouge">var1</code>获得的变量<code class="highlighter-rouge">offvalu=0</code>同理<code class="highlighter-rouge">var2</code>也是如此。</p>
+
+<p>再补充一下 Tkinter 的<a href="https://github.com/MorvanZhou/tutorials/blob/master/tkinterTUT/tk7_checkbutton.py" target="_blank">必备步骤</a>,
+整个框架的全部代码就完美了.</p>
+:ET

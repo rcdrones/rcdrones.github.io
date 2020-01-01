@@ -1,0 +1,116 @@
+I"q2<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/tree/master/contents/7_Policy_gradient_softmax" target="_blank">全部代码</a></li>
+  <li><a href="/tutorials/machine-learning/ML-intro/4-07-PG/">什么是 Policy Gradient 短视频</a></li>
+  <li>模拟视频效果<a href="https://www.youtube.com/playlist?list=PLXO45tsB95cLYyEsEylpPvTY-8ErPt2O_" target="_blank">Youtube</a>, <a href="http://list.youku.com/albumlist/show/id_27485743" target="_blank">Youku</a></li>
+  <li><a href="/tutorials/machine-learning/ML-practice/RL-build-arm-from-scratch1/">强化学习实战</a></li>
+  <li>论文 <a href="https://papers.nips.cc/paper/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf" target="_blank">Policy gradient methods for reinforcement learning with function approximation.</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="要点">要点
+  <a href="/tutorials/machine-learning/reinforcement-learning/5-1-policy-gradient-softmax1/#要点" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>Policy gradient 是 RL 中另外一个大家族, 他不像 Value-based 方法 (Q learning, Sarsa), 但他也要接受环境信息 (observation),
+不同的是他要输出不是 action 的 value, 而是具体的那一个 action, 这样 policy gradient 就跳过了 value 这个阶段. 而且个人认为 Policy gradient
+最大的一个优势是: 输出的这个 action 可以是一个连续的值, 之前我们说到的 value-based 方法输出的都是不连续的值, 然后再选择值最大的 action.
+而 policy gradient 可以在一个连续分布上选取 action.</p>
+
+<video class="tut-content-video" controls="" loop="" autoplay="" muted="">
+  <source src="/static/results/reinforcement-learning/cartpole policy gradient softmax.mp4" type="video/mp4" />
+  Your browser does not support HTML5 video.
+</video>
+
+<video class="tut-content-video" controls="" loop="" autoplay="" muted="">
+  <source src="/static/results/reinforcement-learning/mountaincar policy gradient softmax.mp4" type="video/mp4" />
+  Your browser does not support HTML5 video.
+</video>
+
+<h2 class="tut-h2-pad" id="算法">算法
+  <a href="/tutorials/machine-learning/reinforcement-learning/5-1-policy-gradient-softmax1/#算法" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>我们介绍的 policy gradient 的第一个算法是一种基于 <strong>整条回合数据</strong> 的更新, 也叫 <strong>REINFORCE</strong> 方法.
+这种方法是 policy gradient 的最基本方法, 有了这个的基础, 我们再来做更高级的.</p>
+
+<p><a href="/static/results/reinforcement-learning/5-1-1.png">
+ <img class="course-image lazy-img" src="/static/results/reinforcement-learning/5-1-1.png" alt="Policy Gradients 算法更新 (Tensorflow)" title="Policy Gradients 算法更新 (Tensorflow)" />
+</a></p>
+
+<p><code class="highlighter-rouge">delta(log(Policy(s,a))*V)</code> 表示在 状态 <code class="highlighter-rouge">s</code> 对所选动作 <code class="highlighter-rouge">a</code> 的吃惊度,
+如果 <code class="highlighter-rouge">Policy(s,a)</code> 概率越小, 反向的 <code class="highlighter-rouge">log(Policy(s,a))</code> (即 <code class="highlighter-rouge">-log(P)</code>) 反而越大. 如果在 <code class="highlighter-rouge">Policy(s,a)</code> 很小的情况下,
+拿到了一个 大的 <code class="highlighter-rouge">R</code>, 也就是 大的 <code class="highlighter-rouge">V</code>, 那 <code class="highlighter-rouge">-delta(log(Policy(s, a))*V)</code> 就更大, 表示更吃惊, (我选了一个不常选的动作, 却发现原来它能得到了一个好的 reward,
+那我就得对我这次的参数进行一个大幅修改). 这就是吃惊度的物理意义啦.</p>
+
+<h2 class="tut-h2-pad" id="算法代码形式">算法代码形式
+  <a href="/tutorials/machine-learning/reinforcement-learning/5-1-policy-gradient-softmax1/#算法代码形式" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>和以前类似, 我们先定义主更新的循环, 然后下节内容讲如何用 Tensorflow 定义 <code class="highlighter-rouge">PolicyGradient()</code> 的算法:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">gym</span>
+<span class="kn">from</span> <span class="nn">RL_brain</span> <span class="kn">import</span> <span class="n">PolicyGradient</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="n">RENDER</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c1"># 在屏幕上显示模拟窗口会拖慢运行速度, 我们等计算机学得差不多了再显示模拟
+</span><span class="n">DISPLAY_REWARD_THRESHOLD</span> <span class="o">=</span> <span class="mi">400</span>  <span class="c1"># 当 回合总 reward 大于 400 时显示模拟窗口
+</span>
+<span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s">'CartPole-v0'</span><span class="p">)</span>   <span class="c1"># CartPole 这个模拟
+</span><span class="n">env</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span>     <span class="c1"># 取消限制
+</span><span class="n">env</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>     <span class="c1"># 普通的 Policy gradient 方法, 使得回合的 variance 比较大, 所以我们选了一个好点的随机种子
+</span>
+<span class="k">print</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="p">)</span>     <span class="c1"># 显示可用 action
+</span><span class="k">print</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="p">)</span>    <span class="c1"># 显示可用 state 的 observation
+</span><span class="k">print</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">high</span><span class="p">)</span>   <span class="c1"># 显示 observation 最高值
+</span><span class="k">print</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">low</span><span class="p">)</span>    <span class="c1"># 显示 observation 最低值
+</span>
+<span class="c1"># 定义
+</span><span class="n">RL</span> <span class="o">=</span> <span class="n">PolicyGradient</span><span class="p">(</span>
+    <span class="n">n_actions</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">n</span><span class="p">,</span>
+    <span class="n">n_features</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>
+    <span class="n">reward_decay</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span>   <span class="c1"># gamma
+</span>    <span class="c1"># output_graph=True,    # 输出 tensorboard 文件
+</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>主循环在这, 这节介绍的内容是让计算机跑完一整个回合才更新一次. 之前的 Qleanring 等在回合中每一步都可以更新参数.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">i_episode</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3000</span><span class="p">):</span>
+
+    <span class="n">observation</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">RENDER</span><span class="p">:</span> <span class="n">env</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+
+        <span class="n">action</span> <span class="o">=</span> <span class="n">RL</span><span class="o">.</span><span class="n">choose_action</span><span class="p">(</span><span class="n">observation</span><span class="p">)</span>
+
+        <span class="n">observation_</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+
+        <span class="n">RL</span><span class="o">.</span><span class="n">store_transition</span><span class="p">(</span><span class="n">observation</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">reward</span><span class="p">)</span>    <span class="c1"># 存储这一回合的 transition
+</span>
+        <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
+            <span class="n">ep_rs_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">RL</span><span class="o">.</span><span class="n">ep_rs</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s">'running_reward'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">():</span>
+                <span class="n">running_reward</span> <span class="o">=</span> <span class="n">ep_rs_sum</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">running_reward</span> <span class="o">=</span> <span class="n">running_reward</span> <span class="o">*</span> <span class="mf">0.99</span> <span class="o">+</span> <span class="n">ep_rs_sum</span> <span class="o">*</span> <span class="mf">0.01</span>
+            <span class="k">if</span> <span class="n">running_reward</span> <span class="o">&gt;</span> <span class="n">DISPLAY_REWARD_THRESHOLD</span><span class="p">:</span> <span class="n">RENDER</span> <span class="o">=</span> <span class="bp">True</span>     <span class="c1"># 判断是否显示模拟
+</span>            <span class="k">print</span><span class="p">(</span><span class="s">"episode:"</span><span class="p">,</span> <span class="n">i_episode</span><span class="p">,</span> <span class="s">"  reward:"</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">running_reward</span><span class="p">))</span>
+
+            <span class="n">vt</span> <span class="o">=</span> <span class="n">RL</span><span class="o">.</span><span class="n">learn</span><span class="p">()</span> <span class="c1"># 学习, 输出 vt, 我们下节课讲这个 vt 的作用
+</span>
+            <span class="k">if</span> <span class="n">i_episode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vt</span><span class="p">)</span>    <span class="c1"># plot 这个回合的 vt
+</span>                <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'episode steps'</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'normalized state-action value'</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="k">break</span>
+
+        <span class="n">observation</span> <span class="o">=</span> <span class="n">observation_</span>
+</code></pre></div></div>
+
+<p>另外一个 ‘Mountain Car’ 模拟代码在我的 <a href="https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow/blob/master/contents/7_Policy_gradient_softmax/run_MountainCar.py" target="_blank">Github 中</a>,
+和上面那些代码类似, 只改动了一些大写的参数.</p>
+:ET

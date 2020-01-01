@@ -1,0 +1,145 @@
+I"u'<p>在 Linux 中, 权限是一个非常重要的东西. 无时无刻不影响着你的操作. 就像有时候, 你想去百度云下载一些别人分享的文件,
+可是你却发现虽然你能看到文件但是你却不能下载, 这就是一种权限. 在 Linux 中, 这种权限随处可见. 你可以设置, 让别人不能越界.</p>
+
+<p>不过像我这种人, 也就一台电脑, 一个用户, 涉及不到多少权限的问题. 如果你也像我, 只有你自己在用 Linux 的电脑,
+主要用它来运行你的代码. 我教你一招修改权限, 方便运行你的 Python 脚本的招数.</p>
+
+<p>这节内容不会涉及过深的权限管理. 我们了解一些基础, 方便你拿你的 Linux 跑机器学习的代码就好. 如果你想扩展学习的话, 网上会有很多教程.</p>
+
+<h2 class="tut-h2-pad" id="ls-查看权限">ls 查看权限
+  <a href="/tutorials/others/linux-basic/3-01-file-permissions/#ls-查看权限" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>查看文件权限的方法很简单, 其实之前我们就已经看到过这样的内容了, 如果你还记得. 我们在说 <code class="highlighter-rouge">ls</code> 指令的时候, 提到过权限问题,
+不过到了这节内容我们仔细说说权限. 如果你在 Terminal 中输入图片中的指令.</p>
+
+<p><a href="/static/results/linux-basic/03-01-01.png">
+ <img class="course-image lazy-img" src="/static/results/linux-basic/03-01-01.png" alt="Linux 文件权限" title="Linux 文件权限" />
+</a></p>
+
+<p>1 在 Terminal 中查看文件的权限</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-l</span>
+total 16
+<span class="nt">----rw-r--</span> 1 morvan morvan 34 Oct 12 09:51 t1.py
+<span class="nt">-rw----r--</span> 1 morvan morvan 80 Oct 12 09:57 t2.py
+<span class="nt">-rw-rw-r--</span> 1 morvan morvan 12 Oct 12 09:56 t3
+<span class="nt">-rwxrw-r--</span> 1 morvan morvan 55 Oct 13 17:28 t.py
+</code></pre></div></div>
+
+<p>在这里, 像<code class="highlighter-rouge">-rw-rw-r--</code>这种, 就是权限的说明. 细节展示在下面的图中. 在下图中,
+这串字符得拆成4个部分,</p>
+
+<p><a href="/static/results/linux-basic/03-01-02.png">
+ <img class="course-image lazy-img" src="/static/results/linux-basic/03-01-02.png" alt="Linux 文件权限" title="Linux 文件权限" />
+</a></p>
+
+<ul>
+  <li><code class="highlighter-rouge">Type</code>: 很多种 (最常见的是 <code class="highlighter-rouge">-</code> 为文件, <code class="highlighter-rouge">d</code> 为文件夹, 其他的还有<code class="highlighter-rouge">l</code>, <code class="highlighter-rouge">n</code> … 这种东西, 真正自己遇到了, 网上再搜就好, 一次性说太多记不住的).</li>
+  <li><code class="highlighter-rouge">User</code>: 后面跟着的三个空是使用 User 的身份能对这个做什么处理 (<code class="highlighter-rouge">r</code> 能读; <code class="highlighter-rouge">w</code> 能写; <code class="highlighter-rouge">x</code> 能执行; <code class="highlighter-rouge">-</code> 不能完成某个操作).</li>
+  <li><code class="highlighter-rouge">Group</code>: 一个 Group 里可能有一个或多个 user, 这些权限的样式和 User 一样.</li>
+  <li><code class="highlighter-rouge">Others</code>: 除了 User 和 Group 以外人的权限.</li>
+</ul>
+
+<p>如果有朋友对 User, group, others 这几个没什么概念的话, 我这里补充一下.
+User 一般就是指你, 这个正在使用电脑的人. Group 是一个 User 的集合, 最开始创建新 User 的时候, 他也为这个 User 创建了一个和 User 一样名字的 Group, 这个新 Group 里只有这个 User.
+一般来说, 像一个企业部门的电脑, 都可以放在一个 Group 里, 分享了一些共享文件和权限. Others 就是除了上面提到的 User 和 Group 以外的人.</p>
+
+<p>好了, 有了这些理解, 我们拿上面的 <code class="highlighter-rouge">t1.py</code> 来举例.
+我们可以将 <code class="highlighter-rouge">----rw-r--</code> 拆成 <code class="highlighter-rouge">-</code> (这是文件), <code class="highlighter-rouge">---</code>(这个 user 没有任何权限), <code class="highlighter-rouge">rw-</code> (这个 Group 里可以读,写), <code class="highlighter-rouge">r--</code> (其他人只能读).</p>
+
+<p><a href="/static/results/linux-basic/03-01-03.png">
+ <img class="course-image lazy-img" src="/static/results/linux-basic/03-01-03.png" alt="Linux 文件权限" title="Linux 文件权限" />
+</a></p>
+
+<p>如果我双击这个 <code class="highlighter-rouge">t1.py</code> 上面就弹出这个说我们权限的窗口.</p>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="chmod-修改权限">chmod 修改权限
+  <a href="/tutorials/others/linux-basic/3-01-file-permissions/#chmod-修改权限" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>好了, 我们知道了这些权限的问题, 那我们如何改写权限呢? <code class="highlighter-rouge">chmod</code> (change mode) 就是来干这个的.</p>
+
+<p>通常的修改形式是</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">chmod</span> <span class="o">[</span>谁][怎么修改] <span class="o">[</span>哪个文件]
+</code></pre></div></div>
+
+<p>举个最简单的例子, 现在的 <code class="highlighter-rouge">t1.py</code> 是 <code class="highlighter-rouge">----rw-r--</code>, 如果我们想让你(user)有读的能力. 下面这样改就行了.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">chmod </span>u+r t1.py
+<span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-l</span>
+<span class="nt">-r--rw-r--</span> 1 morvan morvan 34 Oct 12 09:51 t1.py
+</code></pre></div></div>
+
+<p>这里的 <code class="highlighter-rouge">u+r</code> 很形象, User + read, 给 t1.py 这个修改. 所以我们的修改形式就能总结出下面这样.</p>
+
+<p>[谁]</p>
+<ul>
+  <li><code class="highlighter-rouge">u</code>: 对于 User 修改</li>
+  <li><code class="highlighter-rouge">g</code>: 对于 Group 修改</li>
+  <li><code class="highlighter-rouge">o</code>: 对于 Others 修改</li>
+  <li><code class="highlighter-rouge">a</code>: (all) 对于所有人修改</li>
+</ul>
+
+<p>[怎么修改]</p>
+<ul>
+  <li><code class="highlighter-rouge">+</code>, <code class="highlighter-rouge">-</code>, <code class="highlighter-rouge">=</code>: 作用的形式, 加上, 减掉, 等于某些权限</li>
+  <li><code class="highlighter-rouge">r</code>, <code class="highlighter-rouge">w</code>, <code class="highlighter-rouge">x</code> 或者多个权限一起, 比如 <code class="highlighter-rouge">rx</code></li>
+</ul>
+
+<p>[哪个文件]</p>
+<ul>
+  <li>施加操作的文件, 可以为多个</li>
+</ul>
+
+<p>我们再举几个例, 巩固一下.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">-rw----r--</span> 1 morvan morvan 80 Oct 12 09:57 t2.py
+<span class="nt">-rw-rw-r--</span> 1 morvan morvan 12 Oct 12 09:56 t3
+<span class="nt">-rwxrw-r--</span> 1 morvan morvan 55 Oct 13 17:28 t.py
+
+<span class="nv">$ </span><span class="nb">chmod </span>u-r t2.py
+<span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-l</span> t2.py
+<span class="nt">--w----r--</span> 1 morvan morvan 80 Oct 12 09:57 t2.py
+
+<span class="nv">$ </span><span class="nb">chmod </span>g+x-w t3
+<span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-l</span> t3
+<span class="nt">--w-r-xr--</span> 1 morvan morvan 12 Oct 12 09:56 t3
+</code></pre></div></div>
+
+<p>除了上面这些修改形式, 还有一些简化版的形式, 不过我觉得不天天用权限这东西, 了解上面就够了.
+如果你想更深的了解, 网上搜搜 “linux 权限 数字表示” 对你会有帮助.</p>
+
+<h2 class="tut-h2-pad" id="一个使用-Python-的技巧">一个使用 Python 的技巧
+  <a href="/tutorials/others/linux-basic/3-01-file-permissions/#一个使用-Python-的技巧" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>我不怎么用权限这东西, 但是我却发现给 python 文件添加权限 <code class="highlighter-rouge">x</code> 还算有用的. 为什么这么说?
+因为通常, 如果一个 <code class="highlighter-rouge">.py</code> 没有 <code class="highlighter-rouge">x</code> 权限, 在 terminal 中你就需要这样执行:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>python3 t.py
+This is a Python script!
+</code></pre></div></div>
+
+<p>如果你有了 <code class="highlighter-rouge">x</code> (可执行权限), 你运行这个文件可以直接这样打:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./t.py
+This is a Python script!
+</code></pre></div></div>
+
+<p>如果你天天要运行这个脚本, 每次运行的时候少几个字还是挺好的. 如果你决定要这样做, 你在这个 Python 脚本的开头还需要加一句话.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/python3        # 这句话是为了告诉你的电脑执行这个文件的时候用什么来加载
+</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"This is a Python script!"</span><span class="p">)</span>
+</code></pre></div></div>
+:ET

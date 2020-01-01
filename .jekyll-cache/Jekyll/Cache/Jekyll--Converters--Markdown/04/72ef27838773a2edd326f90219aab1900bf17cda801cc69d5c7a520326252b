@@ -1,0 +1,183 @@
+I"�*<p>学习资料:</p>
+<ul>
+  <li><a href="/static/results/git/initial-files/for_gitTUT_2-2.zip">这节例子的初始文件</a></li>
+  <li><a href="https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History" target="_blank">log 的详细参数</a></li>
+  <li><a href="https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository#Viewing-Your-Staged-and-Unstaged-Changes" target="_blank">diff 的详细参数</a></li>
+</ul>
+
+<p>本节内容分为:</p>
+
+<p>在 git 中, 每一次提交(commit)的修改, 都会被单独的保存起来. 
+也可以说 git 的中的所有文件都是一次次修改累积起来的. 文件好比楼房, 每个 commit 记录
+了盖楼需添加或者拿走的材料. 整个施工过程也被记录了下来.</p>
+
+<h2 class="tut-h2-pad" id="修改记录-log">修改记录 log
+  <a href="/tutorials/others/git/2-2-modified/#修改记录-log" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>之前我们以<code class="highlighter-rouge">Morvan Zhou</code> 的名义对版本库进行了一次修改, 添加了一个 <code class="highlighter-rouge">1.py</code> 的文件.
+接下来我们就来查看版本库的些施工的过程. 可以看到在 <code class="highlighter-rouge">Author</code> 那已经有我的名字和 email 信息了.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git log
+
+<span class="c"># 输出</span>
+commit 13be9a7bf70c040544c6242a494206f240aac03c
+Author: Morvan Zhou &lt;mz@email.com&gt;
+Date:   Tue Nov 29 00:06:47 2016 +1100
+
+    create 1.py <span class="c"># 这是我们上节课记录的修改信息</span>
+</code></pre></div></div>
+
+<p>如果我们对<code class="highlighter-rouge">1.py</code>文件进行一次修改, 添加这行代码:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+</code></pre></div></div>
+
+<p>然后我们就能在 <code class="highlighter-rouge">status</code> 中看到修改还没被提交的信息了.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git status
+
+<span class="c"># 输出</span>
+On branch master
+Changes not staged <span class="k">for </span>commit:
+  <span class="o">(</span>use <span class="s2">"git add &lt;file&gt;..."</span> to update what will be committed<span class="o">)</span>
+  <span class="o">(</span>use <span class="s2">"git checkout -- &lt;file&gt;..."</span> to discard changes <span class="k">in </span>working directory<span class="o">)</span>
+
+	modified:   1.py    <span class="c"># 这里显示有一个修改还没被提交</span>
+
+no changes added to commit <span class="o">(</span>use <span class="s2">"git add"</span> and/or <span class="s2">"git commit -a"</span><span class="o">)</span>
+</code></pre></div></div>
+
+<p>所以我们先把这次修改添加 (add) 到可被提交 (commit) 的状态, 
+然后再提交 (commit) 这次的修改:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git add 1.py
+<span class="nv">$ </span>git commit <span class="nt">-m</span> <span class="s2">"change 1"</span>
+
+<span class="c"># 输出</span>
+<span class="o">[</span>master fb51216] change 1
+ 1 file changed, 1 insertion<span class="o">(</span>+<span class="o">)</span> <span class="c"># 提示文件有一处添加</span>
+</code></pre></div></div>
+
+<p>再次查看 <code class="highlighter-rouge">log</code>, 现在我们就能看到 <code class="highlighter-rouge">create 1.py</code> 和 <code class="highlighter-rouge">change 1</code> 这两条修改信息了.
+而且做出这两条 <code class="highlighter-rouge">commit</code> 的 ID, 修改的 <code class="highlighter-rouge">Author</code>, 修改 <code class="highlighter-rouge">Date</code> 也被显示在上面.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git log
+
+<span class="c"># 输出</span>
+commit fb51216b081e00db3996e14edf8ff080fab1980a
+Author: Morvan Zhou &lt;mz@email.com&gt;
+Date:   Tue Nov 29 00:24:50 2016 +1100
+
+    change 1
+
+commit 13be9a7bf70c040544c6242a494206f240aac03c
+Author: Morvan Zhou &lt;mz@email.com&gt;
+Date:   Tue Nov 29 00:06:47 2016 +1100
+
+    create 1.py
+</code></pre></div></div>
+
+<p>如果删除一部分代码, 也会被记录上, 比如把 <code class="highlighter-rouge">a = 1</code> 改成 <code class="highlighter-rouge">a = 2</code>, 再添加一个 <code class="highlighter-rouge">b = 1</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">1</span>
+</code></pre></div></div>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="查看-unstaged">查看 unstaged
+  <a href="/tutorials/others/git/2-2-modified/#查看-unstaged" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>如果想要查看这次还没 <code class="highlighter-rouge">add</code> (unstaged) 的修改部分 和上个已经 <code class="highlighter-rouge">commit</code> 的文件有何不同, 
+我们将使用 <code class="highlighter-rouge">$ git diff</code>:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git diff
+
+<span class="c"># 输出</span>
+diff <span class="nt">--git</span> a/1.py b/1.py
+index 1337a53..ff7c36c 100644
+<span class="nt">---</span> a/1.py
++++ b/1.py
+@@ <span class="nt">-1</span> +1,2 @@
+<span class="nt">-a</span> <span class="o">=</span> 1  <span class="c"># 删除了 a = 1</span>
++a <span class="o">=</span> 2  <span class="c"># 添加了 a = 2</span>
++b <span class="o">=</span> 1  <span class="c"># 添加了 b = 1</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="查看-staged-(--cached)">查看 staged (--cached)
+  <a href="/tutorials/others/git/2-2-modified/#查看-staged-(--cached)" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>如果你已经 <code class="highlighter-rouge">add</code> 了这次修改, 文件变成了 “可提交状态” (staged), 我们可以在 <code class="highlighter-rouge">diff</code> 中添加参数 
+<code class="highlighter-rouge">--cached</code> 来查看修改:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git add <span class="nb">.</span>   <span class="c"># add 全部修改文件</span>
+<span class="nv">$ </span>git diff <span class="nt">--cached</span>
+
+<span class="c"># 输出</span>
+diff <span class="nt">--git</span> a/1.py b/1.py
+index 1337a53..ff7c36c 100644
+<span class="nt">---</span> a/1.py
++++ b/1.py
+@@ <span class="nt">-1</span> +1,2 @@
+<span class="nt">-a</span> <span class="o">=</span> 1
++a <span class="o">=</span> 2
++b <span class="o">=</span> 1
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="查看-staged-&amp;-unstaged-(HEAD)">查看 staged &amp; unstaged (HEAD)
+  <a href="/tutorials/others/git/2-2-modified/#查看-staged-&amp;-unstaged-(HEAD)" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>还有种方法让我们可以查看 <code class="highlighter-rouge">add</code> 过 (staged) 和 没 <code class="highlighter-rouge">add</code> (unstaged) 的修改, 
+比如我们再修改一下 <code class="highlighter-rouge">1.py</code> 但不 <code class="highlighter-rouge">add</code>:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">b</span>
+</code></pre></div></div>
+
+<p>目前 <code class="highlighter-rouge">a = 2</code> 和 <code class="highlighter-rouge">b = 1</code> 已被 <code class="highlighter-rouge">add</code>,  <code class="highlighter-rouge">c = b</code> 是新的修改, 还没被 <code class="highlighter-rouge">add</code>.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 对比三种不同 diff 形式</span>
+<span class="nv">$ </span>git diff HEAD     <span class="c"># staged &amp; unstaged</span>
+
+@@ <span class="nt">-1</span> +1,3 @@
+<span class="nt">-a</span> <span class="o">=</span> 1  <span class="c"># 已 staged</span>
++a <span class="o">=</span> 2  <span class="c"># 已 staged</span>
++b <span class="o">=</span> 1  <span class="c"># 已 staged</span>
++c <span class="o">=</span> b  <span class="c"># 还没 add 去 stage (unstaged)</span>
+<span class="nt">-----------------------</span>
+<span class="nv">$ </span>git diff          <span class="c"># unstaged</span>
+
+@@ <span class="nt">-1</span>,2 +1,3 @@
+ a <span class="o">=</span> 2  <span class="c"># 注: 前面没有 +</span>
+ b <span class="o">=</span> 1  <span class="c"># 注: 前面没有 +</span>
++c <span class="o">=</span> b  <span class="c"># 还没 add 去 stage (unstaged)</span>
+<span class="nt">-----------------------</span>
+<span class="nv">$ </span>git diff <span class="nt">--cached</span> <span class="c"># staged</span>
+
+@@ <span class="nt">-1</span> +1,2 @@
+<span class="nt">-a</span> <span class="o">=</span> 1  <span class="c"># 已 staged</span>
++a <span class="o">=</span> 2  <span class="c"># 已 staged</span>
++b <span class="o">=</span> 1  <span class="c"># 已 staged</span>
+</code></pre></div></div>
+
+<p>为了下节内容, 我们保持这次修改, 全部 <code class="highlighter-rouge">add</code> 变成 <code class="highlighter-rouge">staged</code> 状态, 并 <code class="highlighter-rouge">commit</code>.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git add <span class="nb">.</span>
+<span class="nv">$ </span>git commit <span class="nt">-m</span> <span class="s2">"change 2"</span>
+
+<span class="c"># 输出</span>
+<span class="o">[</span>master 6cc6579] change 2
+ 1 file changed, 3 insertions<span class="o">(</span>+<span class="o">)</span>, 1 deletion<span class="o">(</span>-<span class="o">)</span>
+</code></pre></div></div>
+:ET

@@ -1,0 +1,72 @@
+I"N!<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/tree/master/tensorflowTUT/tf18_CNN2" target="_blank">相关代码</a></li>
+  <li>为 TF 2017 打造的<a href="https://github.com/MorvanZhou/Tensorflow-Tutorial" target="_blank">新版可视化教学代码</a></li>
+  <li>机器学习-简介系列 <a href="/tutorials/machine-learning/ML-intro/2-2-CNN/">什么是 CNN</a></li>
+</ul>
+
+<p>这一次我们会说道 CNN 代码中怎么定义 Convolutional 的层和怎样进行 pooling.</p>
+
+<p>基于上一次卷积神经网络的介绍，我们在代码中实现一个基于MNIST数据集的例子</p>
+
+<h2 class="tut-h2-pad" id="定义卷积层的-weight-bias">定义卷积层的 weight bias
+  <a href="/tutorials/machine-learning/tensorflow/5-04-CNN2/#定义卷积层的-weight-bias" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>首先我们导入</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+</code></pre></div></div>
+
+<p>采用的数据集依然是<code class="highlighter-rouge">tensorflow</code>里面的<code class="highlighter-rouge">mnist</code>数据集</p>
+
+<p>我们需要先导入它</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">python</span> <span class="kn">from</span> <span class="nn">tensorflow.examples.tutorials.mnist</span> <span class="kn">import</span> <span class="n">input_data</span>
+</code></pre></div></div>
+
+<p>本次课程代码用到的数据集就是来自于它</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mnist</span><span class="o">=</span><span class="n">input_data</span><span class="o">.</span><span class="n">read_data_sets</span><span class="p">(</span><span class="s">'MNIST_data'</span><span class="p">,</span><span class="n">one_hot</span><span class="o">=</span><span class="n">true</span><span class="p">)</span>
+</code></pre></div></div>
+<p>接着呢，我们定义<code class="highlighter-rouge">Weight</code>变量，输入<code class="highlighter-rouge">shape</code>，返回变量的参数。其中我们使用<code class="highlighter-rouge">tf.truncted_normal</code>产生随机变量来进行初始化:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">weight_variable</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span> 
+	<span class="n">inital</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">truncted_normal</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span><span class="n">stddev</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">initial</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>同样的定义<code class="highlighter-rouge">biase</code>变量，输入<code class="highlighter-rouge">shape</code> ,返回变量的一些参数。其中我们使用<code class="highlighter-rouge">tf.constant</code>常量函数来进行初始化:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">bias_variable</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span> 
+	<span class="n">initial</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span><span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span> 
+	<span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">initial</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>定义卷积，<code class="highlighter-rouge">tf.nn.conv2d</code>函数是<code class="highlighter-rouge">tensoflow</code>里面的二维的卷积函数，<code class="highlighter-rouge">x</code>是图片的所有参数，<code class="highlighter-rouge">W</code>是此卷积层的权重，然后定义步长<code class="highlighter-rouge">strides=[1,1,1,1]</code>值，<code class="highlighter-rouge">strides[0]</code>和<code class="highlighter-rouge">strides[3]</code>的两个1是默认值，中间两个1代表padding时在x方向运动一步，y方向运动一步，padding采用的方式是<code class="highlighter-rouge">SAME</code>。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">conv2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">W</span><span class="p">):</span>
+	<span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">W</span><span class="p">,</span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="err">，</span><span class="n">padding</span><span class="o">=</span><span class="s">'SAME'</span><span class="p">)</span> 
+</code></pre></div></div>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="定义-pooling">定义 pooling
+  <a href="/tutorials/machine-learning/tensorflow/5-04-CNN2/#定义-pooling" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>接着定义池化<code class="highlighter-rouge">pooling</code>，为了得到更多的图片信息，padding时我们选的是一次一步，也就是<code class="highlighter-rouge">strides[1]=strides[2]=1</code>，这样得到的图片尺寸没有变化，而我们希望压缩一下图片也就是参数能少一些从而减小系统的复杂度，因此我们采用<code class="highlighter-rouge">pooling</code>来稀疏化参数，也就是卷积神经网络中所谓的下采样层。<code class="highlighter-rouge">pooling </code>有两种，一种是最大值池化，一种是平均值池化，本例采用的是最大值池化<code class="highlighter-rouge">tf.max_pool()</code>。池化的核函数大小为2x2，因此<code class="highlighter-rouge">ksize=[1,2,2,1]</code>，步长为2，因此<code class="highlighter-rouge">strides=[1,2,2,1]</code>:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">max_poo_2x2</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> 
+	<span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">max_pool</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">ksize</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span><span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>好啦，如果你对本节课内容已经了解，下一次课我们将构建卷积神经网络的架构~</p>
+
+:ET

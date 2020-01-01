@@ -1,0 +1,155 @@
+I"u><p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/blob/master/multiprocessingTUT/multiprocessing5_pool.py" target="_blank">相关代码</a></li>
+</ul>
+
+<p>这次我们讲进程池<code class="highlighter-rouge">Pool</code>。 进程池就是我们将所要运行的东西，放到池子里，Python会自行解决多进程的问题</p>
+
+<p>首先<code class="highlighter-rouge">import multiprocessing</code>和定义<code class="highlighter-rouge">job()</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="n">mp</span>
+
+<span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="进程池-Pool()-和-map()">进程池 Pool() 和 map()
+  <a href="/tutorials/python-basic/multiprocessing/5-pool/#进程池-Pool()-和-map()" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>然后我们定义一个<code class="highlighter-rouge">Pool</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>有了池子之后，就可以让池子对应某一个函数，我们向池子里丢数据，池子就会返回函数返回的值。
+<code class="highlighter-rouge">Pool</code>和之前的<code class="highlighter-rouge">Process</code>的不同点是丢向<code class="highlighter-rouge">Pool</code>的函数有返回值，而<code class="highlighter-rouge">Process</code>的没有返回值。</p>
+
+<p>接下来用<code class="highlighter-rouge">map()</code>获取结果，在<code class="highlighter-rouge">map()</code>中需要放入函数和需要迭代运算的值，然后它会自动分配给CPU核，返回结果</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">res</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="nb">map</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>让我们来运行一下</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">multicore</span><span class="p">():</span>
+    <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">()</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="nb">map</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+    
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">multicore</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>运行结果：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">81</span><span class="p">]</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="自定义核数量">自定义核数量
+  <a href="/tutorials/python-basic/multiprocessing/5-pool/#自定义核数量" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>我们怎么知道<code class="highlighter-rouge">Pool</code>是否真的调用了多个核呢？我们可以把迭代次数增大些，然后打开CPU负载看下CPU运行情况</p>
+
+<blockquote>
+  <p>打开CPU负载(Mac)：活动监视器 &gt; CPU &gt; CPU负载(单击一下即可)</p>
+</blockquote>
+
+<p><code class="highlighter-rouge">Pool</code>默认大小是CPU的核数，我们也可以通过在<code class="highlighter-rouge">Pool</code>中传入<code class="highlighter-rouge">processes</code>参数即可自定义需要的核数量，</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">multicore</span><span class="p">():</span>
+    <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="c1"># 定义CPU核数量为3
+</span>    <span class="n">res</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="nb">map</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="apply_async()">apply_async()
+  <a href="/tutorials/python-basic/multiprocessing/5-pool/#apply_async()" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p><code class="highlighter-rouge">Pool</code>除了<code class="highlighter-rouge">map()</code>外，还有可以返回结果的方式，那就是<code class="highlighter-rouge">apply_async()</code>.</p>
+
+<p><code class="highlighter-rouge">apply_async()</code>中只能传递一个值，它只会放入一个核进行运算，但是传入值时要注意是可迭代的，所以在传入值后需要加逗号, 同时需要用<code class="highlighter-rouge">get()</code>方法获取返回值</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">multicore</span><span class="p">():</span>
+    <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">()</span> 
+    <span class="n">res</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="nb">map</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
+    <span class="c1"># 用get获得结果
+</span>    <span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p>运行结果；</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">81</span><span class="p">]</span>  <span class="c1"># map()
+</span><span class="mi">4</span> <span class="c1"># apply_async()
+</span></code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="用-apply_async()-输出多个结果">用 apply_async() 输出多个结果
+  <a href="/tutorials/python-basic/multiprocessing/5-pool/#用-apply_async()-输出多个结果" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>那么如何用<code class="highlighter-rouge">apply_async()</code>输出多个迭代呢？</p>
+
+<p>我们在<code class="highlighter-rouge">apply_async()</code>中多传入几个值试试</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">res</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,))</span>
+</code></pre></div></div>
+
+<p>结果会报错：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">TypeError</span><span class="p">:</span> <span class="n">job</span><span class="p">()</span> <span class="n">takes</span> <span class="n">exactly</span> <span class="mi">1</span> <span class="n">argument</span> <span class="p">(</span><span class="mi">3</span> <span class="n">given</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>即<code class="highlighter-rouge">apply_async()</code>只能输入一组参数。</p>
+
+<p>在此我们将<code class="highlighter-rouge">apply_async()</code> 放入迭代器中，定义一个新的<code class="highlighter-rouge">multi_res</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">multi_res</span> <span class="o">=</span> <span class="p">[</span><span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span><span class="p">,))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+</code></pre></div></div>
+
+<p>同样在取出值时需要一个一个取出来</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">([</span><span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">multi_res</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>合并代码</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">multicore</span><span class="p">():</span>
+    <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">()</span> 
+    <span class="n">res</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="nb">map</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,))</span>
+    <span class="c1"># 用get获得结果
+</span>    <span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+    <span class="c1"># 迭代器，i=0时apply一次，i=1时apply一次等等
+</span>    <span class="n">multi_res</span> <span class="o">=</span> <span class="p">[</span><span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span><span class="p">,))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)]</span>
+    <span class="c1"># 从迭代器中取出
+</span>    <span class="k">print</span><span class="p">([</span><span class="n">res</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">multi_res</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>运行结果</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">81</span><span class="p">]</span> <span class="c1"># map()
+</span><span class="mi">4</span> 
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">49</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">81</span><span class="p">]</span> <span class="c1"># multi_res
+</span></code></pre></div></div>
+
+<p>可以看出在apply用迭代器的得到的结果和用map得到的结果是一样的</p>
+
+<h2 class="tut-h2-pad" id="总结">总结
+  <a href="/tutorials/python-basic/multiprocessing/5-pool/#总结" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<ol>
+  <li><code class="highlighter-rouge">Pool</code>默认调用是CPU的核数，传入<code class="highlighter-rouge">processes</code>参数可自定义CPU核数</li>
+  <li><code class="highlighter-rouge">map()</code> 放入迭代参数，返回多个结果</li>
+  <li>
+    <p><code class="highlighter-rouge">apply_async()</code>只能放入一组参数，并返回一个结果，如果想得到<code class="highlighter-rouge">map()</code>的效果需要通过迭代</p>
+
+    <p>​</p>
+  </li>
+</ol>
+
+:ET

@@ -1,0 +1,156 @@
+I"*<p>学习资料:</p>
+<ul>
+  <li><a href="/static/results/git/initial-files/for_gitTUT_4-3.zip">这节例子的初始文件</a></li>
+</ul>
+
+<h2 class="tut-h2-pad" id="什么是-rebase">什么是 rebase
+  <a href="/tutorials/others/git/4-3-rebase/#什么是-rebase" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>和上节内容一样, 不过我们今天来玩一个更高级的合并方式 <code class="highlighter-rouge">rebase</code>.
+同样是合并 <code class="highlighter-rouge">rebase</code> 的做法和 <code class="highlighter-rouge">merge</code> 不一样.</p>
+
+<p>假设共享的 branch 是 <code class="highlighter-rouge">branch B</code>, 而我在 <code class="highlighter-rouge">branch A</code> 上工作, 有一天我发现<code class="highlighter-rouge">branch B</code>已经有一些小更新,
+我也想试试我的程序和这些小更新兼不兼容, 我也我想合并, 这时就可以用 <code class="highlighter-rouge">rebase</code> 来补充我的分支<code class="highlighter-rouge">branch B</code>的内容.
+补充完以后, 和后面那张图的 <code class="highlighter-rouge">merge</code> 不同, 我还是继续在 <code class="highlighter-rouge">C3</code> 上工作, 不过此时的 <code class="highlighter-rouge">C3</code> 的本质却不一样了, 
+因为吸收了那些小更新. 所以我们用 <code class="highlighter-rouge">C3'</code> 来代替.</p>
+
+<p><a href="/static/results/git/4-3-1.png">
+ <img class="course-image lazy-img" src="/static/results/git/4-3-1.png" alt="rebase 分支冲突" title="rebase 分支冲突" />
+</a></p>
+
+<p><a href="/static/results/git/4-3-2.png">
+ <img class="course-image lazy-img" src="/static/results/git/4-3-2.png" alt="rebase 分支冲突" title="rebase 分支冲突" />
+</a></p>
+
+<p><a href="/static/results/git/4-3-3.png">
+ <img class="course-image lazy-img" src="/static/results/git/4-3-3.png" alt="rebase 分支冲突" title="rebase 分支冲突" />
+</a></p>
+
+<p><a href="/static/results/git/4-3-4.png">
+ <img class="course-image lazy-img" src="/static/results/git/4-3-4.png" alt="rebase 分支冲突" title="rebase 分支冲突" />
+</a></p>
+
+<p>可以看出 <code class="highlighter-rouge">rebase</code> 改变了 <code class="highlighter-rouge">C3</code> 的属性, <code class="highlighter-rouge">C3</code> 已经不是从 <code class="highlighter-rouge">C1</code> 衍生而来的了. 
+这一点和 <code class="highlighter-rouge">merge</code> 不一样. <code class="highlighter-rouge">merge</code> 在合并的时候创建了一个新的 <code class="highlighter-rouge">C5</code> <code class="highlighter-rouge">commit</code>. 
+这一点不同, 使得在共享分支中使用 <code class="highlighter-rouge">rebase</code> 变得危险.
+如果是共享分支的历史被改写. 别人之前共享内容的 <code class="highlighter-rouge">commit</code> 就被你的 <code class="highlighter-rouge">rebase</code> 修改掉了.</p>
+
+<p><a href="/static/results/git/4-2-1.png">
+ <img class="course-image lazy-img" src="/static/results/git/4-2-1.png" alt="rebase 分支冲突" title="rebase 分支冲突" />
+</a></p>
+
+<p>所以需要强调的是 <strong>!!! 只能在你自己的分支中使用 rebase, 和别人共享的部分是不能用 !!!</strong>. 
+如果你不小心弄错了. 没事, 我们还能用在 <a href="/tutorials/others/git/3-1-reset/">reset 这一节</a>
+提到的 <code class="highlighter-rouge">reflog</code> 恢复原来的样子.
+为了验证在共享分支上使用 <code class="highlighter-rouge">rebase</code> 的危险性, 我们在下面的例子中也验证一下.</p>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="使用-rebase">使用 rebase
+  <a href="/tutorials/others/git/4-3-rebase/#使用-rebase" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>初始的版本库还是和上回一样, 在 <code class="highlighter-rouge">master</code> 和 <code class="highlighter-rouge">dev</code> 分支中都有自己的独立修改.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 这是 master 的 log</span>
+<span class="k">*</span> 3d7796e change 4 <span class="k">in </span>master <span class="c"># 这一条 commit 和 dev 的不一样</span>
+<span class="k">*</span> 47f167e back to change 1 and add comment <span class="k">for </span>1.py
+<span class="k">*</span> 904e1ba change 2
+<span class="k">*</span> c6762a1 change 1
+<span class="k">*</span> 13be9a7 create 1.py
+<span class="nt">-----------------------------</span>
+<span class="c"># 这是 dev 的 log</span>
+<span class="k">*</span> f7d2e3a change 3 <span class="k">in </span>dev   <span class="c"># 这一条 commit 和 master 的不一样</span>
+<span class="k">*</span> 47f167e back to change 1 and add comment <span class="k">for </span>1.py
+<span class="k">*</span> 904e1ba change 2
+<span class="k">*</span> c6762a1 change 1
+<span class="k">*</span> 13be9a7 create 1.py
+</code></pre></div></div>
+
+<p>当我们想要用 <code class="highlighter-rouge">rebase</code> 合并 <code class="highlighter-rouge">dev</code> 到 <code class="highlighter-rouge">master</code> 的时候:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git branch
+
+<span class="c"># 输出</span>
+  dev
+<span class="k">*</span> master
+<span class="nt">-------------------------</span>
+<span class="nv">$ </span>git rebase dev 
+
+<span class="c"># 输出</span>
+First, rewinding <span class="nb">head </span>to replay your work on top of it...
+Applying: change 3 <span class="k">in </span>dev
+Using index info to reconstruct a base tree...
+M	1.py
+Falling back to patching base and 3-way merge...
+Auto-merging 1.py
+CONFLICT <span class="o">(</span>content<span class="o">)</span>: Merge conflict <span class="k">in </span>1.py
+error: Failed to merge <span class="k">in </span>the changes.
+Patch failed at 0001 change 3 <span class="k">in </span>dev
+The copy of the patch that failed is found <span class="k">in</span>: .git/rebase-apply/patch
+
+When you have resolved this problem, run <span class="s2">"git rebase --continue"</span><span class="nb">.</span>
+If you prefer to skip this patch, run <span class="s2">"git rebase --skip"</span> instead.
+To check out the original branch and stop rebasing, run <span class="s2">"git rebase --abort"</span><span class="nb">.</span>
+</code></pre></div></div>
+
+<p>git 发现的我们的 <code class="highlighter-rouge">1.py</code> 在 <code class="highlighter-rouge">master</code> 和 <code class="highlighter-rouge">dev</code> 上的版本是不同的, 所以提示 <code class="highlighter-rouge">merge</code> 有冲突. 具体的冲突, 
+git 已经帮我们标记出来, 我们打开 <code class="highlighter-rouge">1.py</code> 就能看到:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="c1"># I went back to change 1
+</span><span class="o">&lt;&lt;&lt;&lt;&lt;&lt;&lt;</span> <span class="n">f7d2e3a047be4624e83c1265a0946e2e8790f79c</span>
+<span class="c1"># edited in dev
+</span><span class="o">=======</span>
+<span class="c1"># edited in master
+</span><span class="o">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</span> <span class="n">change</span> <span class="mi">4</span> <span class="ow">in</span> <span class="n">master</span>
+</code></pre></div></div>
+
+<p>这时 <code class="highlighter-rouge">HEAD</code> 并没有指向 <code class="highlighter-rouge">master</code> 或者 <code class="highlighter-rouge">dev</code>, 而是停在了 <code class="highlighter-rouge">rebase</code> 模式上:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git branch
+<span class="k">*</span> <span class="o">(</span>no branch, rebasing master<span class="o">)</span> <span class="c"># HEAD 在这</span>
+  dev
+  master
+</code></pre></div></div>
+
+<p>所以我们打开 <code class="highlighter-rouge">1.py</code>, 手动合并一下两者的不同.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="c1"># I went back to change 1
+</span>
+<span class="c1"># edited in master and dev
+</span></code></pre></div></div>
+
+<p>然后执行 <code class="highlighter-rouge">git add</code> 和 <code class="highlighter-rouge">git rebase --continue</code> 就完成了 <code class="highlighter-rouge">rebase</code> 的操作了.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git add 1.py
+<span class="nv">$ </span>git rebase <span class="nt">--continue</span>
+</code></pre></div></div>
+
+<p>再来看看 <code class="highlighter-rouge">master</code> 的 <code class="highlighter-rouge">log</code>:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git log <span class="nt">--oneline</span> <span class="nt">--graph</span>
+
+<span class="c"># 输出</span>
+<span class="k">*</span> c844cb1 change 4 <span class="k">in </span>master    <span class="c"># 这条 commit 原本的id=3d7796e, 所以 master 的历史被修改</span>
+<span class="k">*</span> f7d2e3a change 3 <span class="k">in </span>dev       <span class="c"># rebase 过来的 dev commit</span>
+<span class="k">*</span> 47f167e back to change 1 and add comment <span class="k">for </span>1.py
+<span class="k">*</span> 904e1ba change 2
+<span class="k">*</span> c6762a1 change 1
+<span class="k">*</span> 13be9a7 create 1.py
+</code></pre></div></div>
+
+<p><strong>!! 注意 !!</strong>
+这个例子也说明了使用 <code class="highlighter-rouge">rebase</code> 要万分小心, 千万不要在共享的 branch 中 <code class="highlighter-rouge">rebase</code>, 不然就像上面那样, 
+现在 <code class="highlighter-rouge">master</code> 的历史已经被 <code class="highlighter-rouge">rebase</code> 改变了. <code class="highlighter-rouge">master</code> 当中别人提交的 <code class="highlighter-rouge">change 4</code> 就被你无情地修改掉了, 
+所以千万不要在共享分支中使用 <code class="highlighter-rouge">rebase</code>.</p>
+
+:ET

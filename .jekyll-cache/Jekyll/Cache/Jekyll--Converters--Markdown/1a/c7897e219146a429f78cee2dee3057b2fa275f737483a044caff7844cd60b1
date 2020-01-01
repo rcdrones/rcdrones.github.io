@@ -1,0 +1,161 @@
+I"uA<p>学习资料:</p>
+<ul>
+  <li><a href="https://github.com/MorvanZhou/tutorials/tree/master/tensorflowTUT/tf18_CNN3" target="_blank">相关代码</a></li>
+  <li>为 TF 2017 打造的<a href="https://github.com/MorvanZhou/Tensorflow-Tutorial" target="_blank">新版可视化教学代码</a></li>
+  <li>机器学习-简介系列 <a href="/tutorials/machine-learning/ML-intro/2-2-CNN/">什么是 CNN</a></li>
+</ul>
+
+<p>这一次我们一层层的加上了不同的 layer. 分别是:</p>
+
+<ol>
+  <li>convolutional layer1 + max pooling;</li>
+  <li>convolutional layer2 + max pooling;</li>
+  <li>fully connected layer1 + dropout;</li>
+  <li>fully connected layer2 to prediction.</li>
+</ol>
+
+<p>我们利用上节课定义好的函数来构建我们的网络</p>
+
+<h2 class="tut-h2-pad" id="图片处理">图片处理
+  <a href="/tutorials/machine-learning/tensorflow/5-05-CNN3/#图片处理" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>首先呢，我们定义一下输入的<code class="highlighter-rouge">placeholder</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">xs</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,[</span><span class="bp">None</span><span class="p">,</span><span class="mi">784</span><span class="p">])</span>
+<span class="n">ys</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,[</span><span class="bp">None</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>我们还定义了<code class="highlighter-rouge">dropout</code>的<code class="highlighter-rouge">placeholder</code>，它是解决过拟合的有效手段</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">keep_prob</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>接着呢，我们需要处理我们的<code class="highlighter-rouge">xs</code>，把<code class="highlighter-rouge">xs</code>的形状变成<code class="highlighter-rouge">[-1,28,28,1]</code>，-1代表先不考虑输入的图片例子多少这个维度，后面的1是channel的数量，因为我们输入的图片是黑白的，因此channel是1，例如如果是RGB图像，那么channel就是3。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x_image</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">xs</span><span class="p">,[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="建立卷积层">建立卷积层
+  <a href="/tutorials/machine-learning/tensorflow/5-05-CNN3/#建立卷积层" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>接着我们定义第一层卷积,先定义本层的<code class="highlighter-rouge">Weight</code>,本层我们的卷积核patch的大小是5x5，因为黑白图片channel是1所以输入是1，输出是32个featuremap</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">W_conv1</span><span class="o">=</span><span class="n">weight_variable</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">32</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>接着定义<code class="highlighter-rouge">bias</code>，它的大小是32个长度，因此我们传入它的<code class="highlighter-rouge">shape</code>为<code class="highlighter-rouge">[32]</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">b_conv1</span><span class="o">=</span><span class="n">bias_variable</span><span class="p">([</span><span class="mi">32</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>定义好了<code class="highlighter-rouge">Weight</code>和<code class="highlighter-rouge">bias</code>，我们就可以定义卷积神经网络的第一个卷积层<code class="highlighter-rouge">h_conv1=conv2d(x_image,W_conv1)+b_conv1</code>,同时我们对<code class="highlighter-rouge">h_conv1</code>进行非线性处理，也就是激活函数来处理喽，这里我们用的是<code class="highlighter-rouge">tf.nn.relu</code>（修正线性单元）来处理，要注意的是，因为采用了<code class="highlighter-rouge">SAME</code>的padding方式，输出图片的大小没有变化依然是28x28，只是厚度变厚了，因此现在的输出大小就变成了28x28x32</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">h_conv1</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">conv2d</span><span class="p">(</span><span class="n">x_image</span><span class="p">,</span><span class="n">W_conv1</span><span class="p">)</span><span class="o">+</span><span class="n">b_conv1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>最后我们再进行<code class="highlighter-rouge">pooling</code>的处理就ok啦，经过<code class="highlighter-rouge">pooling</code>的处理，输出大小就变为了14x14x32</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">h_pool</span><span class="o">=</span><span class="n">max_pool_2x2</span><span class="p">(</span><span class="n">h_conv1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>接着呢，同样的形式我们定义第二层卷积，本层我们的输入就是上一层的输出，本层我们的卷积核patch的大小是5x5，有32个featuremap所以输入就是32，输出呢我们定为64</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">W_conv2</span><span class="o">=</span><span class="n">weight_variable</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">64</span><span class="p">])</span>
+<span class="n">b_conv2</span><span class="o">=</span><span class="n">bias_variable</span><span class="p">([</span><span class="mi">64</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>接着我们就可以定义卷积神经网络的第二个卷积层，这时的输出的大小就是14x14x64</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">h_conv2</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">conv2d</span><span class="p">(</span><span class="n">h_pool1</span><span class="p">,</span><span class="n">W_conv2</span><span class="p">)</span><span class="o">+</span><span class="n">b_conv2</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>最后也是一个pooling处理，输出大小为7x7x64</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">h_pool2</span><span class="o">=</span><span class="n">max_pool_2x2</span><span class="p">(</span><span class="n">h_conv2</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div>
+  <script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  <ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-4601203457616636" data-ad-slot="3397817325"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
+<h2 class="tut-h2-pad" id="建立全连接层">建立全连接层
+  <a href="/tutorials/machine-learning/tensorflow/5-05-CNN3/#建立全连接层" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>好的，接下来我们定义我们的 fully connected layer,</p>
+
+<p>进入全连接层时, 我们通过<code class="highlighter-rouge">tf.reshape()</code>将<code class="highlighter-rouge">h_pool2</code>的输出值从一个三维的变为一维的数据,
+-1表示先不考虑输入图片例子维度, 将上一个输出结果展平.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#[n_samples,7,7,64]-&gt;&gt;[n_samples,7*7*64]
+</span><span class="n">h_pool2_flat</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">h_pool2</span><span class="p">,[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="o">*</span><span class="mi">7</span><span class="o">*</span><span class="mi">64</span><span class="p">])</span> 
+</code></pre></div></div>
+
+<p>此时<code class="highlighter-rouge">weight_variable</code>的<code class="highlighter-rouge">shape</code>输入就是第二个卷积层展平了的输出大小: 7x7x64，
+后面的输出size我们继续扩大，定为1024</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">W_fc1</span><span class="o">=</span><span class="n">weight_variable</span><span class="p">([</span><span class="mi">7</span><span class="o">*</span><span class="mi">7</span><span class="o">*</span><span class="mi">64</span><span class="p">,</span><span class="mi">1024</span><span class="p">])</span> 
+<span class="n">b_fc1</span><span class="o">=</span><span class="n">bias_variable</span><span class="p">([</span><span class="mi">1024</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>然后将展平后的<code class="highlighter-rouge">h_pool2_flat</code>与本层的<code class="highlighter-rouge">W_fc1</code>相乘（注意这个时候不是卷积了）</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">h_fc1</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">h_pool2_flat</span><span class="p">,</span><span class="n">W_fc1</span><span class="p">)</span><span class="o">+</span><span class="n">b_fc1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>如果我们考虑过拟合问题，可以加一个dropout的处理</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">h_fc1_drop</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">h_fc1</span><span class="p">,</span><span class="n">keep_drop</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>接下来我们就可以进行最后一层的构建了，好激动啊, 输入是1024，最后的输出是10个
+(因为mnist数据集就是[0-9]十个类)，prediction就是我们最后的预测值</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">W_fc2</span><span class="o">=</span><span class="n">weight_variable</span><span class="p">([</span><span class="mi">1024</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span> <span class="n">b_fc2</span><span class="o">=</span><span class="n">bias_variable</span><span class="p">([</span><span class="mi">10</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>然后呢我们用softmax分类器（多分类，输出是各个类的概率）,对我们的输出进行分类</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">prediction</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">h_fc1_dropt</span><span class="p">,</span><span class="n">W_fc2</span><span class="p">),</span><span class="n">b_fc2</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 class="tut-h2-pad" id="选优化方法">选优化方法
+  <a href="/tutorials/machine-learning/tensorflow/5-05-CNN3/#选优化方法" class="headerlink" title="Permalink to this headline">¶</a>
+</h2>
+
+<p>接着呢我们利用交叉熵损失函数来定义我们的cost function</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cross_entropy</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span>
+    <span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">ys</span><span class="o">*</span><span class="n">tf</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">prediction</span><span class="p">),</span>
+    <span class="n">reduction_indices</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+</code></pre></div></div>
+
+<p>我们用<code class="highlighter-rouge">tf.train.AdamOptimizer()</code>作为我们的优化器进行优化，使我们的<code class="highlighter-rouge">cross_entropy</code>最小</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">train_step</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="mf">1e-4</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">cross_entropy</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>接着呢就是和之前视频讲的一样喽 定义<code class="highlighter-rouge">Session</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sess</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>初始化变量</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># tf.initialize_all_variables() 这种写法马上就要被废弃
+# 替换成下面的写法:
+</span><span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p>好啦接着就是训练数据啦，我们假定训练<code class="highlighter-rouge">1000</code>步，每<code class="highlighter-rouge">50</code>步输出一下准确率，
+注意<code class="highlighter-rouge">sess.run()</code>时记得要用<code class="highlighter-rouge">feed_dict</code>给我们的众多 <code class="highlighter-rouge">placeholder</code> 喂数据哦.</p>
+
+<p>以上呢就是一个简单的卷积神经网络的例子代码</p>
+
+:ET
