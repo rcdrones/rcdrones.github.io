@@ -136,8 +136,8 @@ introduce:
 
 assemble:
   chapter-names:
-    - 安装外壳1
-    - 安装外壳2
+    - 111
+    - 222
 
 os:
   chapter-names:
