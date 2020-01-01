@@ -129,25 +129,21 @@ basic:
     - 模块
     - 其他
 
-basic2:
+intro:
   chapter-names:
     - 介绍
 
-
-basic3:
+ass:
   chapter-names:
     - 安装sub
 
-basic4:
+os:
   chapter-names:
     - ossub
-
-
 
 multiprocessing:
   chapter-names:
     - 多进程
-
 
 threading:
   chapter-names:
