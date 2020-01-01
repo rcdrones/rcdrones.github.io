@@ -77,18 +77,39 @@ defaults:
       path: "_loop-description/rpi-basic"
     values:
       module: rpi-basic
+
       
   # show on index.html
   - scope:
       path: "_tutorials/rpi-basic/basic"
     values:
-      series: 认识树莓派
+      series: 介绍
       tut-permalink: /tutorials/rpi-basic/basic/
-      category: rpi-basic
-      keywords: 树莓派, 基础
+      category: basic2
+      keywords: 树莓派 基础
       thumbnail: /static/img/course_cover/python_basic.jpg      
+      
+  - scope:
+      path: "_tutorials/rpi-basic/assemble"
+    values:
+      series: 组装
+      tut-permalink: /tutorials/rpi-basic/assemble/
+      category: basic3
+      keywords: 树莓派, 外壳, 安装
+      thumbnail: /static/img/course_cover/tkinter.jpg
+
+  - scope:
+      path: "_tutorials/rpi-basic/os"
+    values:
+      series: 系统
+      tut-permalink: /tutorials/rpi-basic/os/
+      category: basic4
+      keywords: 树莓派, 系统, raspbian
+      thumbnail: /static/img/course_cover/tkinter.jpg      
+    
 
 
+      
   # tutorial default
   - scope:
       path: "_tutorials/machine-learning/ML-intro"

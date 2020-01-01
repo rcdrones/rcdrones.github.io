@@ -1,5 +1,5 @@
 ---
-title: 刷机
+title: 组装
 icon-dir: /static/img/icon/basic_icon.png
 tut-dir: /tutorials/rpi-basic/basic/
 ---

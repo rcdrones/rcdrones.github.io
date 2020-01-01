@@ -1,5 +1,5 @@
 ---
-title: 安装
+title: 系统安装
 icon-dir: /static/img/icon/basic_icon.png
 tut-dir: /tutorials/rpi-basic/basic/
 ---

@@ -7,7 +7,6 @@ tut-course-detail:
   - ["/tutorials/python-basic/basic", "最基础使用方法", "/static/img/course_cover-small/python_basic.jpg"]
   - ["/tutorials/python-basic/tkinter", "窗口视窗的编辑 (Tkinter)", "/static/img/course_cover-small/tkinter.jpg"]
   - ["/tutorials/python-basic/threading", "多线程 (threading)", "/static/img/course_cover-small/threading.jpg"]
-  - ["/tutorials/python-basic/multiprocessing", "多进程 (multiprocessing)", "/static/img/course_cover-small/multiprocessing.jpg"]
 ---
 
 <a href="{{page.tut-dir}}">认识树莓派</a> 非常适合刚入门，
