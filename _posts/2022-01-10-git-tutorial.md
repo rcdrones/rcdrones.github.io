@@ -11,10 +11,6 @@ categories: git_tutoriGI
 
 
 
-### git的脑图
-
-
-
 ### git的常用命令
 
 ```
@@ -83,7 +79,7 @@ git branch -d add_some_func # 目前分支在master下，然后删除莫个特�
 
   * 设置 user.name 和 user.email
 
-```
+  ```
     设置：
     git config --global user.name "aaa"
     git config --global user.email	"bbb@163.com"
@@ -91,63 +87,64 @@ git branch -d add_some_func # 目前分支在master下，然后删除莫个特�
     读取验证：
     git config user.name
     git config user.email
-```
+  ```
 
   * 产生rsa密码
 
-    ```
-    生成密码
-    ssh-keygen -t rsa -C "bbb@163.com" #产生的密码在 c:\users\xxx\.ssh\id_rsa.pub
-    
-    去网站上粘贴id_rsa.pub文件里的内容
-    
-    测试一下：
-    ssh -T git@gitee.com
-    ssh -T git@github.com # 看到succeed表示正确
-    ```
+  ```
+  生成密码
+  ssh-keygen -t rsa -C "bbb@163.com" #产生的密码:\users\xxx\.ssh\id_rsa.pub
 
-* 方式一：如果先建立本地文件夹，要上传到云端（也就是本地任意文件夹和云端做关联）
+  去网站上粘贴id_rsa.pub文件里的内容
+
+  测试一下：
+  ssh -T git@gitee.com
+  ssh -T git@github.com # 看到succeed表示正确
+
+  ```
+
+* 方式一：**如果先建立本地文件夹**，要上传到云端（也就是本地任意文件夹和云端做关联）
 
   * 本地建立和云端地址的关联
 
-    ```
-    git remote add 随便叫一个远程名称 ssh远程云端的地址
+  ```
+  git remote add 随便叫一个远程名称 ssh远程云端的地址
     
-    git remote add github git@github.com:rcdrones/abc.git
-    git remote add gitee git@gitee.com:rcdrones/abc.git
-    ```
+  git remote add github git@github.com:rcdrones/abc.git
+  git remote add gitee git@gitee.com:rcdrones/abc.git
+  ```
 
   * 上传代码到云端
 
-    ```
-    git push -u github master # github就是上面的标签， master是分支名称
-    ```
+  ```
+  git push -u github master # github就是上面的标签， master是分支名称
+  ```
 
-* 方式二：如果只有云端，没有开本地文件夹
+* 方式二：如果只有云端，**没有开本地文件夹**
 
   * git clone 下整个云端的代码库
 
-    ```
-    git clone git@gitee.com:rcdrones/abc.git
-    ```
+  ```
+  git clone git@gitee.com:rcdrones/abc.git
+  ```
 
   * 修改文件，然后git push上云端
 
-    ```
-    git add .
-    git commit -m "写一些修改记录"
+  ```
+  git add .
+  git commit -m "写一些修改记录"
     
-    git push -u github master
+  git push -u github master
     
-    git push -f gitee master
+  git push -f gitee master
     
-    ```
+  ```
 
   * 在push之前最好用pull拉取一下最新的代码库
 
-    ```
-    git pull github master
-    ```
+  ```
+  git pull github master
+  ```
 
     
 
