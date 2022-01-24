@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-01-24T15:44:52+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">RaspberryPi Club</title><subtitle>树莓派Club知识分享站</subtitle><entry><title type="html">树莓派DS3231 RTC模块使用指南</title><link href="http://localhost:4000/pi4-extension/2022/01/23/DS3231-RTC-module-tutorial.html" rel="alternate" type="text/html" title="树莓派DS3231 RTC模块使用指南" /><published>2022-01-23T19:00:00+08:00</published><updated>2022-01-23T19:00:00+08:00</updated><id>http://localhost:4000/pi4-extension/2022/01/23/DS3231-RTC-module-tutorial</id><content type="html" xml:base="http://localhost:4000/pi4-extension/2022/01/23/DS3231-RTC-module-tutorial.html"><![CDATA[<h1 id="树莓派ds3231-rtc模块使用指南">树莓派DS3231 RTC模块使用指南</h1>
+
+<blockquote>
+  <p>树莓派主板本身没有RTC时钟，所以在断网情况下（比如在户外或者不方便上网的环境下），树莓派启动后的系统时间是错误的。为了解决这个问题，我们可以在树莓派IIC总线上外挂一个RTC模块（模块本身是带一颗锂电池，来维持在树莓派断电后，保持时钟芯片的走时）。</p>
+</blockquote>
+
+<h3 id="模块插入图">模块插入图：</h3>
+
+<h3 id="软件操作指南">软件操作指南：</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">命令速查总结：</th>
+      <th style="text-align: center">命令解释</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">sudo i2cdetect -y 1</td>
+      <td style="text-align: center">查询以下IIC模块的地址是否被系统识别（0x68）</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center"> </td>
+    </tr>
+    <tr>
+      <td style="text-align: center">echo ‘ds3231 0x68’ | sudo tee /sys/class/i2c-adapter/i2c-1/new_device</td>
+      <td style="text-align: center">把RTC模块注册到Linux系统内部</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"> </td>
+      <td style="text-align: center">tee是一个从标准输入，输出到指令文件和屏幕的linux常见工具</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">sudo hwclock -r</td>
+      <td style="text-align: center">读取以下RTC模块内部的时间</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">sudo hwclock -w</td>
+      <td style="text-align: center">把系统的时间写入到RTC模块内部</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">sudo hwclock -s</td>
+      <td style="text-align: center">把模块内部的时间更新到系统内部</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="软件操作分解步骤">软件操作分解步骤：</h4>
+
+<ol>
+  <li>
+    <p>把模块正确的插入到Pi4（PI3也可以），然后对照手机的时间，确认一下此刻系统时间是否正确。</p>
+  </li>
+  <li>
+    <p>查询一下模块的地址是否正确被系统识别</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> sudo i2cdetect -y 1
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>把DS3231注册到系统中</p>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> echo 'ds3231 0x68' | sudo tee /sys/class/i2c-adapter/i2c-1/new_device
+</code></pre></div>    </div>
+  </li>
+  <li>从模块读取一下，模块内部的时钟
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> sudo hwclock -r
+</code></pre></div>    </div>
+  </li>
+  <li>把系统时间写入到模块里面
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> sudo hwclock -w
+</code></pre></div>    </div>
+  </li>
+  <li>再次读几遍模块上的时间，看是否在走时间
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> sudo hwclock -r
+</code></pre></div>    </div>
+  </li>
+  <li>开机自动把模块内的时间，更新到系统内部，需要编辑<code class="highlighter-rouge">/etc/rc.local</code>这个文件
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo nano /etc/rc.local
+#在exit 0 上面加入以下内容：
+echo 'ds3231 0x68' | sudo tee /sys/class/i2c-adapter/i2c-1/new_device
+#把模块内部的时间更新到系统时间内部
+sudo hwclock -s
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h3 id="视频教学">视频教学：</h3>]]></content><author><name></name></author><category term="Pi4-extension" /><summary type="html"><![CDATA[树莓派DS3231 RTC模块使用指南]]></summary></entry><entry><title type="html">ARGON ONE 外壳常见疑问解答</title><link href="http://localhost:4000/pi4-case/2022/01/18/ARGON-ONE-CASE-trouble-shorting.html" rel="alternate" type="text/html" title="ARGON ONE 外壳常见疑问解答" /><published>2022-01-18T19:00:00+08:00</published><updated>2022-01-18T19:00:00+08:00</updated><id>http://localhost:4000/pi4-case/2022/01/18/ARGON-ONE-CASE-trouble-shorting</id><content type="html" xml:base="http://localhost:4000/pi4-case/2022/01/18/ARGON-ONE-CASE-trouble-shorting.html"><![CDATA[<h1 id="argon-one-外壳的疑问解答">Argon ONE 外壳的疑问解答</h1>
+
+<blockquote>
+  <p>简介：因为客户经常反馈ONE外壳的一些安装疑问，涉及到软件和硬件。所以这期做了一个详细的解答视频。</p>
+</blockquote>
+
+<p>视频分为以下几个部分来讲解：</p>
+
+<ul>
+  <li>导热垫和背部脚垫的疑问</li>
+  <li>HDMI不显示的疑问解答</li>
+  <li>3P跳线的功能解答</li>
+  <li>IR接收头的解答</li>
+  <li>shell脚本的作用，将来有时间在讲解一下</li>
+</ul>
+
+<h3 id="视频解答">视频解答</h3>
+
+<iframe src="//player.bilibili.com/player.html?aid=465513420&amp;bvid=BV1uL41157xu&amp;cid=482601996&amp;page=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>]]></content><author><name></name></author><category term="Pi4-CASE" /><summary type="html"><![CDATA[Argon ONE 外壳的疑问解答]]></summary></entry><entry><title type="html">Welcome to Jekyll!</title><link href="http://localhost:4000/jekyll-update/2022/01/09/welcome-to-jekyll.html" rel="alternate" type="text/html" title="Welcome to Jekyll!" /><published>2022-01-09T11:24:01+08:00</published><updated>2022-01-09T11:24:01+08:00</updated><id>http://localhost:4000/jekyll-update/2022/01/09/welcome-to-jekyll</id><content type="html" xml:base="http://localhost:4000/jekyll-update/2022/01/09/welcome-to-jekyll.html"><![CDATA[<p>You’ll find this post in your <code class="highlighter-rouge">_posts</code> directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run <code class="highlighter-rouge">jekyll serve</code>, which launches a web server and auto-regenerates your site when a file is updated.</p>
+
+<p>To add new posts, simply add a file in the <code class="highlighter-rouge">_posts</code> directory that follows the convention <code class="highlighter-rouge">YYYY-MM-DD-name-of-post.ext</code> and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.</p>
+
+<p>Jekyll also offers powerful support for code snippets:</p>
+
+<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby"><span class="k">def</span> <span class="nf">print_hi</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+  <span class="nb">puts</span> <span class="s2">"Hi, </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">"</span>
+<span class="k">end</span>
+<span class="n">print_hi</span><span class="p">(</span><span class="s1">'Tom'</span><span class="p">)</span>
+<span class="c1">#=&gt; prints 'Hi, Tom' to STDOUT.</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#include "stdio.h"
+</span>
+<span class="kt">void</span> <span class="nf">main</span><span class="p">(){</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">"helloworld"</span><span class="p">);</span>
+<span class="p">}</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HelloWorld</span><span class="o">{</span>
+	<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="nc">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">){</span>
+		<span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Hello World!"</span><span class="o">);</span>
+	<span class="o">}</span>
+
+<span class="o">}</span></code></pre></figure>
+
+<p>Check out the <a href="https://jekyllrb.com/docs/home">Jekyll docs</a> for more info on how to get the most out of Jekyll. File all bugs/feature requests at <a href="https://github.com/jekyll/jekyll">Jekyll’s GitHub repo</a>. If you have questions, you can ask them on <a href="https://talk.jekyllrb.com/">Jekyll Talk</a>.</p>]]></content><author><name></name></author><category term="jekyll-update" /><summary type="html"><![CDATA[You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run jekyll serve, which launches a web server and auto-regenerates your site when a file is updated.]]></summary></entry><entry><title type="html">ARGON NEO 外壳</title><link href="http://localhost:4000/pi4-case/2022/01/08/ARGON-NEO-CASE.html" rel="alternate" type="text/html" title="ARGON NEO 外壳" /><published>2022-01-08T20:00:00+08:00</published><updated>2022-01-08T20:00:00+08:00</updated><id>http://localhost:4000/pi4-case/2022/01/08/ARGON-NEO-CASE</id><content type="html" xml:base="http://localhost:4000/pi4-case/2022/01/08/ARGON-NEO-CASE.html"><![CDATA[<h1 id="argon-neo-外壳">ARGON NEO 外壳</h1>
+
+<blockquote>
+  <p>简介：ARGON NEO外壳是ARGON品牌外壳中的小弟弟，它没有电路板和风扇，整个铝合金外壳就是一个大散热片，适合喜欢简单安装，对颜值有要求的用户。</p>
+</blockquote>
+
+<h3 id="特点">特点：</h3>
+
+<ul>
+  <li>上壳和下壳是通过磁吸的。并且底部外壳是ABS材料，不影响Pi4的wifi信号。</li>
+  <li>无风扇设计，整个外壳就等价于一个大散热片，对CPU和内存进行被动散热。不用安装任何软件，开箱安装即用。</li>
+  <li>铝外壳表面带品牌LOGO丝印，GPIO、DSI、CSI接口都有丝印标识。颜值有一定的保证。</li>
+  <li>设计有摄像头固定座、兼容ARGON品牌的 FAN HAT的安装。</li>
+</ul>
+
+<h3 id="安装">安装：</h3>
+
+<iframe src="//player.bilibili.com/player.html?aid=295576275&amp;bvid=BV1kF411v7PG&amp;cid=479990833&amp;page=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>]]></content><author><name></name></author><category term="Pi4-CASE" /><summary type="html"><![CDATA[ARGON NEO 外壳]]></summary></entry><entry><title type="html">GIT版本管理</title><link href="http://localhost:4000/git_tutorigi/2022/01/07/git-tutorial.html" rel="alternate" type="text/html" title="GIT版本管理" /><published>2022-01-07T20:00:00+08:00</published><updated>2022-01-07T20:00:00+08:00</updated><id>http://localhost:4000/git_tutorigi/2022/01/07/git-tutorial</id><content type="html" xml:base="http://localhost:4000/git_tutorigi/2022/01/07/git-tutorial.html"><![CDATA[<h1 id="git版本管理">GIT版本管理</h1>
+
+<blockquote>
+  <p>简介：git本身是一种源代码版本管理软件，至于国外的github和国内的码云（gitee）本身只是提供云硬盘。我在学习完git课程之后，联想到的是git本身其实根本不需要远程服务器。在本地任何目录下，都只要运行一下git init 就能开始版本管理。本文就是git使用上的经验分享。</p>
+</blockquote>
+
+<h3 id="git的常用命令">git的常用命令</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git init #对目录开始git管理。也就是执行git初始化的动作。
+
+git add . #表示把目录内的变动文件，都加入暂存区。
+
+git commit -m "这是第一次修改，我添加了XX文件，修改了YY文件" #让暂存区的文件进行一次拍照，然后产生一个以一大堆HEX组成的版本号。
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git reflog # 查看目前这个目录的所有版本号，也就是查看目前的修改记录。
+</code></pre></div></div>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git reset --hard HEX #返回某一次快照的状态。 HEX表示模块的编号，就是上面reflog显示出来的版本号 
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git checkout add_some_func # 从当前分支切换到特定名称的分支。
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git checkout master #切换到主分支
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git merge add_some_func #把add_some_func分支进行的修改合并到master上面。
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git reset --hard HEX # 强制返回到某个版本快照。（工作目录的文件也会更改为快照状态）
+</code></pre></div></div>
+
+<h4 id="产生一个分支在分支上工作的整个流程">产生一个分支，在分支上工作的整个流程</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git branch add_some_func # 在当前分支下面产生一个子分支，用于同步开发，或者是临时想解决一个bug，产生一个分子。
+git checkout add_some_func #切换到主分支
+
+或者如下：
+git checkout -b add_some_func #创建分支并且切换到分支上工作
+
+
+然后在本地：
+	1. 修改源代码（做你的工作）
+	2. git add .
+	3. git commit -m "写点更新记录的标签，方便后期来查看"
+
+
+等修改完成后：
+git checkout master # 切换到master分支
+git merge add_some_func # 把分支上的修改合并到master上
+
+
+最后删除分支：（可选的步骤）
+git branch -d add_some_func # 目前分支在master下，然后删除莫个特定分支
+</code></pre></div></div>
+
+<h3 id="和远程服务器的交互">和远程服务器的交互</h3>
+
+<ul>
+  <li>
+    <p>首先要生成rsa的公匙</p>
+
+    <ul>
+      <li>设置 user.name 和 user.email</li>
+    </ul>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  设置：
+  git config --global user.name "aaa"
+  git config --global user.email	"bbb@163.com"
+    
+  读取验证：
+  git config user.name
+  git config user.email
+</code></pre></div>    </div>
+
+    <ul>
+      <li>产生rsa密码</li>
+    </ul>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>生成密码
+ssh-keygen -t rsa -C "bbb@163.com" #产生的密码:\users\xxx\.ssh\id_rsa.pub
+
+去网站上粘贴id_rsa.pub文件里的内容
+
+测试一下：
+ssh -T git@gitee.com
+ssh -T git@github.com # 看到succeed表示正确
+
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>方式一：<strong>如果先建立本地文件夹</strong>，要上传到云端（也就是本地任意文件夹和云端做关联）</p>
+
+    <ul>
+      <li>本地建立和云端地址的关联</li>
+    </ul>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git remote add 随便叫一个远程名称 ssh远程云端的地址
+    
+git remote add github git@github.com:rcdrones/abc.git
+git remote add gitee git@gitee.com:rcdrones/abc.git
+</code></pre></div>    </div>
+
+    <ul>
+      <li>上传代码到云端</li>
+    </ul>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git push -u github master # github就是上面的标签， master是分支名称
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>方式二：如果只有云端，<strong>没有开本地文件夹</strong></p>
+
+    <ul>
+      <li>git clone 下整个云端的代码库</li>
+    </ul>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone git@gitee.com:rcdrones/abc.git
+</code></pre></div>    </div>
+
+    <ul>
+      <li>修改文件，然后git push上云端</li>
+    </ul>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git add .
+git commit -m "写一些修改记录"
+    
+git push -u github master
+    
+git push -f gitee master
+    
+</code></pre></div>    </div>
+
+    <ul>
+      <li>在push之前最好用pull拉取一下最新的代码库</li>
+    </ul>
+
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git pull github master
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h3 id="疑难杂症">疑难杂症</h3>
+
+<p>在<code class="highlighter-rouge">git status</code>发现文件名转码异常，变成了16进制码。解决方案：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git config --global core.quotepath false
+
+git config --list
+</code></pre></div></div>]]></content><author><name></name></author><category term="git_tutoriGI" /><summary type="html"><![CDATA[GIT版本管理]]></summary></entry></feed>
