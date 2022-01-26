@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-01-24T15:44:52+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">RaspberryPi Club</title><subtitle>树莓派Club知识分享站</subtitle><entry><title type="html">树莓派DS3231 RTC模块使用指南</title><link href="http://localhost:4000/pi4-extension/2022/01/23/DS3231-RTC-module-tutorial.html" rel="alternate" type="text/html" title="树莓派DS3231 RTC模块使用指南" /><published>2022-01-23T19:00:00+08:00</published><updated>2022-01-23T19:00:00+08:00</updated><id>http://localhost:4000/pi4-extension/2022/01/23/DS3231-RTC-module-tutorial</id><content type="html" xml:base="http://localhost:4000/pi4-extension/2022/01/23/DS3231-RTC-module-tutorial.html"><![CDATA[<h1 id="树莓派ds3231-rtc模块使用指南">树莓派DS3231 RTC模块使用指南</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-01-27T07:37:31+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">RaspberryPi Club</title><subtitle>树莓派Club知识分享站</subtitle><entry><title type="html">树莓派DS3231 RTC模块使用指南</title><link href="http://localhost:4000/pi4-extension/2022/01/23/DS3231-RTC-module-tutorial.html" rel="alternate" type="text/html" title="树莓派DS3231 RTC模块使用指南" /><published>2022-01-23T19:00:00+08:00</published><updated>2022-01-23T19:00:00+08:00</updated><id>http://localhost:4000/pi4-extension/2022/01/23/DS3231-RTC-module-tutorial</id><content type="html" xml:base="http://localhost:4000/pi4-extension/2022/01/23/DS3231-RTC-module-tutorial.html"><![CDATA[<h1 id="树莓派ds3231-rtc模块使用指南">树莓派DS3231 RTC模块使用指南</h1>
 
 <blockquote>
   <p>树莓派主板本身没有RTC时钟，所以在断网情况下（比如在户外或者不方便上网的环境下），树莓派启动后的系统时间是错误的。为了解决这个问题，我们可以在树莓派IIC总线上外挂一个RTC模块（模块本身是带一颗锂电池，来维持在树莓派断电后，保持时钟芯片的走时）。</p>
@@ -11,38 +11,38 @@
 <table>
   <thead>
     <tr>
-      <th style="text-align: center">命令速查总结：</th>
-      <th style="text-align: center">命令解释</th>
+      <th style="text-align: left">命令速查总结：</th>
+      <th style="text-align: left">命令解释</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="text-align: center">sudo i2cdetect -y 1</td>
-      <td style="text-align: center">查询以下IIC模块的地址是否被系统识别（0x68）</td>
+      <td style="text-align: left">sudo i2cdetect -y 1</td>
+      <td style="text-align: left">查询以下IIC模块的地址是否被系统识别（0x68）</td>
     </tr>
     <tr>
-      <td style="text-align: center"> </td>
-      <td style="text-align: center"> </td>
+      <td style="text-align: left"> </td>
+      <td style="text-align: left"> </td>
     </tr>
     <tr>
-      <td style="text-align: center">echo ‘ds3231 0x68’ | sudo tee /sys/class/i2c-adapter/i2c-1/new_device</td>
-      <td style="text-align: center">把RTC模块注册到Linux系统内部</td>
+      <td style="text-align: left">echo ‘ds3231 0x68’ | sudo tee /sys/class/i2c-adapter/i2c-1/new_device</td>
+      <td style="text-align: left">把RTC模块注册到Linux系统内部</td>
     </tr>
     <tr>
-      <td style="text-align: center"> </td>
-      <td style="text-align: center">tee是一个从标准输入，输出到指令文件和屏幕的linux常见工具</td>
+      <td style="text-align: left"> </td>
+      <td style="text-align: left">tee是一个从标准输入，输出到指令文件和屏幕的linux常见工具</td>
     </tr>
     <tr>
-      <td style="text-align: center">sudo hwclock -r</td>
-      <td style="text-align: center">读取以下RTC模块内部的时间</td>
+      <td style="text-align: left">sudo hwclock -r</td>
+      <td style="text-align: left">读取以下RTC模块内部的时间</td>
     </tr>
     <tr>
-      <td style="text-align: center">sudo hwclock -w</td>
-      <td style="text-align: center">把系统的时间写入到RTC模块内部</td>
+      <td style="text-align: left">sudo hwclock -w</td>
+      <td style="text-align: left">把系统的时间写入到RTC模块内部</td>
     </tr>
     <tr>
-      <td style="text-align: center">sudo hwclock -s</td>
-      <td style="text-align: center">把模块内部的时间更新到系统内部</td>
+      <td style="text-align: left">sudo hwclock -s</td>
+      <td style="text-align: left">把模块内部的时间更新到系统内部</td>
     </tr>
   </tbody>
 </table>
@@ -62,7 +62,8 @@
   <li>
     <p>把DS3231注册到系统中</p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> echo 'ds3231 0x68' | sudo tee /sys/class/i2c-adapter/i2c-1/new_device
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">echo</span> <span class="s1">'ds3231 0x68'</span> | <span class="nb">sudo tee</span> /sys/class/i2c-adapter/i2c-1/new_device
+ <span class="c">#如果web页复制到linux command里面报错，可能是单引号粘贴不对，需要重新修正为英文半角状态下的单引号（'）</span>
 </code></pre></div>    </div>
   </li>
   <li>从模块读取一下，模块内部的时钟
@@ -78,11 +79,12 @@
 </code></pre></div>    </div>
   </li>
   <li>开机自动把模块内的时间，更新到系统内部，需要编辑<code class="highlighter-rouge">/etc/rc.local</code>这个文件
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo nano /etc/rc.local
-#在exit 0 上面加入以下内容：
-echo 'ds3231 0x68' | sudo tee /sys/class/i2c-adapter/i2c-1/new_device
-#把模块内部的时间更新到系统时间内部
-sudo hwclock -s
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>nano /etc/rc.local
+<span class="c">#在exit 0 上面加入以下内容：</span>
+<span class="nb">echo</span> <span class="s1">'ds3231 0x68'</span> | <span class="nb">sudo tee</span> /sys/class/i2c-adapter/i2c-1/new_device
+<span class="c">#如果web页复制到linux command里面报错，可能是单引号粘贴不对，需要重新修正为英文半角状态下的单引号（'）</span>
+<span class="c">#把模块内部的时间更新到系统时间内部</span>
+<span class="nb">sudo </span>hwclock <span class="nt">-s</span>
 </code></pre></div>    </div>
   </li>
 </ol>

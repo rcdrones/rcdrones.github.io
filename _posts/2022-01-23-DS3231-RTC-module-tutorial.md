@@ -19,15 +19,15 @@ categories: Pi4-extension
 
 ### 软件操作指南：
 
-|                        命令速查总结：                        |                         命令解释                         |
-| :----------------------------------------------------------: | :------------------------------------------------------: |
-|                     sudo i2cdetect -y 1                      |       查询以下IIC模块的地址是否被系统识别（0x68）        |
+| 命令速查总结：                                               | 命令解释                                                 |
+| :----------------------------------------------------------- | :------------------------------------------------------- |
+| sudo i2cdetect -y 1                                          | 查询以下IIC模块的地址是否被系统识别（0x68）              |
 |                                                              |                                                          |
-| echo 'ds3231 0x68' \| sudo tee /sys/class/i2c-adapter/i2c-1/new_device |               把RTC模块注册到Linux系统内部               |
+| echo 'ds3231 0x68' \| sudo tee /sys/class/i2c-adapter/i2c-1/new_device | 把RTC模块注册到Linux系统内部                             |
 |                                                              | tee是一个从标准输入，输出到指令文件和屏幕的linux常见工具 |
-|                       sudo hwclock -r                        |                读取以下RTC模块内部的时间                 |
-|                       sudo hwclock -w                        |              把系统的时间写入到RTC模块内部               |
-|                       sudo hwclock -s                        |              把模块内部的时间更新到系统内部              |
+| sudo hwclock -r                                              | 读取以下RTC模块内部的时间                                |
+| sudo hwclock -w                                              | 把系统的时间写入到RTC模块内部                            |
+| sudo hwclock -s                                              | 把模块内部的时间更新到系统内部                           |
 
 #### 软件操作分解步骤：
 
@@ -41,8 +41,9 @@ categories: Pi4-extension
 
 3. 把DS3231注册到系统中
 
-    ```
+    ```sh
     echo 'ds3231 0x68' | sudo tee /sys/class/i2c-adapter/i2c-1/new_device
+    #如果web页复制到linux command里面报错，可能是单引号粘贴不对，需要重新修正为英文半角状态下的单引号（'）
     ```
 
 4. 从模块读取一下，模块内部的时钟  
@@ -58,10 +59,11 @@ categories: Pi4-extension
     sudo hwclock -r
     ```
 7.  开机自动把模块内的时间，更新到系统内部，需要编辑`/etc/rc.local`这个文件
-    ```
+    ```sh
     sudo nano /etc/rc.local
     #在exit 0 上面加入以下内容：
     echo 'ds3231 0x68' | sudo tee /sys/class/i2c-adapter/i2c-1/new_device
+    #如果web页复制到linux command里面报错，可能是单引号粘贴不对，需要重新修正为英文半角状态下的单引号（'）
     #把模块内部的时间更新到系统时间内部
     sudo hwclock -s
     ```
