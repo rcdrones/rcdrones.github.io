@@ -35,7 +35,7 @@ categories: Pi4-extension
 
 2. 查询一下模块的地址是否正确被系统识别
 
-    ```
+    ```sh
     sudo i2cdetect -y 1
     ```
 
@@ -47,15 +47,15 @@ categories: Pi4-extension
     ```
 
 4. 从模块读取一下，模块内部的时钟  
-    ```
+    ```sh
     sudo hwclock -r
     ```
 5. 把系统时间写入到模块里面
-    ```
+    ```sh
     sudo hwclock -w
     ```
 6. 再次读几遍模块上的时间，看是否在走时间
-    ```
+    ```sh
     sudo hwclock -r
     ```
 7.  开机自动把模块内的时间，更新到系统内部，需要编辑`/etc/rc.local`这个文件

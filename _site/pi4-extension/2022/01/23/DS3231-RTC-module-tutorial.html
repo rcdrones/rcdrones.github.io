@@ -105,7 +105,7 @@
   <li>
     <p>查询一下模块的地址是否正确被系统识别</p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> sudo i2cdetect -y 1
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">sudo </span>i2cdetect <span class="nt">-y</span> 1
 </code></pre></div>    </div>
   </li>
   <li>
@@ -116,15 +116,15 @@
 </code></pre></div>    </div>
   </li>
   <li>从模块读取一下，模块内部的时钟
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> sudo hwclock -r
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">sudo </span>hwclock <span class="nt">-r</span>
 </code></pre></div>    </div>
   </li>
   <li>把系统时间写入到模块里面
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> sudo hwclock -w
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">sudo </span>hwclock <span class="nt">-w</span>
 </code></pre></div>    </div>
   </li>
   <li>再次读几遍模块上的时间，看是否在走时间
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> sudo hwclock -r
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">sudo </span>hwclock <span class="nt">-r</span>
 </code></pre></div>    </div>
   </li>
   <li>开机自动把模块内的时间，更新到系统内部，需要编辑<code class="highlighter-rouge">/etc/rc.local</code>这个文件

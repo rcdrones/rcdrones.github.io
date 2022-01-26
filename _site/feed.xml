@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-01-27T07:37:31+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">RaspberryPi Club</title><subtitle>树莓派Club知识分享站</subtitle><entry><title type="html">树莓派DS3231 RTC模块使用指南</title><link href="http://localhost:4000/pi4-extension/2022/01/23/DS3231-RTC-module-tutorial.html" rel="alternate" type="text/html" title="树莓派DS3231 RTC模块使用指南" /><published>2022-01-23T19:00:00+08:00</published><updated>2022-01-23T19:00:00+08:00</updated><id>http://localhost:4000/pi4-extension/2022/01/23/DS3231-RTC-module-tutorial</id><content type="html" xml:base="http://localhost:4000/pi4-extension/2022/01/23/DS3231-RTC-module-tutorial.html"><![CDATA[<h1 id="树莓派ds3231-rtc模块使用指南">树莓派DS3231 RTC模块使用指南</h1>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-01-27T07:44:16+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">RaspberryPi Club</title><subtitle>树莓派Club知识分享站</subtitle><entry><title type="html">树莓派DS3231 RTC模块使用指南</title><link href="http://localhost:4000/pi4-extension/2022/01/23/DS3231-RTC-module-tutorial.html" rel="alternate" type="text/html" title="树莓派DS3231 RTC模块使用指南" /><published>2022-01-23T19:00:00+08:00</published><updated>2022-01-23T19:00:00+08:00</updated><id>http://localhost:4000/pi4-extension/2022/01/23/DS3231-RTC-module-tutorial</id><content type="html" xml:base="http://localhost:4000/pi4-extension/2022/01/23/DS3231-RTC-module-tutorial.html"><![CDATA[<h1 id="树莓派ds3231-rtc模块使用指南">树莓派DS3231 RTC模块使用指南</h1>
 
 <blockquote>
   <p>树莓派主板本身没有RTC时钟，所以在断网情况下（比如在户外或者不方便上网的环境下），树莓派启动后的系统时间是错误的。为了解决这个问题，我们可以在树莓派IIC总线上外挂一个RTC模块（模块本身是带一颗锂电池，来维持在树莓派断电后，保持时钟芯片的走时）。</p>
@@ -56,7 +56,7 @@
   <li>
     <p>查询一下模块的地址是否正确被系统识别</p>
 
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> sudo i2cdetect -y 1
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">sudo </span>i2cdetect <span class="nt">-y</span> 1
 </code></pre></div>    </div>
   </li>
   <li>
@@ -67,15 +67,15 @@
 </code></pre></div>    </div>
   </li>
   <li>从模块读取一下，模块内部的时钟
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> sudo hwclock -r
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">sudo </span>hwclock <span class="nt">-r</span>
 </code></pre></div>    </div>
   </li>
   <li>把系统时间写入到模块里面
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> sudo hwclock -w
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">sudo </span>hwclock <span class="nt">-w</span>
 </code></pre></div>    </div>
   </li>
   <li>再次读几遍模块上的时间，看是否在走时间
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> sudo hwclock -r
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nb">sudo </span>hwclock <span class="nt">-r</span>
 </code></pre></div>    </div>
   </li>
   <li>开机自动把模块内的时间，更新到系统内部，需要编辑<code class="highlighter-rouge">/etc/rc.local</code>这个文件
